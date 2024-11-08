@@ -20,11 +20,11 @@
 
 <h2 id="colab">🤝 Colaboradores</h2>
 
-<table>
+<table align="center">
   <tr>
     <td align="center">
       <a href="https://github.com/CristianoMends">
-        <img src="https://avatars.githubusercontent.com/u/116528159?v=4" width="100px" style="border-radius: 50%; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.15); transition: transform 0.3s;" alt="Foto de perfil de Cristiano Mendes"/>
+        <img src="https://avatars.githubusercontent.com/u/116528159?v=4" width="100px" alt="Foto de perfil de Cristiano Mendes"/>
         <br>
         <sub>
           <b>CristianoMends</b>
@@ -33,7 +33,7 @@
     </td>
     <td align="center">
       <a href="https://github.com/Rafaelleit3">
-        <img src="https://avatars.githubusercontent.com/u/137407431?v=4" width="100px" style="border-radius: 50%; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.15); transition: transform 0.3s;" alt="Foto de perfil de Cristiano Mendes"/>
+        <img src="https://avatars.githubusercontent.com/u/137407431?v=4" width="100px" alt="Foto de perfil de Rafael"/>
         <br>
         <sub>
           <b>Rafaelleit3</b>
@@ -42,7 +42,7 @@
     </td>
     <td align="center">
       <a href="https://github.com/jnatansb">
-        <img src="https://avatars.githubusercontent.com/u/111660222?v=4" width="100px" style="border-radius: 50%; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.15); transition: transform 0.3s;" alt="Foto de perfil de Cristiano Mendes"/>
+        <img src="https://avatars.githubusercontent.com/u/111660222?v=4" width="100px" alt="Foto de perfil de Natan"/>
         <br>
         <sub>
           <b>jnatansb</b>
@@ -51,7 +51,7 @@
     </td>
     <td align="center">
       <a href="https://github.com/josiasdev">
-        <img src="https://avatars.githubusercontent.com/u/71450649?v=4" width="100px" style="border-radius: 50%; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.15); transition: transform 0.3s;" alt="Foto de perfil de Cristiano Mendes"/>
+        <img src="https://avatars.githubusercontent.com/u/71450649?v=4" width="100px" alt="Foto de perfil de Josias"/>
         <br>
         <sub>
           <b>josiasdev</b>
@@ -60,9 +60,3 @@
     </td>
   </tr>
 </table>
-
-<style>
-  img:hover {
-    transform: scale(1.05);
-  }
-</style>
