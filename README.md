@@ -1,7 +1,7 @@
 <h1 align="center" style="font-weight: bold;">Sys agua💻</h1>
 
 <p align="center">
- <a href="#tech">Tecnologias</a> • 
+ <a href="#technologies">Tecnologias</a> • 
  <a href="#colab">Colaboradores</a> •
 </p>
 
