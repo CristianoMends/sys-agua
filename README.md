@@ -2,7 +2,7 @@
 
 <p align="center">
  <a href="#technologies">Tecnologias</a> • 
- <a href="#colab">Colaboradores</a> •
+ <a href="#colab">Colaboradores</a>
 </p>
 
 <p align="center">
@@ -14,9 +14,12 @@
 <h2 id="technologies">💻 Tecnologias</h2>
 
 - Java 17
+- Spring Boot
+- Hibernate
+- BootstrapFX
+- JavaFx
 - PostgreSQL
 - Gradle
-- JavaFx
 
 <h2 id="colab">🤝 Colaboradores</h2>
 
