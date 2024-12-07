@@ -1,0 +1,31 @@
+spring:
+  datasource:
+    url: ${DB_URL}  # URL de conexão com o banco de dados
+    username: ${DB_USERNAME}  # Nome de usuário do banco de dados
+    password: ${DB_PASSWORD}  # Senha do banco de dados
+    driver-class-name: org.postgresql.Driver  # Driver para PostgreSQL
+
+  servlet:
+    multipart:
+      max-file-size: 10MB  # Limite de tamanho para upload de arquivos
+      max-request-size: 10MB  # Limite de tamanho para requisições
+
+  jpa:
+    show-sql: false  # Desativa a exibição de SQL no console em produção
+    generate-ddl: false  # Desativa a geração automática do DDL
+    hibernate:
+      ddl-auto: update  # Comportamento do Hibernate para atualizar o banco de dados
+    flyway:
+      locations: classpath:db/migration  # Caminho para scripts de migração com Flyway
+      baseline-on-migrate: true  # Permite migrações em bancos de dados existentes
+
+springdoc:
+  api-docs:
+    path: /api-docs  # Caminho para os documentos da API
+  swagger-ui:
+    path: /swagger-ui  # Caminho para a interface Swagger
+
+security:
+  config:
+    jwt-secret-key: ${JWT_SECRET_KEY}  # Chave secreta para geração de tokens JWT
+    jwt-expiration-time: 1d  # Tempo de expiração dos tokens JWT (em dias)
