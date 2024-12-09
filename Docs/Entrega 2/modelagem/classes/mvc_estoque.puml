@@ -1,0 +1,76 @@
+@startuml Estoque
+
+skin rose
+
+title Diagrama de Classes MVC - Estoque
+
+package "Visão (View)" {
+    class TelaConsultaEstoque <<view>> {
+        + exibirEstoque(estoque: Estoque): void
+    }
+
+    class TelaRegistroEntradaEstoque <<view>> {
+        + exibirFormularioEntrada(): void
+        + obterDadosEntrada(): {produtoId: Long, quantidade: int}
+    }
+
+    class TelaRegistroSaidaEstoque <<view>> {
+        + exibirFormularioSaida(): void
+        + obterDadosSaida(): {produtoId: Long, quantidade: int}
+    }
+}
+
+package "Controle (Controller)" {
+    class EstoqueController <<controller>> {
+        + registrarEntrada(quantidade: int, produtoId: Long): boolean
+        + registrarSaida(quantidade: int, produtoId: Long): boolean
+        + consultarEstoque(produtoId: Long): Estoque
+    }
+}
+
+package "Modelo (Model)" {
+    class Estoque {
+        - idProduto: Long
+        - quantidadeInicial: int
+        - entradas: int
+        - saidas: int
+        --
+        + calcularDisponivel(): int
+    }
+
+    class Produto {
+        - id: Long
+        - nome: String
+        - precoUnitario: double
+        - custo: double
+        - marca: String
+        - linha: String
+        - unidade: String
+    }
+}
+
+package "Repositório (Repository)" {
+    class ProdutoRepository {
+        + buscarPorId(id: Long): Produto
+        + listarTodos(): List<Produto>
+    }
+
+    class EstoqueRepository {
+        + registrarEntrada(quantidade: int, produtoId: Long): void
+        + registrarSaida(quantidade: int, produtoId: Long): void
+        + buscarEstoquePorProduto(produtoId: Long): Estoque
+    }
+}
+
+'Relacionamentos entre as classes
+TelaConsultaEstoque --> EstoqueController: "solicita consulta de estoque"
+TelaRegistroEntradaEstoque --> EstoqueController: "solicita registro de entrada"
+TelaRegistroSaidaEstoque --> EstoqueController: "solicita registro de saída"
+
+EstoqueController --> ProdutoRepository: "busca informações do produto"
+EstoqueController --> EstoqueRepository: "manipula dados do estoque"
+
+ProdutoRepository --> Produto: "retorna informações"
+EstoqueRepository --> Estoque: "retorna ou altera dados"
+
+@enduml

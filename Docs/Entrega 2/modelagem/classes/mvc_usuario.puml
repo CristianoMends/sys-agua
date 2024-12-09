@@ -1,0 +1,68 @@
+@startuml Usuario
+skin rose
+title Diagrama de Classes MVC - Usuário
+
+package "Visão (View)" {
+    class TelaLogin <<view>> {
+        + login(): void
+    }
+
+    class TelaAtualizacaoUsuario <<view>> {
+        + exibirFormularioAtualizacao(): void
+        + obterDadosAtualizacao(): Usuario
+    }
+}
+
+package "Controle (Controller)" {
+    class UsuarioController <<controller>> {
+        + login(email: String, senha: String): Token
+        + atualizar(telefone: String, role: String, email: String, senha: String): boolean
+        + deletar(id: Long): boolean
+        + cadastrar(nome: String, telefone: String, role: String, email: String, senha: String): boolean
+        + getUsuario(id: Long)
+    }
+}
+
+package "Modelo (Model)" {
+    class Token <<model>> {
+        - token: String
+        --
+        + getToken(): String
+        + setToken(token: String): void
+    }
+
+    class Usuario <<model>> {
+        - id: Long
+        - nome: String
+        - telefone: String
+        - acesso: Acesso
+        - email: String
+        - senha: String
+    }
+    enum Acesso{
+        DONO
+        FUNCIONARIO
+        GESTOR
+    }
+
+    class UsuarioRepository <<model>> {
+        + salvar(usuario: Usuario): boolean
+        + deletarPorId(id: Long): boolean
+        + buscarPorEmail(email: String): Usuario
+    }
+}
+
+'Tela para Controller
+TelaLogin --> UsuarioController : chama
+TelaAtualizacaoUsuario --> UsuarioController : solicita atualização
+
+'Controller para Model
+UsuarioController ----> Usuario : manipula
+UsuarioController --> Token : retorna
+UsuarioController --> UsuarioRepository : acessa
+
+'Repository para Model
+UsuarioRepository --> Usuario : persiste
+Usuario "1"--"1" Acesso: possui
+
+@enduml
