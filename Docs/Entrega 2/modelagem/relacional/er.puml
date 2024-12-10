@@ -1,0 +1,96 @@
+@startuml Diagrama_ER
+skin rose
+
+title Diagrama ER - Modelo de Domínio
+
+entity Cliente {
+    + id: SERIAL [PK]
+    + nome: VARCHAR
+    + telefone: VARCHAR
+    + endereco_id: INTEGER [FK]
+}
+
+entity Endereco {
+    + id: SERIAL [PK]
+    + numero: VARCHAR
+    + rua: VARCHAR
+    + bairro: VARCHAR
+    + cidade: VARCHAR
+    + estado: VARCHAR
+}
+
+entity Pedido {
+    + id: SERIAL [PK]
+    + cliente_id: INTEGER [FK]
+    + entregador_id: INTEGER [FK]
+    + status_id: INTEGER [FK]
+    + valor_recebido: DOUBLE
+    + valor_total: DOUBLE
+    + forma_pagamento_id: INTEGER [FK]
+    + data: TIMESTAMP
+}
+
+entity Entregador {
+    + id: SERIAL [PK]
+    + nome: VARCHAR
+    + telefone: VARCHAR
+}
+
+entity Produto {
+    + id: SERIAL [PK]
+    + nome: VARCHAR
+    + unidade: VARCHAR
+    + preco_unitario: DOUBLE
+    + custo: DOUBLE
+    + marca: VARCHAR
+    + linha: VARCHAR
+}
+
+entity ProdutoPedido {
+    + id: SERIAL [PK]
+    + pedido_id: INTEGER [FK]
+    + produto_id: INTEGER [FK]
+    + quantidade: INTEGER
+    + preco_unitario: DOUBLE
+}
+
+entity Estoque {
+    + id: SERIAL [PK]
+    + produto_id: INTEGER [FK]
+    + quantidade_inicial: INTEGER
+    + entradas: INTEGER
+    + saidas: INTEGER
+}
+
+entity Caixa {
+    + id: SERIAL [PK]
+    + saldo: DOUBLE
+}
+
+entity Transacao {
+    + id: SERIAL [PK]
+    + caixa_id: INTEGER [FK]
+    + valor: DOUBLE
+    + status_id: INTEGER [FK]
+    + tipo_id: INTEGER [FK]
+    + descricao: VARCHAR
+    + data: TIMESTAMP
+}
+
+entity Usuario {
+    + id: SERIAL [PK]
+    + nome: VARCHAR
+    + telefone: VARCHAR
+    + acesso_id: INTEGER [FK]
+    + email: VARCHAR
+    + senha: VARCHAR
+}
+
+Cliente }o--|| Endereco
+Cliente }o--|| Pedido
+Pedido }o--|| Entregador
+Pedido }o--|| ProdutoPedido
+ProdutoPedido }o--|| Produto
+Estoque }o--|| Produto
+Caixa }o--|| Transacao
+@enduml
