@@ -1,0 +1,27 @@
+@startuml
+skin rose
+title Diagrama de Sequência - Pedido (MVC)
+
+actor Cliente
+
+participant TelaCriacaoPedido <<view>>
+participant PedidoController <<controller>>
+participant Pedido <<model>>
+participant Entregador <<model>>
+participant ProdutoPedido <<model>>
+
+Cliente -> TelaCriacaoPedido: "Solicita criação de pedido"
+TelaCriacaoPedido -> TelaCriacaoPedido: "Exibir formulário de criação"
+Cliente -> TelaCriacaoPedido: "Preenche formulário e confirma"
+TelaCriacaoPedido -> PedidoController: "Obter dados do pedido e enviar para criação"
+
+PedidoController -> Pedido: "Criar novo pedido"
+Pedido -> Entregador: "Associar entregador"
+Pedido -> ProdutoPedido: "Adicionar produtos ao pedido"
+Pedido -> Pedido: "Calcular valor total"
+
+PedidoController <-- Pedido: "Confirmação de criação"
+PedidoController -> TelaCriacaoPedido: "Retorna status da criação"
+TelaCriacaoPedido -> Cliente: "Exibir confirmação"
+
+@enduml

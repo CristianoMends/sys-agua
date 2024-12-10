@@ -1,0 +1,24 @@
+@startuml
+skin rose
+
+title Diagrama de Sequência - Registro de Transação no Caixa
+
+actor Usuário as usr
+participant TelaCaixa as view
+participant CaixaController as ctrl
+participant TransacaoRepository as repo
+participant Caixa as model
+participant Transacao as transacao
+
+usr -> view : Registrar transação (valor, descrição, tipo)
+view -> ctrl : registrarEntrada(valor, descrição) ou registrarSaida(valor, descrição)
+ctrl -> model : adicionarTransacao(Transacao)
+model -> transacao : Criar nova transação
+transacao -> model : Retornar transação criada
+model -> model : Atualizar saldo (calcularSaldo)
+ctrl -> repo : salvar(transacao)
+repo --> ctrl : Confirmação de salvamento
+ctrl -> view : atualizarSaldo(saldo atualizado)
+view -> usr : Exibir mensagem de confirmação
+
+@enduml
