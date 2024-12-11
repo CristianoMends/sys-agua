@@ -18,10 +18,15 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig{
-    private final String[] allowedForLogged = {
-    };
+
+    @Autowired
+    SecurityFilter securityFilter;
     private final String[] freeRoutes = {
             "/users/login",
+            "/users/create"
+    };
+    private final String[] allowedForOwner = {
+
     };
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -30,10 +35,10 @@ public class SecurityConfig{
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.POST, freeRoutes).permitAll()
-                        .requestMatchers(HttpMethod.POST, allowedForLogged).hasRole("OWNER")//autorizando com role para post
-                        .requestMatchers("/messages/**").hasAnyRole("OWNER", "USER")
+                        .requestMatchers(allowedForOwner).hasRole("OWNER") //rotas liberadas para logados com acesso OWNER
                         .anyRequest().permitAll()//.authenticated() //autorizando as demais rotas
                 )
+                .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class) //adiciona filtro antes
                 .build();
     }
 
