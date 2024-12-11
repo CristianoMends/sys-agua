@@ -28,4 +28,4 @@ springdoc:
 security:
   config:
     jwt-secret-key: ${JWT_SECRET_KEY}  # Chave secreta para geração de tokens JWT
-    jwt-expiration-time: 1  # Tempo de expiração dos tokens JWT (em dias)
+    jwt-expiration-time: 12  # Tempo de expiração dos tokens JWT (em horas)
