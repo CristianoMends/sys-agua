@@ -1,7 +1,6 @@
 package com.api.sysagua.exception;
 
 import jakarta.annotation.Resource;
-import org.postgresql.util.PSQLException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
