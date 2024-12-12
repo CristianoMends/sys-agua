@@ -19,12 +19,6 @@ spring:
       locations: classpath:db/migration  # Caminho para scripts de migração com Flyway
       baseline-on-migrate: true  # Permite migrações em bancos de dados existentes
 
-springdoc:
-  api-docs:
-    path: /api-docs  # Caminho para os documentos da API
-  swagger-ui:
-    path: /swagger-ui  # Caminho para a interface Swagger
-
 security:
   config:
     jwt-secret-key: ${JWT_SECRET_KEY}  # Chave secreta para geração de tokens JWT
