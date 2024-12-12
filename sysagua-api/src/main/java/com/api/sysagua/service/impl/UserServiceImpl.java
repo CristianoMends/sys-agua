@@ -21,12 +21,16 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User createUser(CreateUserDto userDto) {
-        if(this.findByEmail(userDto.getEmail()) != null){
-            throw new BusinessException("There is already a user with the email "+ userDto.getEmail());
-        }
-        if (this.userRepository.findByPhone(userDto.getPhone()) != null){
-            throw new BusinessException("There is already a phone number "+userDto.getPhone());
-        }
+        userRepository.findByEmail(userDto.getEmail())
+                .ifPresent(user -> {
+                    throw new BusinessException("There is already a user with the e-mail " + userDto.getEmail());
+                });
+
+        // Verifica se já existe um usuário com o número de telefone fornecido
+        userRepository.findByPhone(userDto.getPhone())
+                .ifPresent(user -> {
+                    throw new BusinessException("There is already a user with the phone " + userDto.getPhone());
+                });
 
         userDto.setPassword(new BCryptPasswordEncoder().encode(userDto.getPassword()));
         return userRepository.save(userDto.toModel());
@@ -34,7 +38,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDetails findByEmail(String email) {
-        return this.userRepository.findByEmail(email);
+        return this.userRepository.findByEmail(email).orElseThrow();
     }
 
 
