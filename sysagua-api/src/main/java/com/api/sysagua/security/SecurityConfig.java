@@ -23,7 +23,10 @@ public class SecurityConfig{
     SecurityFilter securityFilter;
     private final String[] freeRoutes = {
             "/users/login",
-            "/users/create"
+            "/users",
+            "/swagger-ui/**",
+            "/v3/api-docs/**",
+            "/api-docs/**",
     };
     private final String[] allowedForOwner = {
 
@@ -34,11 +37,11 @@ public class SecurityConfig{
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers(HttpMethod.POST, freeRoutes).permitAll()
+                        .requestMatchers(freeRoutes).permitAll()//rotas liberadas
                         .requestMatchers(allowedForOwner).hasRole("OWNER") //rotas liberadas para logados com acesso OWNER
-                        .anyRequest().permitAll()//.authenticated() //autorizando as demais rotas
+                        .anyRequest().authenticated()//libera demais rotas pra usuario autenticados
                 )
-                .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class) //adiciona filtro antes
+                .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class) //adiciona filtro antes, para checar o token
                 .build();
     }
 
