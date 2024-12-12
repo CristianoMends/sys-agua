@@ -9,6 +9,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -28,65 +30,38 @@ public class GlobalExceptionHandler {
     @Resource
     private MessageSource messageSource;
 
-    private HttpHeaders headers() {
+    private HttpHeaders createHeaders() {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         return headers;
     }
 
-    private ResponseError responseError(String message, HttpStatus statusCode) {
-        ResponseError responseError = new ResponseError();
-        responseError.setStatus("error");
-        responseError.setError(message);
-        responseError.setStatusCode(statusCode.value());
-        return responseError;
+    private ResponseEntity<ResponseError> buildResponse(String message, HttpStatus status) {
+        ResponseError error = new ResponseError();
+        error.setStatus("error");
+        error.setError(message);
+        error.setStatusCode(status.value());
+        return ResponseEntity.status(status).headers(createHeaders()).body(error);
     }
 
-    // Método para tratar erros de validação
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Object> handleValidationExceptions(MethodArgumentNotValidException ex) {
-        BindingResult result = ex.getBindingResult();
-
-        // Criando um mapa para armazenar os erros por campo
-        Map<String, String> errors = new HashMap<>();
-
-        // Iterando sobre os erros de validação e adicionando ao mapa
-        for (ObjectError error : result.getAllErrors()) {
-            // A chave será uma mensagem genérica (como nome do DTO ou outro campo)
-            String errorMessage = error.getDefaultMessage(); // mensagem de erro
-            errors.put("createUserDto", errorMessage); // Adicionando erro com chave genérica
-        }
-
-        // Criando a resposta com timestamp e status code
-        Map<String, Object> response = new HashMap<>();
-        response.put("timestamp", new Date().toString());
-        response.put("status", "error");
-        response.put("statusCode", HttpStatus.BAD_REQUEST.value());
-        response.put("errors", errors);
-
-        // Retornando o erro como um JSON estruturado
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    public ResponseEntity<ResponseError> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        return buildResponse(ex.getAllErrors().get(0).getDefaultMessage(),HttpStatus.BAD_REQUEST);
     }
 
-
-    // Handler para exceções gerais (qualquer outro tipo de erro)
-    @ExceptionHandler(Exception.class)
-    protected ResponseEntity<Object> handleGeneral(Exception e, WebRequest request) {
-        // Log para monitoramento
-        logger.error("Unhandled exception: ", e);
-
-        String message = "An unexpected error has occurred. Please try again later.";
-        ResponseError error = responseError(message, HttpStatus.INTERNAL_SERVER_ERROR);
-        return new ResponseEntity<>(error, headers(), HttpStatus.INTERNAL_SERVER_ERROR);
+    @ExceptionHandler({BadCredentialsException.class, InternalAuthenticationServiceException.class})
+    protected ResponseEntity<ResponseError> handleAuthenticationExceptions(RuntimeException e, WebRequest request) {
+        return buildResponse("Nonexistent username or invalid password", HttpStatus.UNAUTHORIZED);
     }
 
-    // Handler para exceções de negócios específicas
     @ExceptionHandler(BusinessException.class)
-    protected ResponseEntity<Object> handleBusinessException(BusinessException e, WebRequest request) {
-        // Log para monitoramento
-        logger.warn("Business exception: ", e);
+    protected ResponseEntity<ResponseError> handleBusinessException(BusinessException e, WebRequest request) {
+        return buildResponse(e.getMessage(), HttpStatus.CONFLICT);
+    }
 
-        ResponseError error = responseError(e.getMessage(), HttpStatus.CONFLICT);
-        return new ResponseEntity<>(error, headers(), HttpStatus.CONFLICT);
+    @ExceptionHandler(Exception.class)
+    protected ResponseEntity<ResponseError> handleGeneralException(Exception e, WebRequest request) {
+        logger.error("Unhandled exception: ", e);
+        return buildResponse("An unexpected error has occurred. Please try again later.", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
