@@ -24,14 +24,14 @@ public class TokenService {
     private int expireTime;
 
     @Autowired
-    private UserRepository userRepository;
+    private UserService userService;
 
     public String generateToken(User user){
         try{
             Algorithm algorithm = Algorithm.HMAC256(secretKey);
             return JWT.create()
                     .withIssuer("sysagua-api") //nome do criador
-                    .withSubject(user.getEmail()) //usuario q esta recebendo
+                    .withSubject(user.getUsername()) //usuario q esta recebendo
                     .withExpiresAt(genExpirationDate())
                     .sign(algorithm);
         }catch (JWTCreationException exception){
@@ -62,10 +62,6 @@ public class TokenService {
             throw new BusinessException("Invalid or expired token");
         }
 
-        var user = userRepository.findByEmail(email);
-        if (user == null) {
-            throw new BusinessException("User not found");
-        }
-        return (User) user;
+        return (User) userService.findByEmail(email);
     }
 }
