@@ -8,4 +8,6 @@ module edu.pies.sysaguaapp {
 
     opens edu.pies.sysaguaapp to javafx.fxml;
     exports edu.pies.sysaguaapp;
+    exports edu.pies.sysaguaapp.controllers;
+    opens edu.pies.sysaguaapp.controllers to javafx.fxml;
 }
