@@ -2,28 +2,28 @@
 skin rose
 title Diagrama de Classes MVC - Usuário
 
-package "Visão (View)" {
+package "view" {
     class TelaLogin <<view>> {
         + login(): void
     }
-
-    class TelaAtualizacaoUsuario <<view>> {
-        + exibirFormularioAtualizacao(): void
-        + obterDadosAtualizacao(): Usuario
-    }
 }
 
-package "Controle (Controller)" {
+package "controller" {
     class UsuarioController <<controller>> {
         + login(email: String, senha: String): Token
-        + atualizar(telefone: String, role: String, email: String, senha: String): boolean
-        + deletar(id: Long): boolean
-        + cadastrar(nome: String, telefone: String, role: String, email: String, senha: String): boolean
-        + getUsuario(id: Long)
+        + cadastrar(usuarioDto: CreateUsuarioDto): boolean
     }
 }
 
-package "Modelo (Model)" {
+package "model" {
+    class CreateUsuarioDto <<model>> {
+        - nome: String
+        - sobrenome: String
+        - telefone: String
+        - email: String
+        - senha: String
+        - acesso: Acesso
+    }
     class Token <<model>> {
         - token: String
         --
@@ -32,37 +32,47 @@ package "Modelo (Model)" {
     }
 
     class Usuario <<model>> {
-        - id: Long
+        - id: UUID
         - nome: String
+        - sobrenome: String
         - telefone: String
-        - acesso: Acesso
         - email: String
         - senha: String
+        - acesso: Acesso
     }
-    enum Acesso{
+    enum Acesso {
         DONO
         FUNCIONARIO
         GESTOR
     }
+}
 
+package service {
+    class UsuarioService {
+        + salvar(usuario: Usuario): boolean
+    }
+    class TokenService {
+        + gerarToken(usuario: Usuario): String
+    }
+}
+
+package repository {
     class UsuarioRepository <<model>> {
         + salvar(usuario: Usuario): boolean
-        + deletarPorId(id: Long): boolean
+        + buscarPorTelefone(telefone: String): Usuario
         + buscarPorEmail(email: String): Usuario
     }
 }
 
-'Tela para Controller
-TelaLogin --> UsuarioController : chama
-TelaAtualizacaoUsuario --> UsuarioController : solicita atualização
-
-'Controller para Model
-UsuarioController ----> Usuario : manipula
-UsuarioController --> Token : retorna
-UsuarioController --> UsuarioRepository : acessa
-
-'Repository para Model
-UsuarioRepository --> Usuario : persiste
-Usuario "1"--"1" Acesso: possui
+' Relações entre as classes
+TelaLogin --> UsuarioController : solicita >
+UsuarioController --> UsuarioService : usa >
+UsuarioController --> CreateUsuarioDto : usa >
+UsuarioController --> TokenService : usa >
+UsuarioService --> UsuarioRepository : usa >
+UsuarioService --> Usuario : cria/atualiza >
+TokenService --> Token : cria >
+UsuarioRepository -> Usuario : persiste >
+Usuario -- Acesso: tem
 
 @enduml
