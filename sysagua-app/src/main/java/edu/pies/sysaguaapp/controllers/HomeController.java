@@ -34,7 +34,7 @@ public class HomeController {
     }
 
     @FXML
-    private void handleConfiguracoes() {
+    private void handleUsuario() {
         // Lógica para abrir configurações
         showMessage("Abrir Configurações");
     }
