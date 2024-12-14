@@ -1,29 +1,111 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import org.kordamp.bootstrapfx.scene.layout.*?>
 
-<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="edu.pies.sysaguaapp.controllers.HomeController">
-    <!-- Menu Lateral -->
-    <left>
-        <VBox spacing="10" prefWidth="200" style="-fx-background-color: #2A2A2A; -fx-padding: 10;">
-            <Label text="Menu" style="-fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold;" />
-            <Button text="Dashboard" prefWidth="180" onAction="#handleDashboard" styleClass="menu-button" />
-            <Button text="Cadastros Gerais" prefWidth="180" onAction="#handleCadastrosGerais" styleClass="menu-button" />
-            <Button text="Entregas" prefWidth="180" onAction="#handleEntregas" styleClass="menu-button" />
-            <Button text="Compras" prefWidth="180" onAction="#handleCompras" styleClass="menu-button" />
-            <Button text="Estoque" prefWidth="180" onAction="#handleEstoque" styleClass="menu-button" />
-            <Button text="Caixa" prefWidth="180" onAction="#handleCaixa" styleClass="menu-button" />
-            <Button text="Relatório" prefWidth="180" onAction="#handleRelatorio" styleClass="menu-button" />
-            <Button text="Usuário" prefWidth="180" onAction="#handleUsuario" styleClass="menu-button" />
-            <Pane fx:id="spacer" VBox.vgrow="always" />
-            <Button text="Sair" prefWidth="180" onAction="#handleSair" styleClass="menu-button" />
-        </VBox>
-    </left>
 
-    <!-- Área Principal -->
-    <center>
-        <StackPane fx:id="contentArea" style="-fx-padding: 20;">
-            <Label text="Bem-vindo ao SysAgua!" style="-fx-font-size: 24px;" />
-        </StackPane>
-    </center>
-</BorderPane>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
+<StackPane xmlns:fx="http://javafx.com/fxml"
+           fx:id="rootPane"
+           fx:controller="edu.pies.sysaguaapp.controllers.HomeController"
+           stylesheets="@/styles.css">
+    <VBox style="-fx-background-color: white">
+        <HBox fx:id="topMenu"
+                      spacing="10"
+                      style="-fx-background-color: white; -fx-padding: 10px 20px; -fx-pref-height: 80px;">
+                    <ImageView fx:id="logo" fitHeight="40" fitWidth="150" preserveRatio="true">
+                        <Image url="@../icons/home/logo.png"/>
+                    </ImageView>
+                    <TextField fx:id="textField" promptText="Pesquisar..." HBox.hgrow="ALWAYS" styleClass="form-control"/>
+                    <Button fx:id="searchButton" text="Pesquisar" onAction="#handlePesquisar"/>
+                    <Button fx:id="userSettingsButton" text="Configurações" onAction="#handleConfiguracoes"/>
+                    <Button fx:id="notificationButton" text="Notificações" onAction="#handleNotificacoes"/>
+                </HBox>
+        <HBox VBox.vgrow="ALWAYS">
+            <VBox fx:id="sideMenu"
+                  spacing="10"
+                  prefWidth="200"
+                  style="-fx-background-color: #F1F2F7; -fx-padding: 10;-fx-pref-height: 100%; -fx-fill: true;">
+                <Label text="Menu" style="-fx-text-fill: black; -fx-font-size: 18px; -fx-font-weight: bold;" />
+                <Button text="Dashboard" prefWidth="180" onAction="#handleDashboard" styleClass="menu-button">
+                    <graphic>
+                        <ImageView fitHeight="16" fitWidth="16" pickOnBounds="true" preserveRatio="true">
+                            <Image url="@../icons/homebar/dashboard.png"/>
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <Button text="Cadastros Gerais" prefWidth="180" onAction="#handleCadastrosGerais" styleClass="menu-button">
+                    <graphic>
+                        <ImageView fitHeight="16" fitWidth="16" pickOnBounds="true" preserveRatio="true">
+                            <Image url="@../icons/homebar/cadastros.png"/>
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <Button text="Entregas" prefWidth="180" onAction="#handleEntregas" styleClass="menu-button">
+                    <graphic>
+                        <ImageView fitHeight="16" fitWidth="16" pickOnBounds="true" preserveRatio="true">
+                            <Image url="@../icons/homebar/entregas.png"/>
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <Button text="Compras" prefWidth="180" onAction="#handleCompras" styleClass="menu-button">
+                    <graphic>
+                        <ImageView fitHeight="16" fitWidth="16" pickOnBounds="true" preserveRatio="true">
+                            <Image url="@../icons/homebar/compras.png"/>
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <Button text="Estoque" prefWidth="180" onAction="#handleEstoque" styleClass="menu-button" >
+                    <graphic>
+                        <ImageView fitHeight="16" fitWidth="16" pickOnBounds="true" preserveRatio="true">
+                            <Image url="@../icons/homebar/estoque.png"/>
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <Button text="Financeiro" prefWidth="180" onAction="#handleFinanceiro" styleClass="menu-button">
+                    <graphic>
+                        <ImageView fitHeight="16" fitWidth="16" pickOnBounds="true" preserveRatio="true">
+                            <Image url="@../icons/homebar/financeiro.png"/>
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <Button text="Relatório" prefWidth="180" onAction="#handleRelatorio" styleClass="menu-button">
+                    <graphic>
+                        <ImageView fitHeight="16" fitWidth="16" pickOnBounds="true" preserveRatio="true">
+                            <Image url="@../icons/homebar/relatorios.png"/>
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <Button text="Ajuda" prefWidth="180" onAction="#handleAjuda" styleClass="menu-button">
+                    <graphic>
+                        <ImageView fitHeight="16" fitWidth="16" pickOnBounds="true" preserveRatio="true">
+                            <Image url="@../icons/homebar/ajuda.png"/>
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <Pane fx:id="spacer" VBox.vgrow="ALWAYS" />
+                <Button text="Sair" prefWidth="180" onAction="#handleSair" styleClass="menu-button">
+                    <graphic>
+                        <ImageView fitHeight="16" fitWidth="16" pickOnBounds="true" preserveRatio="true">
+                            <Image url="@../icons/homebar/sair.png"/>
+                        </ImageView>
+                    </graphic>
+                </Button>
+            </VBox>
+            <VBox fx:id="submenu"
+                  spacing="10"
+                  style="-fx-padding: 80 10 0 10; "
+                  prefWidth="200"
+                  visible="false"
+                  managed="false">
+                <Button text="Clientes" prefWidth="180" onAction="#handleClientes" styleClass="submenu-button" />
+                <Button text="Produtos" prefWidth="180" onAction="#handleProdutos" styleClass="submenu-button" />
+                <Button text="Entregador" prefWidth="180" onAction="#handleEntregador" styleClass="submenu-button" />
+                <Button text="Fornecedor" prefWidth="180" onAction="#handleFornecedor" styleClass="submenu-button" />
+            </VBox>
+        </HBox>
+    </VBox>
+</StackPane>
+
+
