@@ -1,11 +1,51 @@
 .menu-button {
-    -fx-background-color: #404040;
-    -fx-text-fill: white;
+    /*-fx-background-color: #404040;*/
+    -fx-background-color: transparent; /* Remove a cor de fundo */
+    -fx-border-color: transparent; /* Remove a borda */
+    -fx-focus-color: transparent; /* Remove o efeito de foco (se houver) */
+    -fx-text-fill: black;
     -fx-font-size: 14px;
-    -fx-font-weight: bold;
+    -fx-font-weight: normal;
     -fx-background-radius: 5;
+    -fx-alignment: center-left; /* Alinha o texto à esquerda */
 }
 
 .menu-button:hover {
-    -fx-background-color: #606060;
+    -fx-background-color: #707FDD;
+    -fx-font-weight: bold;
+}
+
+.submenu-button {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-text-fill: black;
+    /*-fx-focus-color: transparent;*/
+    -fx-padding: 5;
+    -fx-alignment: center-left;
+}
+
+.submenu-button:hover {
+    -fx-background-color: #707FDD;
+    -fx-font-weight: bold;
+}
+
+#topMenu {
+    -fx-background-color: #ffffff;
+    -fx-padding: 10px 20px;
+    /*-fx-border-bottom: 1px solid #ccc;*/
+}
+
+#sideMenu {
+    -fx-background-color: #F1F2F7;
+    -fx-padding: 10px;
+    -fx-pref-width: 200px;
+}
+
+#contentArea {
+    -fx-padding: 10px;
+    -fx-background-color: #f4f4f4;
+}
+
+#contentArea{
+    -fx-background-color: white;
 }
