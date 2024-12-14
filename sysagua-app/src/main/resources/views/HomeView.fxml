@@ -12,22 +12,51 @@
            stylesheets="@/styles.css">
     <VBox style="-fx-background-color: white">
         <HBox fx:id="topMenu"
-                      spacing="10"
-                      style="-fx-background-color: white; -fx-padding: 10px 20px; -fx-pref-height: 80px;">
-                    <ImageView fx:id="logo" fitHeight="40" fitWidth="150" preserveRatio="true">
-                        <Image url="@../icons/home/logo.png"/>
+                      spacing="15"
+                      style="-fx-background-color: white; -fx-padding: 0 20 0 0; -fx-pref-height: 80px; -fx-alignment: center;">
+
+            <StackPane style="-fx-background-color: #F1F2F7; -fx-padding: 0 82px; -fx-alignment: center;">
+                <ImageView fx:id="logo" fitHeight="40" fitWidth="150" preserveRatio="true">
+                    <Image url="@../icons/home/logo.png"/>
+                </ImageView>
+            </StackPane>
+            <HBox spacing="2" style="-fx-padding: 5; -fx-alignment: center;" HBox.hgrow="ALWAYS">
+                <TextField fx:id="textField"
+                           promptText="Pesquisar..."
+                           HBox.hgrow="ALWAYS"
+                           styleClass="textField"
+                           style="-fx-prompt-text-fill: grey; -fx-font-size: 14px;" />
+                <Button fx:id="searchButton"
+                        onAction="#handlePesquisar"
+                        styleClass="menu-button">
+                    <graphic>
+                        <ImageView fitHeight="16" fitWidth="16" pickOnBounds="true" preserveRatio="true">
+                            <Image url="@../icons/home/searchicon.png" />
+                        </ImageView>
+                    </graphic>
+                </Button>
+            </HBox>
+            <Button fx:id="userButton" text="Usuário" onAction="#handleUsuario" styleClass="menu-button">
+                <graphic>
+                    <ImageView fitHeight="16" fitWidth="16" pickOnBounds="true" preserveRatio="true">
+                        <Image url="@../icons/home/usericon.png"/>
                     </ImageView>
-                    <TextField fx:id="textField" promptText="Pesquisar..." HBox.hgrow="ALWAYS" styleClass="form-control"/>
-                    <Button fx:id="searchButton" text="Pesquisar" onAction="#handlePesquisar"/>
-                    <Button fx:id="userSettingsButton" text="Configurações" onAction="#handleConfiguracoes"/>
-                    <Button fx:id="notificationButton" text="Notificações" onAction="#handleNotificacoes"/>
-                </HBox>
+                </graphic>
+            </Button>
+            <Button fx:id="notificationButton" onAction="#handleNotificacoes" styleClass="menu-button">
+                <graphic>
+                    <ImageView fitHeight="16" fitWidth="16" pickOnBounds="true" preserveRatio="true">
+                        <Image url="@../icons/home/notif.png"/>
+                    </ImageView>
+                </graphic>
+            </Button>
+        </HBox>
         <HBox VBox.vgrow="ALWAYS">
             <VBox fx:id="sideMenu"
                   spacing="10"
                   prefWidth="200"
                   style="-fx-background-color: #F1F2F7; -fx-padding: 10;-fx-pref-height: 100%; -fx-fill: true;">
-                <Label text="Menu" style="-fx-text-fill: black; -fx-font-size: 18px; -fx-font-weight: bold;" />
+                <Label text="Menu" style="-fx-text-fill: black; -fx-font-size: 18px; -fx-font-weight: normal;" />
                 <Button text="Dashboard" prefWidth="180" onAction="#handleDashboard" styleClass="menu-button">
                     <graphic>
                         <ImageView fitHeight="16" fitWidth="16" pickOnBounds="true" preserveRatio="true">
