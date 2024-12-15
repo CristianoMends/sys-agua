@@ -22,7 +22,7 @@ public class ResponseError {
     @Schema(description = "Código de status HTTP do erro", example = "400")
     private int statusCode = 400;
 
-    @Schema(description = "Descrição do erro", example = "Usuário ou senha incorretos")
+    @Schema(description = "Descrição do erro", example = "ocorreu um erro")
     private String error;
 
     public ResponseError(String error, int statusCode) {
