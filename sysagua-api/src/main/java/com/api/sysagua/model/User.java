@@ -1,9 +1,9 @@
 package com.api.sysagua.model;
 
+import com.api.sysagua.dto.ViewUserDto;
+import com.api.sysagua.enumeration.UserStatus;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,13 +12,14 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
-import com.api.sysagua.enumeration.Access;
+import com.api.sysagua.enumeration.UserAccess;
 
 @Table(name="Users")
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
+@ToString
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -31,7 +32,7 @@ public class User implements UserDetails {
     @Column(length = 30)
     private String surname;
 
-    @Column(nullable = false, unique = true,length = 11)
+    @Column(unique = true,length = 11)
     private String phone;
 
     @Column(nullable = false,unique = true)
@@ -40,23 +41,50 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private String password;
 
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private UserStatus status;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Access access;
+    private UserAccess access;
 
-    public User(String name, String surname, String phone,String email, String password, Access access) {
+    public User(String name, String surname, String phone,String email, String password, UserStatus status, UserAccess access) {
         setName(name);
         setSurname(surname);
         setEmail(email);
         setPhone(phone);
         setPassword(password);
+        setStatus(status);
         setAccess(access);
+    }
+
+    public ViewUserDto toView(){
+        return new ViewUserDto(
+                getId(),
+                getName(),
+                getSurname(),
+                getPhone(),
+                getEmail(),
+                getStatus(),
+                getAccess()
+
+        );
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        String role = "ROLE_" + this.access.name();
-        return List.of(new SimpleGrantedAuthority(role));
+        if(this.access.equals(UserAccess.DEVELOPER)){
+            return List.of(
+                    new SimpleGrantedAuthority("ROLE_OWNER"),
+                    new SimpleGrantedAuthority("ROLE_EMPLOYEE"),
+                    new SimpleGrantedAuthority("ROLE_MANAGER"),
+                    new SimpleGrantedAuthority("ROLE_DEVELOPER")
+                    );
+        }
+        else if (this.access.equals(UserAccess.MANAGER)){return List.of(new SimpleGrantedAuthority("ROLE_MANAGER"));}
+        else if (this.access.equals(UserAccess.EMPLOYEE)){return List.of(new SimpleGrantedAuthority("ROLE_EMPLOYEE"));}
+        else {return List.of(new SimpleGrantedAuthority("ROLE_OWNER"));}
     }
 
     @Override
