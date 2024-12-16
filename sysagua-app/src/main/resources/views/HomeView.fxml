@@ -9,7 +9,7 @@
 <StackPane xmlns:fx="http://javafx.com/fxml"
            fx:id="rootPane"
            fx:controller="edu.pies.sysaguaapp.controllers.HomeController"
-           stylesheets="@/styles.css">
+           stylesheets="@../styles/homestyles.css">
     <VBox style="-fx-background-color: white">
         <HBox fx:id="topMenu"
                       spacing="15"
