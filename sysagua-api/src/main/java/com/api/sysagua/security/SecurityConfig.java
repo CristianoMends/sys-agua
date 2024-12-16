@@ -1,9 +1,9 @@
 package com.api.sysagua.security;
 
+import com.api.sysagua.enumeration.UserAccess;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -23,13 +23,9 @@ public class SecurityConfig{
     SecurityFilter securityFilter;
     private final String[] freeRoutes = {
             "/users/login",
-            "/users",
             "/swagger-ui/**",
             "/v3/api-docs/**",
             "/api-docs/**",
-    };
-    private final String[] allowedForOwner = {
-
     };
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -37,8 +33,9 @@ public class SecurityConfig{
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/users").hasRole(UserAccess.DEVELOPER.name())//penas devs manipulam usuarios
+
                         .requestMatchers(freeRoutes).permitAll()//rotas liberadas
-                        .requestMatchers(allowedForOwner).hasRole("OWNER") //rotas liberadas para logados com acesso OWNER
                         .anyRequest().authenticated()//libera demais rotas pra usuario autenticados
                 )
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class) //adiciona filtro antes, para checar o token

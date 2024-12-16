@@ -1,6 +1,7 @@
 package com.api.sysagua.docs;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
@@ -11,26 +12,23 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @OpenAPIDefinition(
-        info = @io.swagger.v3.oas.annotations.info.Info(
+        info = @Info(
                 title = "SysAgua API",
                 description = "API para gerenciamento de distribuidora de água",
                 version = "1.0"
         ),
-        security = @SecurityRequirement(name = "bearerAuth"),
+        security = @SecurityRequirement(name = "Bearer"),
         servers = {
-                @Server(url = "/", description = "Default Server URL"),
+                @Server(url = "/", description = "Servidor padrão")
         }
 )
 @SecurityScheme(
-        name = "bearerAuth",
+        name = "Bearer",
         type = SecuritySchemeType.HTTP,
-        scheme = "bearer",
+        scheme = "Bearer",
         bearerFormat = "JWT"
 )
 public class SwaggerConfig {
-
-
-    // Agrupamento de endpoints
 
     @Bean
     public GroupedOpenApi userApi() {
@@ -39,5 +37,4 @@ public class SwaggerConfig {
                 .pathsToMatch("/users/**")
                 .build();
     }
-
 }
