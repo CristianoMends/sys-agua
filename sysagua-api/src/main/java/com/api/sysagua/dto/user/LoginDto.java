@@ -1,4 +1,4 @@
-package com.api.sysagua.dto;
+package com.api.sysagua.dto.user;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;

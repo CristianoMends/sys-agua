@@ -1,6 +1,6 @@
 package com.api.sysagua.controller;
 
-import com.api.sysagua.dto.*;
+import com.api.sysagua.dto.user.*;
 import com.api.sysagua.enumeration.UserAccess;
 import com.api.sysagua.enumeration.UserStatus;
 import com.api.sysagua.exception.ResponseError;
@@ -187,7 +187,7 @@ public class UserController {
     )
     @ApiResponses({
             @ApiResponse(
-                    responseCode = "200",
+                    responseCode = "204",
                     description = "Usuário atualizado com sucesso",
                     content = @Content(
                             mediaType = "application/json",

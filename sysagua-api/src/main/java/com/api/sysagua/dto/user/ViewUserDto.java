@@ -1,4 +1,4 @@
-package com.api.sysagua.dto;
+package com.api.sysagua.dto.user;
 
 import com.api.sysagua.enumeration.UserAccess;
 import com.api.sysagua.enumeration.UserStatus;

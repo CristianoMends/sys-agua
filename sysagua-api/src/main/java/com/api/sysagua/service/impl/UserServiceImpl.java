@@ -1,6 +1,6 @@
 package com.api.sysagua.service.impl;
 
-import com.api.sysagua.dto.*;
+import com.api.sysagua.dto.user.*;
 import com.api.sysagua.enumeration.UserStatus;
 import com.api.sysagua.exception.BusinessException;
 import com.api.sysagua.model.User;

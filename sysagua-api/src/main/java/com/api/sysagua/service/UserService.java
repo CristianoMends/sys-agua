@@ -1,6 +1,6 @@
 package com.api.sysagua.service;
 
-import com.api.sysagua.dto.*;
+import com.api.sysagua.dto.user.*;
 import com.api.sysagua.model.User;
 import org.springframework.security.core.userdetails.UserDetails;
 
