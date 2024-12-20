@@ -1,6 +1,6 @@
 package com.api.sysagua.model;
 
-import com.api.sysagua.dto.ViewUserDto;
+import com.api.sysagua.dto.user.ViewUserDto;
 import com.api.sysagua.enumeration.UserStatus;
 import jakarta.persistence.*;
 import lombok.*;

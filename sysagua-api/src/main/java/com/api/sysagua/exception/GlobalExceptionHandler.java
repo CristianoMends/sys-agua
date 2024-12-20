@@ -8,6 +8,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.*;
 
@@ -39,6 +41,20 @@ public class GlobalExceptionHandler {
         error.setError(message);
         error.setStatusCode(status.value());
         return ResponseEntity.status(status).headers(createHeaders()).body(error);
+    }
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ResponseError> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex, WebRequest request) {
+
+        String errorMessage = "Invalid JSON: the request body is malformed or contains invalid values.";
+
+        return buildResponse(errorMessage, HttpStatus.BAD_REQUEST);
+    }
+
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ResponseError> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException ex, WebRequest request) {
+        String errorMessage = String.format("Invalid value '%s' for parameter '%s'. Expected type: %s", ex.getValue(), ex.getName(), Objects.requireNonNull(ex.getRequiredType()).getSimpleName());
+        return buildResponse(errorMessage, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(AccessDeniedException.class)
