@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Rectangle?>
+
+<StackPane fx:id="rootPane" prefHeight="600.0" prefWidth="900.0" style="-fx-background-color: white;" stylesheets="@../../styles/produtos.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.pies.sysaguaapp.controllers.ProdutosController">
+     <children>
+        <BorderPane fx:id="formCadastroProduto" maxHeight="303.0" maxWidth="365.0" style="-fx-background-color: white; -fx-border-radius: 10; -fx-background-radius: 10;" visible="false">
+           <top>
+                <HBox alignment="CENTER" maxHeight="100.0" prefHeight="50.0" spacing="100.0" BorderPane.alignment="CENTER">
+                    <children>
+                        <Button mnemonicParsing="false" onAction="#handleDetailsProdutoModal" style="-fx-border-color: #5A6ACF; -fx-border-width: 0 0 1px 0;" styleClass="switchDetails" text="PRODUTO" />
+                        <Button mnemonicParsing="false" onAction="#handleDetailsFiscalModal" style="-fx-border-color: #5A6ACF; -fx-border-width: 0 0 1px 0;" styleClass="switchDetails" text="FISCAL" />
+                    </children>
+                </HBox>
+           </top>
+           <center>
+              <StackPane minHeight="205.0" prefHeight="150.0" BorderPane.alignment="CENTER_LEFT">
+                 <children>
+                      <VBox fx:id="detailsFormProduto" managed="true" minHeight="205.0" minWidth="365.0" spacing="5.0">
+                          <children>
+                               <Label text="NOME DO PRODUTO" />
+                               <TextField fx:id="nomeField" maxWidth="300.0" promptText="Nome" styleClass="text-field" />
+                          <HBox maxHeight="50.0" prefHeight="100.0" prefWidth="299.0">
+                             <children>
+                                <VBox maxHeight="50.0" prefHeight="200.0" prefWidth="100.0">
+                                   <children>
+                                           <Label text="CUSTO" />
+                                           <TextField fx:id="custoField" maxWidth="100.0" promptText="Custo" styleClass="text-field" />
+                                   </children>
+                                </VBox>
+                              <Region maxWidth="100.0" prefHeight="200.0" prefWidth="200.0" />
+                                <VBox maxHeight="50.0" prefHeight="200.0" prefWidth="100.0">
+                                   <children>
+                                      <Label text="PREÇO UNITÁRIO" />
+                                      <TextField fx:id="precoUnitarioField" maxWidth="100.0" promptText="Preço unitário" styleClass="text-field" />
+                                   </children>
+                                </VBox>
+                             </children>
+                          </HBox>
+                          <Label text="MARCA" />
+                          <TextField fx:id="marcaField" maxWidth="300.0" promptText="Marca" styleClass="text-field" />
+                          <Label text="LINHA" />
+                          <TextField fx:id="linhaField" maxWidth="300.0" promptText="Linha" styleClass="text-field" />
+                          </children>
+                       <padding>
+                          <Insets left="20.0" />
+                       </padding>
+                      </VBox>
+                    <VBox fx:id="detailsFormFiscal" managed="false" minHeight="205.0" minWidth="365.0" spacing="5.0" visible="false">
+                       <children>
+                          <Label text="NCM" />
+                          <TextField fx:id="ncmField" maxWidth="300.0" promptText="Nome" styleClass="text-field" />
+                          <Label text="DESCRIÇÃO" />
+                          <TextField fx:id="descricaoField" maxWidth="300.0" promptText="Descrição" styleClass="text-field" />
+                          <Label text="CEST" />
+                          <TextField fx:id="cestField" maxWidth="300.0" promptText="Cest" styleClass="text-field" />
+                          <Label text="GTIN/EAN" />
+                          <TextField fx:id="gtinField" maxWidth="300.0" promptText="Gtin/EAN" styleClass="text-field" />
+                       </children>
+                       <padding>
+                          <Insets left="20.0" />
+                       </padding>
+                    </VBox>
+                 </children>
+                 <padding>
+                    <Insets bottom="5.0" />
+                 </padding>
+              </StackPane>
+           </center>
+           <bottom>
+                  <HBox alignment="CENTER_RIGHT" prefHeight="45.0" spacing="20.0" BorderPane.alignment="CENTER">
+                      <children>
+                          <Button onAction="#handleCancelar" style="-fx-background-color: #FEBAC6;" styleClass="menu-button" text="Cancelar" />
+                          <Button onAction="#handleSalvar" style="-fx-background-color: #DDE4F0;" styleClass="menu-button" text="Salvar" />
+                      </children>
+                      <padding>
+                          <Insets right="20.0" />
+                      </padding>
+                  </HBox>
+           </bottom>
+        </BorderPane>
+      <Rectangle fx:id="overlay" fill="#D9D9D9" managed="false" visible="false" />
+      <VBox fx:id="listProductView" prefHeight="200.0" prefWidth="100.0">
+         <children>
+              <HBox alignment="CENTER_LEFT" prefHeight="90.0" prefWidth="900.0" style="-fx-padding: 10; -fx-border-color: #C8CBD9; -fx-border-width: 0 0 1px 0;">
+                 <children>
+                    <Label text="Todos os produtos" />
+                    <Region HBox.hgrow="ALWAYS" />
+                    <Button mnemonicParsing="false" onAction="#handleAddProduto" styleClass="menu-button" text="Adicionar" />
+                 </children>
+              </HBox>
+              <StackPane prefHeight="472.0" prefWidth="917.0">
+                 <children>
+                    <TableView fx:id="tabelaProdutos" prefHeight="484.0">
+                      <columns>
+                        <TableColumn prefWidth="210" text="Nome" />
+                          <TableColumn prefWidth="151" text="Marca" />
+                          <TableColumn prefWidth="118" text="Linha" />
+                          <TableColumn prefWidth="118" text="Custo" />
+                          <TableColumn prefWidth="118" text="Ncm" />
+                      </columns>
+                    </TableView>
+                 </children>
+              </StackPane>
+<!--              <Pagination pageCount="10" prefHeight="78.0" prefWidth="900.0" styleClass="pagination"/>-->
+             <!-- Paginação -->
+             <HBox fx:id="paginationContainer" alignment="CENTER" spacing="10" minWidth="365.0" minHeight="50">
+                 <children>
+                     <Button fx:id="btnAnterior" text="Anterior" onAction="#handlePaginaAnterior" />
+                     <!-- Botões de paginação dinâmica serão adicionados no controlador -->
+                     <Button fx:id="btnProximo" text="Próximo" onAction="#handleProximaPagina" />
+                 </children>
+             </HBox>
+         </children>
+      </VBox>
+     </children>
+</StackPane>
