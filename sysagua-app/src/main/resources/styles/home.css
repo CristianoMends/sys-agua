@@ -44,10 +44,10 @@
 }
 
 #submenu{
-    -fx-background-color: #F1F2F750;
+    -fx-background-color: #F1F2F780;
 }
 
-#contentArea {
+#contentBody {
     -fx-padding: 10px;
     -fx-background-color: #f4f4f4;
 }
