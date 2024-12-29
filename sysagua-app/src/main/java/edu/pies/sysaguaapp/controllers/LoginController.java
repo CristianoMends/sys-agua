@@ -1,50 +1,62 @@
 package edu.pies.sysaguaapp.controllers;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.pies.sysaguaapp.services.AuthService;
+import edu.pies.sysaguaapp.services.TokenManager;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
-import javafx.scene.Scene;
-import javafx.scene.control.TextField;
-import javafx.scene.layout.StackPane;
+import javafx.scene.*;
+import javafx.scene.control.*;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
-import java.io.IOException;
 
 public class LoginController {
+
+    private final AuthService authService;
+
     @FXML
     private TextField emailField;
-    @FXML
-    private TextField senhaField;
 
     @FXML
-    private void initialize() {
-        // Dados hardcoded para simular um login
-        String email = "cliente@cliente.com";
-        String senha = "12345678";
+    private PasswordField senhaField;
 
-        // Preenche os TextFields com os dados
-        emailField.setText(email);
-        senhaField.setText(senha);
+    @FXML
+    private Label errorLabel; //exibir mensagens de erro
+
+    public LoginController() {
+        this.authService = new AuthService();
     }
 
-
-    // Método acionado ao clicar no botão "Entrar"
     @FXML
     private void handleLoginButtonAction(ActionEvent event) {
+        String email = emailField.getText().trim();
+        String senha = senhaField.getText().trim();
+
+        if (email.isEmpty() || senha.isEmpty()) {
+            errorLabel.setText("Por favor, preencha todos os campos.");
+            return;
+        }
+
         try {
-            // Carrega o arquivo Home.fxml
+            String token = authService.autenticar(email, senha);
+
+            // Salva o token
+            TokenManager.getInstance().setToken(token);
+
+            // Carrega a tela Home
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/Home.fxml"));
             StackPane homeView = loader.load();
-            // Obtém a janela atual (Stage) e troca a cena
+
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             Scene scene = new Scene(homeView, 800, 600);
 
             stage.setScene(scene);
-            stage.setTitle("SysAgua - Inicio");
+            stage.setTitle("SysAgua - Início");
             stage.show();
 
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("Erro ao carregar a tela Home.fxml");
+            errorLabel.setText("Erro ao autenticar. Verifique suas credenciais.");
         }
     }
 }
