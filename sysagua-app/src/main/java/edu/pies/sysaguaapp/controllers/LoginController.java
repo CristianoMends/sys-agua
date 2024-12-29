@@ -56,7 +56,7 @@ public class LoginController {
 
         } catch (Exception e) {
             e.printStackTrace();
-            errorLabel.setText("Erro ao autenticar. Verifique suas credenciais.");
+            errorLabel.setText("Email ou senha inválidos.");
         }
     }
 }
