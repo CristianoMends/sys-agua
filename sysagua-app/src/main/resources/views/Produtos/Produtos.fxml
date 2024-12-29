@@ -102,15 +102,7 @@
               </HBox>
               <StackPane prefHeight="472.0" prefWidth="917.0">
                  <children>
-                    <TableView fx:id="tabelaProdutos" prefHeight="484.0">
-                      <columns>
-                        <TableColumn prefWidth="210" text="Nome" />
-                          <TableColumn prefWidth="151" text="Marca" />
-                          <TableColumn prefWidth="118" text="Linha" />
-                          <TableColumn prefWidth="118" text="Custo" />
-                          <TableColumn prefWidth="118" text="Ncm" />
-                      </columns>
-                    </TableView>
+                    <TableView fx:id="tabelaProdutos" prefHeight="484.0"/>
                  </children>
               </StackPane>
 <!--              <Pagination pageCount="10" prefHeight="78.0" prefWidth="900.0" styleClass="pagination"/>-->
@@ -118,7 +110,6 @@
              <HBox fx:id="paginationContainer" alignment="CENTER" spacing="10" minWidth="365.0" minHeight="50">
                  <children>
                      <Button fx:id="btnAnterior" text="Anterior" onAction="#handlePaginaAnterior" />
-                     <!-- Botões de paginação dinâmica serão adicionados no controlador -->
                      <Button fx:id="btnProximo" text="Próximo" onAction="#handleProximaPagina" />
                  </children>
              </HBox>
