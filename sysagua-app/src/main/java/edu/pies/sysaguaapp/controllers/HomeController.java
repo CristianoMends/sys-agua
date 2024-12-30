@@ -2,28 +2,43 @@ package edu.pies.sysaguaapp.controllers;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
+import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
-public class HomeController {
-    public Pane spacer;
+import java.io.IOException;
+import java.net.URL;
+import java.util.ResourceBundle;
+
+public class HomeController implements Initializable {
 
     @FXML
-    private VBox submenu;
-
-    @FXML
-    private StackPane rootPane;
+    private StackPane rootPane; //toda a pilha da tela de home
 
     @FXML
     private VBox sideMenu; // VBox principal do menu lateral.
 
+    @FXML
+    private HBox contentBody; //Hbox do menu do meio
+
+    public Pane spacer; //espaçador do botão de sair
+
+    @FXML
+    private VBox submenu;
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        loadInitView();
+    }
+
+    private void loadInitView() {
+        loadView("/views/Produtos/Produtos.fxml");
+    }
 
     //---------------- menu superior -------------------//
     @FXML
@@ -32,6 +47,7 @@ public class HomeController {
         // Lógica de pesquisa (por enquanto só imprime)
         showMessage("Pesquisar");
     }
+
 
     @FXML
     private void handleUsuario() {
@@ -52,12 +68,6 @@ public class HomeController {
         showMessage("Dashboard");
     }
 
-
-
-//    @FXML
-//    private void handleCadastrosGerais() {
-//        showMessage("Cadastros Gerais");
-//    }
 
     @FXML
     private void handleEntregas() {
@@ -90,25 +100,41 @@ public class HomeController {
     }
 
     @FXML
-    private void handleClientes() {
-        try {
-            // Carregar a nova tela de clientes
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/Views/ClientesView.fxml"));
-            AnchorPane clientesView = loader.load();
+    private void handleCadastrosGerais() {
+        if (!submenu.isVisible()) {
+            submenu.setLayoutX(sideMenu.getWidth());  // Alinha ao lado do menu lateral
+            submenu.setManaged(true);
+            submenu.toFront();
+            submenu.setVisible(true);
 
-            // Criar a cena e configurar a janela
-            Stage clientesStage = new Stage();
-            clientesStage.setTitle("Clientes");
-            clientesStage.setScene(new Scene(clientesView));
-            clientesStage.show();
-        } catch (Exception e) {
-            e.printStackTrace();
+
+            // Adiciona evento para recolher o submenu ao clicar fora
+            rootPane.setOnMouseClicked(event -> {
+                    hideSubmenu();
+//                if (!submenu.contains(event.getX(), event.getY())) {
+//                }
+            });
+        } else {
+            hideSubmenu();
         }
+    }
+
+    private void hideSubmenu() {
+        submenu.setVisible(false);
+        submenu.setManaged(false);
+        rootPane.setOnMouseClicked(null); // Remove o evento
+    }
+
+
+    //------------------submenu cadastros gerais ---------------------//
+    @FXML
+    private void handleLoadClientesView() {
+        showMessage("Todos os clientes");
     }
 
     @FXML
     private void handleProdutos() {
-        showMessage("Todos os produtos");
+        loadView("/views/Produtos/Produtos.fxml");
     }
 
     @FXML
@@ -122,42 +148,33 @@ public class HomeController {
     }
 
     @FXML
-    private void handleCadastrosGerais() {
-        if (!submenu.isVisible()) {
-            // Exibe o submenu ao lado
-            submenu.setLayoutX(sideMenu.getWidth());
-            submenu.setLayoutY(50); // Altere conforme necessário
-            submenu.setVisible(true);
-            submenu.setManaged(true);
-
-            // Adiciona evento para recolher o submenu ao clicar fora
-            rootPane.setOnMouseClicked(event -> {
-                if (!submenu.contains(event.getX(), event.getY())) {
-                    hideSubmenu();
-                }
-            });
-        } else {
-            hideSubmenu();
-        }
-    }
-
-    private void hideSubmenu() {
-        submenu.setVisible(false);
-        submenu.setManaged(false);
-        rootPane.setOnMouseClicked(null); // Remove o evento
-    }
-
-    @FXML
     private void handleSair() {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Deseja realmente sair?", ButtonType.YES, ButtonType.NO);
         alert.showAndWait().ifPresent(response -> {
             if (response == ButtonType.YES) {
-                System.exit(0);
+                try {
+                    // Fecha a janela atual (Home)
+                    Stage currentStage = (Stage) rootPane.getScene().getWindow();
+                    currentStage.close();
+
+                    // Carrega a tela de login
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/LoginView.fxml"));
+                    Parent root = loader.load();
+
+                    // Cria uma nova cena e exibe a nova janela
+                    Stage loginStage = new Stage();
+                    loginStage.setScene(new Scene(root, 800, 600));
+                    loginStage.setTitle("SysAgua - Entrar");
+                    loginStage.show();
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         });
     }
 
-    //----------------------------content--------//
+    //----------------------------contentBody--------//
     @FXML
     private void handleContent() {
         showMessage("Algum conteúdo aqui");
@@ -166,16 +183,24 @@ public class HomeController {
     private void showMessage(String message) {
         // Cria um novo label com a mensagem
         javafx.scene.control.Label messageLabel = new javafx.scene.control.Label(message);
-
-        // Garantir que o menu lateral (sideMenu) não seja alterado
-        if (rootPane.getChildren().size() > 1) {
-            rootPane.getChildren().remove(1); // Remove o conteúdo anterior (se houver)
-        }
-
-        // Adiciona o conteúdo dinamicamente no StackPane sem sobrepor o menu lateral
-        StackPane.setAlignment(messageLabel, javafx.geometry.Pos.CENTER);
-        rootPane.getChildren().add(messageLabel);
+        contentBody.getChildren().clear();
+        contentBody.getChildren().add(messageLabel);
     }
+
+
+    private void loadView(String fxmlPath) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
+            Node view = loader.load();
+
+            HBox.setHgrow(view, Priority.ALWAYS); // Configurar crescimento horizontal
+            contentBody.getChildren().clear(); // Limpar conteúdos existentes
+            contentBody.getChildren().add(view); // Adicionar nova view
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 
 
 
