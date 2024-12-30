@@ -3,6 +3,7 @@ package edu.pies.sysaguaapp.controllers;
 import edu.pies.sysaguaapp.models.Produto;
 import edu.pies.sysaguaapp.services.ProdutoService;
 import edu.pies.sysaguaapp.services.TokenManager;
+import javafx.animation.PauseTransition;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -10,7 +11,9 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.*;
 import javafx.scene.shape.Rectangle;
+import javafx.util.Duration;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public class ProdutosController{
@@ -36,7 +39,31 @@ public class ProdutosController{
     private TextField nomeField;
 
     @FXML
-    private TextField emailField;
+    private TextField categoriaField;
+
+    @FXML
+    private TextField custoField;
+
+    @FXML
+    private TextField precoUnitarioField;
+
+    @FXML
+    private TextField marcaField;
+
+    @FXML
+    private TextField unidadeField;
+
+    @FXML
+    private TextField ncmFiel;
+
+    @FXML
+    private TextField descricaoField;
+
+    @FXML
+    private TextField cestField;
+
+    @FXML
+    private TextField gtinField;
 
     @FXML
     private BorderPane formCadastroProduto;
@@ -53,9 +80,18 @@ public class ProdutosController{
     @FXML
     private VBox listProductView;
 
+    @FXML
+    private Label successMessage;
+
+    @FXML
+    private Label nomeErrorLabel;
+
+    @FXML
+    private Label categoriaErrorLabel;
+
     private ObservableList<Produto> produtosObservable;
     private int paginaAtual = 0;
-    private final int itensPorPagina = 10;
+    private final int itensPorPagina = 18;
     private int totalPaginas;
 
     public ProdutosController() {
@@ -67,6 +103,27 @@ public class ProdutosController{
     public void initialize() {
         configurarTabela();
         carregarProdutos();
+
+        // Validar números
+        configurarValidacaoNumerica(custoField);
+        configurarValidacaoNumerica(precoUnitarioField);
+        configurarValidacaoNumerica(cestField);
+        configurarValidacaoNumerica(gtinField);
+
+        // Validar texto
+        configurarValidacaoTexto(nomeField);
+        nomeField.textProperty().addListener((obs, oldText, newText) -> {
+            nomeErrorLabel.setVisible(newText.trim().isEmpty());
+        });
+
+        configurarValidacaoTexto(categoriaField);
+        categoriaField.textProperty().addListener((obs, oldText, newText) -> {
+            categoriaErrorLabel.setVisible(newText.trim().isEmpty());
+        });
+
+        configurarValidacaoTexto(marcaField);
+        configurarValidacaoTexto(unidadeField);
+        configurarValidacaoTexto(descricaoField);
     }
 
     private void showOverlay() {
@@ -88,10 +145,47 @@ public class ProdutosController{
     @FXML
     private void handleSalvar() {
         String nome = nomeField.getText();
-        String email = emailField.getText();
+        String categoria = categoriaField.getText();
+        String unidade = unidadeField.getText();
+        BigDecimal precoUnitario = new BigDecimal(precoUnitarioField.getText());
+        BigDecimal custo = new BigDecimal(custoField.getText());
+        String marca = marcaField.getText();
+
+        //Fazer o tratamento correto de texto e numeros
+
+        Produto novoProduto = new Produto();
+        novoProduto.setName(nome);
+        novoProduto.setCategory(categoria);
+        novoProduto.setUnit(unidade);
+        novoProduto.setPrice(precoUnitario);
+        novoProduto.setBrand(marca);
+        novoProduto.setCost(custo);
+
+        try {
+            String token = TokenManager.getInstance().getToken();
+//            Produto produtoCriado = produtoService.criarProduto(novoProduto, token);
+//            produtosObservable.add(produtoCriado);
+            produtoService.criarProduto(novoProduto, token);
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Erro");
+            alert.setHeaderText("Falha ao criar produto");
+            System.out.println(e.getMessage());
+            alert.setContentText(e.getMessage());
+            hideForm();
+            hideOverlay();
+            alert.showAndWait();
+        }
+
         hideForm();
         hideOverlay();
+        clearFieldForm();
         listProductView.setDisable(false);
+        showSucessMessage();
+        carregarProdutos();
     }
 
     @FXML
@@ -173,7 +267,10 @@ public class ProdutosController{
         TableColumn<Produto, Double> colunaPreco = new TableColumn<>("Preço");
         colunaPreco.setCellValueFactory(new PropertyValueFactory<>("price"));
 
-        tabelaProdutos.getColumns().addAll(colunaNome, colunaCategoria, colunaMarca ,colunaUnidade,colunaPreco);
+        TableColumn<Produto, Double> colunaCusto = new TableColumn<>("Custo");
+        colunaCusto.setCellValueFactory(new PropertyValueFactory<>("cost"));
+
+        tabelaProdutos.getColumns().addAll(colunaNome, colunaCategoria, colunaMarca ,colunaUnidade,colunaPreco, colunaCusto);
 
 
         tabelaProdutos.setItems(produtosObservable);
@@ -243,6 +340,52 @@ public class ProdutosController{
             carregarProdutos();
         }
     }
+
+    private void clearFieldForm() {
+        nomeField.clear();
+        categoriaField.clear();
+        unidadeField.clear();
+        precoUnitarioField.clear();
+        custoField.clear();
+        marcaField.clear();
+    }
+
+
+    /*--------- validações ----------*/
+
+    private void configurarValidacaoNumerica(TextField textField) {
+        TextFormatter<String> formatter = new TextFormatter<>(change -> {
+            if (change.getText().matches("\\d*([.]\\d*)?")) { // Permite números e ponto decimal
+                return change;
+            }
+            return null; // Rejeita mudanças inválidas
+        });
+        textField.setTextFormatter(formatter);
+    }
+
+    private void configurarValidacaoTexto(TextField textField) {
+        textField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.matches("[\\p{L}\\s\\d.,-]*")) { // Permite letras, espaços, números, '.', ',' e '-'
+                textField.setText(oldValue);
+            }
+        });
+    }
+
+    /*------------------------ mensagens ---------------*/
+
+    private void showSucessMessage() {
+        successMessage.setVisible(true);
+        successMessage.toFront();
+
+        // Oculta a mensagem após 3 segundos
+        PauseTransition pause = new PauseTransition(Duration.seconds(3));
+        pause.setOnFinished(event -> successMessage.setVisible(false));
+        pause.play();
+    }
+
+
+
+
 
 
 
