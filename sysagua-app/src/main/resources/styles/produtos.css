@@ -51,6 +51,15 @@
 
 }
 
+.label-field {
+    -fx-text-fill: #737B8B;
+}
+
+.success-Message{
+    -fx-border-color: green;
+    -fx-border-radius: 5px;
+}
+
 /*---------- pagination ----------*/
 
 
