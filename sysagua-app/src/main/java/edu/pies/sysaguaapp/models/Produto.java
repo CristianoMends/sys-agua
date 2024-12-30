@@ -3,45 +3,20 @@ package edu.pies.sysaguaapp.models;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.math.BigDecimal;
+
 public class Produto {
     private Long id;
     private String name;
     private String unit;
-    private Double price;
-    private Double cost;
+    private BigDecimal price;
+    private BigDecimal cost;
     private String brand;
     private String category;
     private String line;
     private String ncm;
     private String registeredAt;
     private String updatedAt;
-
-    @JsonCreator
-    public Produto(
-            @JsonProperty("id") Long id,
-            @JsonProperty("name") String name,
-            @JsonProperty("unit") String unit,
-            @JsonProperty("price") Double price,
-            @JsonProperty("cost") Double cost,
-            @JsonProperty("brand") String brand,
-            @JsonProperty("category") String category,
-            @JsonProperty("line") String line,
-            @JsonProperty("ncm") String ncm,
-            @JsonProperty("registeredAt") String registeredAt,
-            @JsonProperty("updateAt") String updatedAt
-    ) {
-        this.id = id;
-        this.name = name;
-        this.unit = unit;
-        this.price = price;
-        this.cost = cost;
-        this.brand = brand;
-        this.category = category;
-        this.line = line;
-        this.ncm = ncm;
-        this.registeredAt = registeredAt;
-        this.updatedAt = updatedAt;
-    }
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -52,11 +27,11 @@ public class Produto {
     public String getUnit() { return unit; }
     public void setUnit(String unit) { this.unit = unit; }
 
-    public Double getPrice() { return price; }
-    public void setPrice(Double price) { this.price = price; }
+    public BigDecimal getPrice() { return price; }
+    public void setPrice(BigDecimal price) { this.price = price; }
 
-    public Double getCost() { return cost; }
-    public void setCost(Double cost) { this.cost = cost; }
+    public BigDecimal getCost() { return cost; }
+    public void setCost(BigDecimal cost) { this.cost = cost; }
 
     public String getBrand() { return brand; }
     public void setBrand(String brand) { this.brand = brand; }
