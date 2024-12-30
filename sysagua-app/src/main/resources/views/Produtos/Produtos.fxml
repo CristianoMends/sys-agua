@@ -3,7 +3,6 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
@@ -12,10 +11,11 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.Rectangle?>
+<?import javafx.scene.text.Font?>
 
 <StackPane fx:id="rootPane" prefHeight="600.0" prefWidth="900.0" style="-fx-background-color: white;" stylesheets="@../../styles/produtos.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.pies.sysaguaapp.controllers.ProdutosController">
      <children>
-        <BorderPane fx:id="formCadastroProduto" maxHeight="303.0" maxWidth="365.0" style="-fx-background-color: white; -fx-border-radius: 10; -fx-background-radius: 10;" visible="false">
+        <BorderPane fx:id="formCadastroProduto" maxHeight="466.0" maxWidth="437.0" style="-fx-background-color: white; -fx-border-radius: 10; -fx-background-radius: 10;" visible="false">
            <top>
                 <HBox alignment="CENTER" maxHeight="100.0" prefHeight="50.0" spacing="100.0" BorderPane.alignment="CENTER">
                     <children>
@@ -25,92 +25,110 @@
                 </HBox>
            </top>
            <center>
-              <StackPane minHeight="205.0" prefHeight="150.0" BorderPane.alignment="CENTER_LEFT">
+              <StackPane minHeight="230.0" minWidth="437.0" BorderPane.alignment="CENTER_LEFT">
                  <children>
                       <VBox fx:id="detailsFormProduto" managed="true" minHeight="205.0" minWidth="365.0" spacing="5.0">
                           <children>
-                               <Label text="NOME DO PRODUTO" />
-                               <TextField fx:id="nomeField" maxWidth="300.0" promptText="Nome" styleClass="text-field" />
-                          <HBox maxHeight="50.0" prefHeight="100.0" prefWidth="299.0">
+                              <Label styleClass="label-field" text="NOME DO PRODUTO" />
+                              <TextField fx:id="nomeField" promptText="Nome" styleClass="text-field" />
+                              <Label fx:id="nomeErrorLabel" style="-fx-text-fill: red;" text="Campo inválido" visible="false" />
+                              <Label styleClass="label-field" text="CATEGORIA" />
+                              <TextField fx:id="categoriaField" promptText="Categoria" styleClass="text-field" />
+                              <Label fx:id="categoriaErrorLabel" style="-fx-text-fill: red;" text="Campo inválido" visible="false" />
+                              <HBox maxHeight="50.0" prefHeight="100.0" prefWidth="299.0">
                              <children>
-                                <VBox maxHeight="50.0" prefHeight="200.0" prefWidth="100.0">
+                                <VBox maxHeight="50.0" prefHeight="200.0">
                                    <children>
-                                           <Label text="CUSTO" />
-                                           <TextField fx:id="custoField" maxWidth="100.0" promptText="Custo" styleClass="text-field" />
+                                           <Label styleClass="label-field" text="CUSTO" />
+                                           <TextField fx:id="custoField" promptText="Custo" styleClass="text-field" />
                                    </children>
                                 </VBox>
-                              <Region maxWidth="100.0" prefHeight="200.0" prefWidth="200.0" />
-                                <VBox maxHeight="50.0" prefHeight="200.0" prefWidth="100.0">
+                              <Region maxWidth="120.0" prefHeight="200.0" prefWidth="120.0" />
+                                <VBox maxHeight="50.0" prefHeight="200.0">
                                    <children>
-                                      <Label text="PREÇO UNITÁRIO" />
-                                      <TextField fx:id="precoUnitarioField" maxWidth="100.0" promptText="Preço unitário" styleClass="text-field" />
+                                      <Label styleClass="label-field" text="PREÇO UNITÁRIO" />
+                                      <TextField fx:id="precoUnitarioField" promptText="Preço unitário" styleClass="text-field" />
                                    </children>
                                 </VBox>
                              </children>
                           </HBox>
-                          <Label text="MARCA" />
-                          <TextField fx:id="marcaField" maxWidth="300.0" promptText="Marca" styleClass="text-field" />
-                          <Label text="LINHA" />
-                          <TextField fx:id="linhaField" maxWidth="300.0" promptText="Linha" styleClass="text-field" />
+                          <Label styleClass="label-field" text="MARCA" />
+                          <TextField fx:id="marcaField" promptText="Marca" styleClass="text-field" />
+                          <Label styleClass="label-field" text="LINHA" />
+                          <TextField fx:id="linhaField" promptText="Linha" styleClass="text-field" />
+                          <Label styleClass="label-field" text="UNIDADE" />
+                          <TextField fx:id="unidadeField" promptText="Unidade" styleClass="text-field" />
                           </children>
                        <padding>
-                          <Insets left="20.0" />
+                          <Insets left="20.0" right="20.0" />
                        </padding>
                       </VBox>
-                    <VBox fx:id="detailsFormFiscal" managed="false" minHeight="205.0" minWidth="365.0" spacing="5.0" visible="false">
+                    <VBox fx:id="detailsFormFiscal" managed="false" minHeight="205.0" minWidth="365.0" prefHeight="305.0" spacing="5.0" visible="false">
                        <children>
-                          <Label text="NCM" />
-                          <TextField fx:id="ncmField" maxWidth="300.0" promptText="Nome" styleClass="text-field" />
-                          <Label text="DESCRIÇÃO" />
-                          <TextField fx:id="descricaoField" maxWidth="300.0" promptText="Descrição" styleClass="text-field" />
-                          <Label text="CEST" />
-                          <TextField fx:id="cestField" maxWidth="300.0" promptText="Cest" styleClass="text-field" />
-                          <Label text="GTIN/EAN" />
-                          <TextField fx:id="gtinField" maxWidth="300.0" promptText="Gtin/EAN" styleClass="text-field" />
+                          <Label styleClass="label-field" text="NCM" />
+                          <TextField fx:id="ncmField" promptText="NCM" styleClass="text-field" />
+                          <Label styleClass="label-field" text="DESCRIÇÃO" />
+                          <TextField fx:id="descricaoField" promptText="Descrição" styleClass="text-field" />
+                          <Label styleClass="label-field" text="CEST" />
+                          <TextField fx:id="cestField" promptText="Cest" styleClass="text-field" />
+                          <Label styleClass="label-field" text="GTIN/EAN" />
+                          <TextField fx:id="gtinField" promptText="GTIN/EAN" styleClass="text-field" />
                        </children>
                        <padding>
-                          <Insets left="20.0" />
+                          <Insets left="20.0" right="20.0" />
                        </padding>
                     </VBox>
                  </children>
-                 <padding>
-                    <Insets bottom="5.0" />
-                 </padding>
               </StackPane>
            </center>
            <bottom>
-                  <HBox alignment="CENTER_RIGHT" prefHeight="45.0" spacing="20.0" BorderPane.alignment="CENTER">
+                  <HBox alignment="CENTER_RIGHT" minWidth="437.0" prefHeight="45.0" spacing="20.0" BorderPane.alignment="CENTER_RIGHT">
                       <children>
-                          <Button onAction="#handleCancelar" style="-fx-background-color: #FEBAC6;" styleClass="menu-button" text="Cancelar" />
-                          <Button onAction="#handleSalvar" style="-fx-background-color: #DDE4F0;" styleClass="menu-button" text="Salvar" />
+                          <Button onAction="#handleCancelar" style="-fx-background-color: #FEBAC6; -fx-text-fill: #F2383A;" styleClass="menu-button" text="Cancelar" />
+                          <Button onAction="#handleSalvar" style="-fx-background-color: #DDE4F0; -fx-text-fill: #5A6ACF;" styleClass="menu-button" text="Salvar" />
                       </children>
-                      <padding>
-                          <Insets right="20.0" />
-                      </padding>
+               <padding>
+                  <Insets right="20.0" />
+               </padding>
                   </HBox>
            </bottom>
         </BorderPane>
       <Rectangle fx:id="overlay" fill="#D9D9D9" managed="false" visible="false" />
       <VBox fx:id="listProductView" prefHeight="200.0" prefWidth="100.0">
          <children>
-              <HBox alignment="CENTER_LEFT" prefHeight="90.0" prefWidth="900.0" style="-fx-padding: 10; -fx-border-color: #C8CBD9; -fx-border-width: 0 0 1px 0;">
-                 <children>
-                    <Label text="Todos os produtos" />
-                    <Region HBox.hgrow="ALWAYS" />
-                    <Button mnemonicParsing="false" onAction="#handleAddProduto" styleClass="menu-button" text="Adicionar" />
-                 </children>
-              </HBox>
+            <StackPane prefHeight="90.0">
+               <children>
+                     <Label fx:id="successMessage" alignment="CENTER" minHeight="50.0" style="-fx-text-fill: white; -fx-background-color: green; -fx-font-size: 18px; -fx-border-color: transparent; -fx-border-width: 1; -fx-border-radius: 5;" styleClass="success-Message" text="Cadastro realizado com sucesso!" visible="false" StackPane.alignment="CENTER_RIGHT">
+                     <font>
+                        <Font size="18.0" />
+                     </font>
+                  </Label>
+                    <HBox alignment="CENTER_LEFT" prefHeight="90.0" style="-fx-padding: 10; -fx-border-color: #C8CBD9; -fx-border-width: 0 0 1px 0;">
+                       <children>
+                          <Label text="Todos os produtos" />
+                          <Region HBox.hgrow="ALWAYS" />
+                          <Button mnemonicParsing="false" onAction="#handleAddProduto" styleClass="menu-button" text="Adicionar" />
+                       </children>
+                    </HBox>
+               </children>
+               <padding>
+                  <Insets right="20.0" />
+               </padding>
+            </StackPane>
               <StackPane prefHeight="472.0" prefWidth="917.0">
                  <children>
-                    <TableView fx:id="tabelaProdutos" prefHeight="484.0"/>
+                    <TableView fx:id="tabelaProdutos" prefHeight="484.0">
+                     <columnResizePolicy>
+                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                     </columnResizePolicy></TableView>
                  </children>
               </StackPane>
 <!--              <Pagination pageCount="10" prefHeight="78.0" prefWidth="900.0" styleClass="pagination"/>-->
              <!-- Paginação -->
-             <HBox fx:id="paginationContainer" alignment="CENTER" spacing="10" minWidth="365.0" minHeight="50">
+             <HBox fx:id="paginationContainer" alignment="CENTER" minHeight="50" minWidth="365.0" spacing="10">
                  <children>
-                     <Button fx:id="btnAnterior" text="Anterior" onAction="#handlePaginaAnterior" />
-                     <Button fx:id="btnProximo" text="Próximo" onAction="#handleProximaPagina" />
+                     <Button fx:id="btnAnterior" onAction="#handlePaginaAnterior" text="Anterior" />
+                     <Button fx:id="btnProximo" onAction="#handleProximaPagina" text="Próximo" />
                  </children>
              </HBox>
          </children>

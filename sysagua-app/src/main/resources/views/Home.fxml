@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<StackPane fx:id="rootPane" stylesheets="@../styles/home.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.pies.sysaguaapp.controllers.HomeController">
+<StackPane fx:id="rootPane" minHeight="600.0" minWidth="800.0" stylesheets="@../styles/home.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.pies.sysaguaapp.controllers.HomeController">
     <VBox style="-fx-background-color: white">
         <HBox fx:id="topMenu" minHeight="100.0" spacing="15" style="-fx-background-color: white; -fx-padding: 0 20 0 0; -fx-pref-height: 80px; -fx-alignment: center;">
 
