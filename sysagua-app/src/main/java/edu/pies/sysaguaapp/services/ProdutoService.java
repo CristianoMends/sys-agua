@@ -31,9 +31,33 @@ public class ProdutoService {
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
         if (response.statusCode() == 200) {
-            return objectMapper.readValue(response.body(), new TypeReference<List<Produto>>() {});
+            return objectMapper.readValue(response.body(), new TypeReference<List<Produto>>() {
+            });
         } else {
             throw new Exception("Erro ao buscar produtos: " + response.body());
+        }
+    }
+
+    public Produto criarProduto(Produto produto, String token) throws Exception {
+        // Converter o objeto Produto para JSON
+        String produtoJson = objectMapper.writeValueAsString(produto);
+
+        // Criar a requisição POST
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(BASE_URL))
+                .POST(HttpRequest.BodyPublishers.ofString(produtoJson))
+                .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer " + token)
+                .build();
+
+        // Enviar a requisição
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+        // Verificar a resposta
+        if (response.statusCode() == 201) {
+            return null;
+        } else {
+            throw new Exception("Erro ao criar produto: " + response.body());
         }
     }
 }
