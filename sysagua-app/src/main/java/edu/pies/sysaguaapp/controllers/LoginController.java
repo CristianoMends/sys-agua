@@ -48,7 +48,7 @@ public class LoginController {
             StackPane homeView = loader.load();
 
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            Scene scene = new Scene(homeView, 800, 600);
+            Scene scene = new Scene(homeView);
 
             stage.setScene(scene);
             stage.setTitle("SysAgua - Início");
