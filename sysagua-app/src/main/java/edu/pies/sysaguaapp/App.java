@@ -14,7 +14,7 @@ public void start(Stage primaryStage) throws Exception {
     BorderPane root = loader.load();
     Scene scene = new Scene(root, 800, 600);
 
-    scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/styles/loginstyle.css")).toExternalForm());
+//    scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/styles/loginstyle.css")).toExternalForm());
 
     primaryStage.setTitle("SysAgua - Controle de Pedidos");
     primaryStage.setScene(scene);
