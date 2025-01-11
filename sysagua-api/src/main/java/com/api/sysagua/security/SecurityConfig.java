@@ -35,6 +35,7 @@ public class SecurityConfig{
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/users").hasRole(UserAccess.DEVELOPER.name())//penas devs manipulam usuarios
 
+                        .requestMatchers("/customers").authenticated()
                         .requestMatchers("/products").authenticated()
                         .requestMatchers(freeRoutes).permitAll()//rotas liberadas
                         .anyRequest().authenticated()//libera demais rotas pra usuario autenticados
