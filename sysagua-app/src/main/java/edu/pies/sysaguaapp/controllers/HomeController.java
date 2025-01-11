@@ -129,7 +129,7 @@ public class HomeController implements Initializable {
     //------------------submenu cadastros gerais ---------------------//
     @FXML
     private void handleLoadClientesView() {
-        showMessage("Todos os clientes");
+        loadView("/views/Clientes/Clientes.fxml");
     }
 
     @FXML
