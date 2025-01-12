@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface CustomerRepository extends JpaRepository<Customer, Long> {
@@ -21,7 +22,8 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
                 and     ((:neighborhood IS NULL OR :neighborhood = '') OR upper(c.address.neighborhood) like upper(concat('%', :neighborhood, '%')))
                 and     ((:city IS NULL OR :city = '') OR upper(c.address.city) like upper(concat('%', :city, '%')))
                 and     ((:state IS NULL OR :state = '') OR upper(c.address.state) like upper(concat('%', :state, '%')))
-                and     (:active IS NULL OR c.active = :active) 
+                and     (:active IS NULL OR c.active = :active)
+                and     (:cnpj IS NULL OR c.cnpj = :cnpj)  
                 order by c.name
             """)
     List<Customer> findByFilters(
@@ -32,8 +34,8 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
             @Param("neighborhood") String neighborhood,
             @Param("city") String city,
             @Param("state") String state,
-            @Param("active") Boolean active
+            @Param("active") Boolean active,
+            @Param("cnpj") String cnpj
     );
-
 
 }
