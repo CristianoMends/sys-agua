@@ -1,22 +1,46 @@
 package com.api.sysagua.dto.customer;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import lombok.*;
-
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
-public class SearchCustomerDto {
-    @Schema(description = "Id do cliente.", example = "2")
-    private Long id;
+public class UpdateCustomerDto {
 
     @Schema(description = "Nome completo do Cliente.", example = "John Doe", maxLength = 100)
     @Size(max = 100, message = "The name must be at most 100 characters.")
     private String name;
+
+    @Schema(
+            description = "Número de telefone do cliente, incluindo numero do país.",
+            example = "5588999999999",
+            pattern = "^[0-9]{13}$"    )
+    @Pattern(
+            regexp = "^[0-9]{13}$",
+            message = "Phone must follow the format 5588999999999 (13 digits)."
+    )
+    private String phone;
+
+    @Schema(description = "Se o cliente esta ativo", example = "true")
+    private Boolean active;
+
+    @Schema(description = "Numero de residencia do cliente.", example = "123", maxLength = 10)
+    @Size(max = 10, message = "The number must be at most 10 characters.")
+
+    @Pattern(
+            regexp = "^\\d+(?: [a-zA-Z]+(?: [a-zA-Z]+)*)?$",
+            message = "The number format must be '204 B' or '204 B High', where the text after the number is optional."
+    )
+    private String number;
 
     @Schema(description = "Nome da rua.", example = "Rua torres tortas", maxLength = 50)
     @Size(max = 50, message = "The street must be at most 50 characters.")
@@ -34,19 +58,4 @@ public class SearchCustomerDto {
     @Size(max = 20, message = "The state must be at most 20 characters.")
     private String state;
 
-    @Schema(
-            description = "Número de telefone do cliente, incluindo numero do país.",
-            example = "5588999999999",
-            pattern = "^[0-9]{13}$"    )
-    private String phone;
-
-    @Schema(description = "Se o cliente esta ativo", example = "true")
-    private Boolean active;
-
-    @Schema(
-            description = "Número do CNPJ do cliente.",
-            example = "04.693.497/0001-21",
-            pattern = "\\d{2}\\.\\d{3}\\.\\d{3}/\\d{4}-\\d{2}"
-    )
-    private String cnpj;
 }
