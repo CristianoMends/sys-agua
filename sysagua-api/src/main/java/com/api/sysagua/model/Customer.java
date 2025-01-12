@@ -19,7 +19,7 @@ public class Customer {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(nullable = false)
+    @Column(name = "customer_id", nullable = false)
     private Long id;
     private String name;
     @Embedded
@@ -27,11 +27,13 @@ public class Customer {
     private String phone;
     private LocalDate createdAt;
     private Boolean active;
+    private String cnpj;
 
-    public Customer(String name, AddressDto address,String phone){
+    public Customer(String name, AddressDto address, String phone, String cnpj){
         setName(name);
         setAddress(address);
         setPhone(phone);
+        setCnpj(cnpj);
     }
 
 }

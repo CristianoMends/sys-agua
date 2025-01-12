@@ -40,7 +40,20 @@ public class CreateCustomerDto {
     )
     private String phone;
 
+    @Schema(
+            description = "Número do CNPJ do cliente.",
+            example = "04.693.497/0001-21",
+            pattern = "\\d{2}\\.\\d{3}\\.\\d{3}/\\d{4}-\\d{2}"
+    )
+    @NotBlank(message = "The CNPJ cannot be blank.")
+    @Pattern(
+            regexp = "\\d{2}\\.\\d{3}\\.\\d{3}/\\d{4}-\\d{2}",
+            message = "The CNPJ must follow the format 00.000.000/0000-00."
+    )
+    private String cnpj;
+
+
     public Customer toModel() {
-        return new Customer(getName(), getAddress(), getPhone());
+        return new Customer(getName(), getAddress(), getPhone(), getCnpj());
     }
 }
