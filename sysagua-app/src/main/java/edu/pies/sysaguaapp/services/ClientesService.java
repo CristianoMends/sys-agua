@@ -1,6 +1,7 @@
 package edu.pies.sysaguaapp.services;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import edu.pies.sysaguaapp.models.ClientesCadastro;
 
 import java.net.URI;
@@ -39,7 +40,12 @@ public class ClientesService {
     }
 
     public static ClientesCadastro criarCliente(ClientesCadastro clientes, String token) throws Exception {
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+
         // Converter o objeto Produto para JSON
+
         String clienteJson = objectMapper.writeValueAsString(clientes);
         System.out.println("Sending client data: " + clienteJson);
 

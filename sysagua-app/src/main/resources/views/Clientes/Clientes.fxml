@@ -34,8 +34,8 @@
                         <TextField fx:id="numberField" promptText="Numero" styleClass="text-field" />
                         <Label styleClass="label-field" text="Rua" />
                         <TextField fx:id="streetField" promptText="Rua" styleClass="text-field" />
-                        <Label styleClass="label-field" text="Vizinhança" />
-                        <TextField fx:id="neighborhoodField" promptText="Vizinhança" styleClass="text-field" />
+                        <Label styleClass="label-field" text="Bairro" />
+                        <TextField fx:id="neighborhoodField" promptText="Bairro" styleClass="text-field" />
                         <Label styleClass="label-field" text="Cidade" />
                         <TextField fx:id="cityField" promptText="Cidade" styleClass="text-field" />
                         <Label styleClass="label-field" text="Estado" />
