@@ -11,7 +11,7 @@ import java.util.List;
 
 
 public class ClientesService {
-    private static final String BASE_URL = "http://localhost:8080/clients";
+    private static final String BASE_URL = "http://localhost:8080/customers";
     private static HttpClient httpClient;
     private static ObjectMapper objectMapper;
 
@@ -40,12 +40,14 @@ public class ClientesService {
 
     public static ClientesCadastro criarCliente(ClientesCadastro clientes, String token) throws Exception {
         // Converter o objeto Produto para JSON
-        String produtoJson = objectMapper.writeValueAsString(clientes);
+        String clienteJson = objectMapper.writeValueAsString(clientes);
+        System.out.println("Sending client data: " + clienteJson);
+
 
         // Criar a requisição POST
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(BASE_URL))
-                .POST(HttpRequest.BodyPublishers.ofString(produtoJson))
+                .POST(HttpRequest.BodyPublishers.ofString(clienteJson))
                 .header("Content-Type", "application/json")
                 .header("Authorization", "Bearer " + token)
                 .build();
@@ -55,9 +57,13 @@ public class ClientesService {
 
         // Verificar a resposta
         if (response.statusCode() == 201) {
-            return null;
+            return objectMapper.readValue(response.body(), ClientesCadastro.class);
+        } else if (response.statusCode() == 400) {
+            System.out.println("Erro ao criar cliente: " + response.body());
         } else {
+            System.out.println("Server response: " + response.body());
             throw new Exception("Erro ao criar cliente: " + response.body());
         }
+        return clientes;
     }
 }
