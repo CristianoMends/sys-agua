@@ -12,7 +12,6 @@ import javafx.scene.layout.*;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 public class ClientesController {
@@ -27,10 +26,22 @@ public class ClientesController {
     private Label successMessage;
 
     @FXML
-    private TextField nomeCompleto_RazaoSocialField;
+    private TextField nomeField;
 
     @FXML
-    private TextField EnderecoCompletoField;
+    private VBox addressBox;
+    @FXML
+    private TextField numberField;
+    @FXML
+    private TextField streetField;
+    @FXML
+    private TextField neighborhoodField;
+    @FXML
+    private TextField cityField;
+    @FXML
+    private TextField stateField;
+
+    private ClientesCadastro.Address address;
 
     @FXML
     private TextField telefoneField;
@@ -39,10 +50,7 @@ public class ClientesController {
     private TextField CNPJField;
 
     @FXML
-    private TextField EmailField;
-
-    @FXML
-    private Label nomeCompleto_RazaoSocialErrorLabel;
+    private Label nomeLabelErrorField;
 
     @FXML
     private BorderPane formCadastroClientes;
@@ -84,18 +92,6 @@ public class ClientesController {
     public void initialize() {
         configurarTabela();
         carregarClientes();
-
-
-        configurarValidacaoTexto(nomeCompleto_RazaoSocialField);
-        nomeCompleto_RazaoSocialField.textProperty().addListener((obs, oldText, newText) -> {
-            nomeCompleto_RazaoSocialErrorLabel.setVisible(newText.trim().isEmpty());
-        });
-
-        configurarValidacaoTexto(EnderecoCompletoField);
-        configurarValidacaoNumerica(telefoneField);
-        configurarValidacaoNumerica(CNPJField);
-        configurarValidacaoTexto(EmailField);
-
     }
 
     private void showOverlay() {
@@ -114,43 +110,122 @@ public class ClientesController {
 
     @FXML
     private void handleSalvar() {
-        String nomeCompletoRazaoSocial = nomeCompleto_RazaoSocialField.getText();
-        String enderecoCompleto = EnderecoCompletoField.getText();
-        Long telefone = Long.parseLong(telefoneField.getText());
-        Long cnpj = Long.parseLong(CNPJField.getText());
-        String email = EmailField.getText();
+        String nome = nomeField.getText();
+        String telefoneStr = telefoneField.getText();
+        String cnpjStr = CNPJField.getText();
+        String numeroStr = numberField.getText();
+        String rua = streetField.getText();
+        String bairro = neighborhoodField.getText();
+        String cidade = cityField.getText();
+        String estado = stateField.getText();
 
-        //Fazer o tratamento correto de texto e numeros
+        // Validações iniciais (campos obrigatórios)
+        if (nome == null || nome.isEmpty() ||
+                telefoneStr == null || telefoneStr.isEmpty() ||
+                cnpjStr == null || cnpjStr.isEmpty() ||
+                numeroStr == null || numeroStr.isEmpty() ||
+                rua == null || rua.isEmpty() ||
+                bairro == null || bairro.isEmpty() ||
+                cidade == null || cidade.isEmpty() ||
+                estado == null || estado.isEmpty()) {
+
+            mostrarAlerta("Erro", "Campos obrigatórios", "Por favor, preencha todos os campos.");
+            return;
+        }
+
+        // Validação com Regex (Telefone)
+        if (!validarTelefone(telefoneStr)) {
+            mostrarAlerta("Erro", "Telefone inválido", "Por favor, insira um telefone no formato (XX)XXXXXXXX ou (XX)XXXXXXXXX.");
+            return;
+        }
+
+        // Validação com Regex (CNPJ)
+        if (!validarCNPJ(cnpjStr)) {
+            mostrarAlerta("Erro", "CNPJ inválido", "Por favor, insira um CNPJ no formato XX.XXX.XXX/XXXX-XX.");
+            return;
+        }
+
+        Long telefone;
+        try {
+            telefone = Long.parseLong(telefoneStr.replaceAll("[^\\d]", ""));
+        } catch (NumberFormatException e) {
+            mostrarAlerta("Erro", "Telefone inválido", "Erro ao processar o telefone. Verifique o formato.");
+            return;
+        }
+
+        Long cnpj;
+        try {
+            cnpj = Long.parseLong(cnpjStr.replaceAll("[^\\d]", ""));
+        } catch (NumberFormatException e) {
+            mostrarAlerta("Erro", "CNPJ inválido", "Erro ao processar o CNPJ. Verifique o formato.");
+            return;
+        }
+
+        Long numero;
+        try {
+            numero = Long.parseLong(numeroStr);
+        } catch (NumberFormatException e) {
+            mostrarAlerta("Erro", "Número inválido", "Por favor, insira um número válido.");
+            return;
+        }
+
+        // Cria o objeto Address
+        ClientesCadastro.Address address = new ClientesCadastro.Address(); // Inicializa aqui!!
+        address.setNumber(numero);
+        address.setStreet(rua);
+        address.setNeighborhood(bairro);
+        address.setCity(cidade);
+        address.setState(estado);
 
         ClientesCadastro novoCliente = new ClientesCadastro();
-        novoCliente.setNomeCompleto_RazaoSocial(nomeCompletoRazaoSocial);
-        novoCliente.setEnderecoCompleto(enderecoCompleto);
-        novoCliente.setTelefone(telefone);
+        novoCliente.setName(nome);
+        novoCliente.setPhone(telefone);
         novoCliente.setCnpj(cnpj);
-        novoCliente.setEmail(email);
+        novoCliente.setAddress(address);
 
         try {
             String token = TokenManager.getInstance().getToken();
-            ClientesService.criarCliente(novoCliente, token);
-        } catch (Exception e) {
-            e.printStackTrace();
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Erro");
-            alert.setHeaderText("Falha ao criar cliente");
-            System.out.println(e.getMessage());
-            alert.setContentText(e.getMessage());
+            ClientesCadastro clienteCriado = ClientesService.criarCliente(novoCliente, token);
+
             hideForm();
             hideOverlay();
-            alert.showAndWait();
+            clearFieldForm();
+            listClienteView.setDisable(false);
+            showSucessMessage();
+            carregarClientes();
+        } catch (Exception e) {
+            e.printStackTrace();
+            mostrarAlerta("Erro inesperado", "Falha ao criar cliente", "Ocorreu um erro inesperado. Detalhes: " + e.getMessage());
         }
-
-        hideForm();
-        hideOverlay();
-        clearFieldForm();
-        listClienteView.setDisable(false);
-        showSucessMessage();
-        carregarClientes();
     }
+
+    private boolean validarTelefone(String telefone) {
+        return telefone.matches("\\(\\d{2}\\)\\d{8,9}");
+    }
+
+    private boolean validarCNPJ(String cnpj) {
+        return cnpj.matches("\\d{2}\\.\\d{3}\\.\\d{3}\\/\\d{4}\\-\\d{2}");
+    }
+
+    private void mostrarAlerta(String title, String header, String content) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(header);
+        alert.setContentText(content);
+        alert.showAndWait();
+    }
+
+    private void clearFieldForm() {
+        nomeField.clear();
+        telefoneField.clear();
+        CNPJField.clear();
+        numberField.clear();
+        streetField.clear();
+        neighborhoodField.clear();
+        cityField.clear();
+        stateField.clear();
+    }
+
     @FXML
     private void handleCancelar() {
         hideForm();
@@ -262,22 +337,26 @@ public class ClientesController {
         }
     }
 
-    private void clearFieldForm() {
-        nomeCompleto_RazaoSocialField.clear();
-        EnderecoCompletoField.clear();
-        telefoneField.clear();
-        CNPJField.clear();
-        EmailField.clear();
-    }
-
 
     private void configurarTabela() {
         // Configuração das colunas da tabela
-        TableColumn<ClientesCadastro, String> colunaNomeCompleto_RazaoSocial = new TableColumn<>("Nome Completo ou Razão Social");
-        colunaNomeCompleto_RazaoSocial.setCellValueFactory(new PropertyValueFactory<>("name_razao_social"));
+        TableColumn<ClientesCadastro, String> colunaNome = new TableColumn<>("Nome");
+        colunaNome.setCellValueFactory(new PropertyValueFactory<>("Nome"));
 
-        TableColumn<ClientesCadastro, String> colunaEnderecoCompleto = new TableColumn<>("Endereço Completo");
-        colunaEnderecoCompleto.setCellValueFactory(new PropertyValueFactory<>("endereco"));
+        TableColumn<ClientesCadastro, Long> colunaNumero = new TableColumn<>("Numero");
+        colunaNumero.setCellValueFactory(new PropertyValueFactory<>("numero"));
+
+        TableColumn<ClientesCadastro, String> colunaRua = new TableColumn<>("Rua");
+        colunaRua.setCellValueFactory(new PropertyValueFactory<>("rua"));
+
+        TableColumn<ClientesCadastro, String> colunaVizinhanca = new TableColumn<>("Vizinhança");
+        colunaVizinhanca.setCellValueFactory(new PropertyValueFactory<>("vizinhanca"));
+
+        TableColumn<ClientesCadastro, String> colunaCidade = new TableColumn<>("Cidade");
+        colunaCidade.setCellValueFactory(new PropertyValueFactory<>("cidade"));
+
+        TableColumn<ClientesCadastro, String> colunaEstado = new TableColumn<>("Estado");
+        colunaEstado.setCellValueFactory(new PropertyValueFactory<>("estado"));
 
         TableColumn<ClientesCadastro, Long> colunaTelefone = new TableColumn<>("Telefone");
         colunaTelefone.setCellValueFactory(new PropertyValueFactory<>("telefone"));
@@ -285,31 +364,8 @@ public class ClientesController {
         TableColumn<ClientesCadastro, Long> colunaCnpj = new TableColumn<>("CNPJ");
         colunaCnpj.setCellValueFactory(new PropertyValueFactory<>("cnpj"));
 
-        TableColumn<ClientesCadastro, String> colunaEmail = new TableColumn<>("Email");
-        colunaEmail.setCellValueFactory(new PropertyValueFactory<>("email"));
-
-        tabelaClientes.getColumns().addAll(colunaNomeCompleto_RazaoSocial, colunaEnderecoCompleto, colunaTelefone , colunaCnpj, colunaEmail);
+        tabelaClientes.getColumns().addAll(colunaNome, colunaNumero, colunaRua, colunaVizinhanca, colunaCidade, colunaEstado, colunaTelefone , colunaCnpj);
         tabelaClientes.setItems(clientesObservable);
-    }
-
-    /*--------- validações ----------*/
-
-    private void configurarValidacaoNumerica(TextField textField) {
-        TextFormatter<String> formatter = new TextFormatter<>(change -> {
-            if (change.getText().matches("\\d*([.]\\d*)?")) { // Permite números e ponto decimal
-                return change;
-            }
-            return null; // Rejeita mudanças inválidas
-        });
-        textField.setTextFormatter(formatter);
-    }
-
-    private void configurarValidacaoTexto(TextField textField) {
-        textField.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (!newValue.matches("[\\p{L}\\s\\d.,-]*")) { // Permite letras, espaços, números, '.', ',' e '-'
-                textField.setText(oldValue);
-            }
-        });
     }
 
     private void showSucessMessage() {
