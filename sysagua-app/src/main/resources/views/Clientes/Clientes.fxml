@@ -12,10 +12,11 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.text.Font?>
+<?import javafx.scene.control.ScrollPane?>
 
-<StackPane fx:id="rootPane" prefHeight="600.0" prefWidth="900.0" style="-fx-background-color: white;" stylesheets="@../../styles/produtos.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.pies.sysaguaapp.controllers.ClientesController">
+<StackPane fx:id="rootPane" prefHeight="600.0" prefWidth="900.0" style="-fx-background-color: white;" stylesheets="@../../styles/clientes.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.pies.sysaguaapp.controllers.ClientesController">
     <children>
-        <BorderPane fx:id="formCadastroClientes" maxHeight="466.0" maxWidth="437.0" style="-fx-background-color: white; -fx-border-radius: 10; -fx-background-radius: 10;" visible="false">
+        <BorderPane fx:id="formCadastroClientes" maxHeight="500.0" maxWidth="500.0" style="-fx-background-color: white; -fx-border-radius: 10; -fx-background-radius: 10;" visible="false">
             <top>
                 <HBox alignment="CENTER" maxHeight="100.0" prefHeight="50.0" spacing="100.0" BorderPane.alignment="CENTER">
                     <children>
@@ -24,44 +25,47 @@
                 </HBox>
             </top>
             <center>
-                <StackPane minHeight="230.0" minWidth="437.0" BorderPane.alignment="CENTER_LEFT">
+                <VBox fx:id="detailsFormCliente" managed="true" minHeight="205.0" minWidth="365.0" spacing="5.0">
                     <children>
-                        <VBox fx:id="detailsFormCliente" managed="true" minHeight="205.0" minWidth="365.0" spacing="5.0">
-                            <children>
-                                <Label styleClass="label-field" text="NOME DO CLIENTE OU RAZÃO SOCIAL" />
-                                <TextField fx:id="nomeCompleto_RazaoSocialFieldField" promptText="NomeCompleto_RazaoSocial" styleClass="text-field" />
-                                <Label fx:id="nomeCompleto_RazaoSocialErrorLabel" style="-fx-text-fill: red;" text="Campo inválido" visible="false" />
-                                <Label styleClass="label-field" text="ENDEREÇO COMPLETO" />
-                                <TextField fx:id="EnderecoCompletoFieldField" promptText="Endereço Completo" styleClass="text-field" />
-                                <HBox maxHeight="50.0" prefHeight="100.0" prefWidth="299.0">
-                                    <children>
-                                        <VBox maxHeight="50.0" prefHeight="200.0">
-                                            <children>
-                                                <Label styleClass="label-field" text="TELEFONE" />
-                                                <TextField fx:id="telefoneFieldField" promptText="Telefone" styleClass="text-field" />
-                                            </children>
-                                        </VBox>
-                                        <Region maxWidth="120.0" prefHeight="200.0" prefWidth="120.0" />
-                                        <VBox maxHeight="50.0" prefHeight="200.0">
-                                            <children>
-                                                <Label styleClass="label-field" text="CNPJ" />
-                                                <TextField fx:id="CNPJField" promptText="CNPJ" styleClass="text-field" />
-                                            </children>
-                                        </VBox>
-                                    </children>
-                                </HBox>
-                                <Label styleClass="label-field" text="Email" />
-                                <TextField fx:id="EmailField" promptText="Email" styleClass="text-field" />
-                            </children>
-                            <padding>
-                                <Insets left="20.0" right="20.0" />
-                            </padding>
+                        <Label styleClass="label-field" text="NOME DA EMPRESA" />
+                        <TextField fx:id="nomeField" promptText="Nome da Empresa" styleClass="text-field" />
+                        <VBox fx:id="addressBox" spacing="5.0">
+                        <Label styleClass="label-field" text="Número" />
+                        <TextField fx:id="numberField" promptText="Numero" styleClass="text-field" />
+                        <Label styleClass="label-field" text="Rua" />
+                        <TextField fx:id="streetField" promptText="Rua" styleClass="text-field" />
+                        <Label styleClass="label-field" text="Vizinhança" />
+                        <TextField fx:id="neighborhoodField" promptText="Vizinhança" styleClass="text-field" />
+                        <Label styleClass="label-field" text="Cidade" />
+                        <TextField fx:id="cityField" promptText="Cidade" styleClass="text-field" />
+                        <Label styleClass="label-field" text="Estado" />
+                        <TextField fx:id="stateField" promptText="Estado" styleClass="text-field" />
                         </VBox>
+                        <HBox maxHeight="50.0" prefHeight="100.0" prefWidth="299.0">
+                            <children>
+                                <VBox maxHeight="50.0" prefHeight="200.0">
+                                    <children>
+                                        <Label styleClass="label-field" text="TELEFONE" />
+                                        <TextField fx:id="telefoneField" promptText="Telefone" styleClass="text-field" />
+                                    </children>
+                                </VBox>
+                                <Region maxWidth="120.0" prefHeight="200.0" prefWidth="120.0" />
+                                <VBox maxHeight="50.0" prefHeight="200.0">
+                                    <children>
+                                        <Label styleClass="label-field" text="CNPJ" />
+                                        <TextField fx:id="CNPJField" promptText="CNPJ" styleClass="text-field" />
+                                    </children>
+                                </VBox>
+                            </children>
+                        </HBox>
                     </children>
-                </StackPane>
+                    <padding>
+                        <Insets left="20.0" right="20.0" />
+                    </padding>
+                </VBox>
             </center>
             <bottom>
-                <HBox alignment="CENTER_RIGHT" minWidth="437.0" prefHeight="45.0" spacing="20.0" BorderPane.alignment="CENTER_RIGHT">
+                <HBox alignment="CENTER_RIGHT" minWidth="437.0" prefHeight="45.0" spacing="10.0" BorderPane.alignment="CENTER_RIGHT">
                     <children>
                         <Button onAction="#handleCancelar" style="-fx-background-color: #FEBAC6; -fx-text-fill: #F2383A;" styleClass="menu-button" text="Cancelar" />
                         <Button onAction="#handleSalvar" style="-fx-background-color: #DDE4F0; -fx-text-fill: #5A6ACF;" styleClass="menu-button" text="Salvar" />
@@ -94,14 +98,11 @@
                         <Insets right="20.0" />
                     </padding>
                 </StackPane>
-                <StackPane prefHeight="472.0" prefWidth="917.0">
-                    <children>
-                        <TableView fx:id="tabelaClientes" prefHeight="484.0">
-                            <columnResizePolicy>
-                                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-                            </columnResizePolicy></TableView>
-                    </children>
-                </StackPane>
+                <TableView fx:id="tabelaClientes" prefHeight="484.0" styleClass="table-view">
+                    <columnResizePolicy>
+                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                    </columnResizePolicy>
+                </TableView>
                 <HBox fx:id="paginationContainer" alignment="CENTER" minHeight="50" minWidth="365.0" spacing="10">
                     <children>
                         <Button fx:id="btnAnterior" onAction="#handlePaginaAnterior" text="Anterior" />
