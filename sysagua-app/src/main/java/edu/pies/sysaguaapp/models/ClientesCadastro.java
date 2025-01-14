@@ -1,12 +1,11 @@
 package edu.pies.sysaguaapp.models;
-
-import javax.xml.crypto.Data;
+import java.time.LocalDate;
 
 public class ClientesCadastro {
     private Long id;
     private String name;
     public static class Address {
-        private Long number;
+        private String number;
         private String street;
         private String neighborhood;
         private String city;
@@ -36,18 +35,18 @@ public class ClientesCadastro {
         public String getState() {
             return state;
         }
-        public void setNumber(Long number) {
+        public void setNumber(String number) {
             this.number = number;
         }
-        public Long getNumber() {
+        public String getNumber() {
             return number;
         }
     }
     private Address address;
-    private Long phone;
-    private Data createdAt;
+    private String phone;
+    private LocalDate createdAt;
     private boolean active;
-    private Long cnpj;
+    private String cnpj;
 
     // Getters e Setters
     public void setName(String name) {
@@ -57,17 +56,17 @@ public class ClientesCadastro {
         return name;
     }
 
-    public void setPhone(long phone) {
+    public void setPhone(String phone) {
         this.phone = phone;
     }
-    public long getPhone() {
+    public String getPhone() {
         return phone;
     }
 
-    public void setCnpj(long cnpj) {
+    public void setCnpj(String cnpj) {
         this.cnpj = cnpj;
     }
-    public long getCnpj() {
+    public String getCnpj() {
         return cnpj;
     }
 
@@ -83,10 +82,10 @@ public class ClientesCadastro {
     public Address getAddress() {
         return address;
     }
-    public void setCreatedAt(Data createdAt) {
+    public void setCreatedAt(LocalDate createdAt) {
         this.createdAt = createdAt;
     }
-    public Data getCreatedAt() {
+    public LocalDate getCreatedAt() {
         return createdAt;
     }
 }
