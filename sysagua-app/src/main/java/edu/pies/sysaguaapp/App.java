@@ -6,8 +6,6 @@ import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
-import java.util.Objects;
-
 public class App extends Application {@Override
 public void start(Stage primaryStage) throws Exception {
     FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/LoginView.fxml"));
