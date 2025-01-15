@@ -19,8 +19,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
         and     upper(p.brand) like upper(concat('%', :brand, '%'))
         and     ((:registerUpdateInit is null or :registerUpdateEnd is null) or p.updatedAt between :registerUpdateInit and :registerUpdateEnd)
         and     ((:registerDateInit is null or :registerDateEnd is null) or p.registeredAt between :registerDateInit and :registerDateEnd)
-        and     ((:minCost          is null or :maxCost  is null) or p.cost between :minCost and :maxCost)
-        and     ((:minPrice         is null or :maxPrice is null) or p.price between :minPrice and :maxPrice)
         order by p.name, p.category
     """)
     List<Product> findByFilters(
@@ -32,11 +30,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             @Param("registerUpdateInit") LocalDate registerUpdateInit,
             @Param("registerUpdateEnd") LocalDate registerUpdateEnd,
             @Param("registerDateInit") LocalDate registerDateInit,
-            @Param("registerDateEnd") LocalDate registerDateEnd,
-            @Param("minCost") Double minCost,
-            @Param("maxCost") Double maxCost,
-            @Param("minPrice") Double minPrice,
-            @Param("maxPrice") Double maxPrice
+            @Param("registerDateEnd") LocalDate registerDateEnd
     );
 
 
