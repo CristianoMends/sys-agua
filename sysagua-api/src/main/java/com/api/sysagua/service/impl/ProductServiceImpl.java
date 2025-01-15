@@ -37,13 +37,6 @@ public class ProductServiceImpl implements ProductService {
         if (p.getUnit()     == null ) p.setUnit("");
         if (p.getBrand()    == null ) p.setBrand("");
 
-        if (p.getMinPrice() != null && p.getMaxPrice() != null && p.getMinPrice() > p.getMaxPrice()) {
-            throw new BusinessException("Minimum price cannot be greater than maximum price.", HttpStatus.BAD_REQUEST);
-        }
-
-        if (p.getMinCost() != null && p.getMaxCost() != null && p.getMinCost() > p.getMaxCost()) {
-            throw new BusinessException("Minimum cost cannot be greater than maximum cost.", HttpStatus.BAD_REQUEST);
-        }
 
         if (p.getStartUpdateDate() != null && p.getEndRegisterDate() != null
                 && p.getStartUpdateDate().isAfter(p.getEndRegisterDate())) {
@@ -59,11 +52,7 @@ public class ProductServiceImpl implements ProductService {
                 p.getStartUpdateDate(),
                 p.getEndUpdateDate(),
                 p.getStartRegisterDate(),
-                p.getEndRegisterDate(),
-                p.getMinCost(),
-                p.getMaxCost(),
-                p.getMinPrice(),
-                p.getMaxPrice()
+                p.getEndRegisterDate()
         );
     }
 
@@ -74,10 +63,8 @@ public class ProductServiceImpl implements ProductService {
 
         if (dto.getBrand()      != null) p.setBrand(    dto.getBrand());
         if (dto.getCategory()   != null) p.setCategory( dto.getCategory());
-        if (dto.getCost()       != null) p.setCost(     dto.getCost());
         if (dto.getUnit()       != null) p.setUnit(     dto.getUnit());
         if (dto.getName()       != null) p.setName(     dto.getName());
-        if (dto.getPrice()      != null) p.setPrice(    dto.getPrice());
 
         p.setUpdatedAt(LocalDate.now(ZoneOffset.of("-03:00")));
         this.productRepository.save(p);

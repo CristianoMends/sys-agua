@@ -49,19 +49,4 @@ public class SearchProductDto {
     @FutureOrPresent(message = "End update date should not be in the past")
     private LocalDate endUpdateDate;
 
-    @Schema(description = "Custo mínimo para busca", example = "1.25")
-    @Min(value = 0, message = "Min cost should be at least 0")
-    private Double minCost;
-
-    @Schema(description = "Custo maximo para busca", example = "10.25")
-    @Min(value = 0, message = "Max cost should be at least 0")
-    private Double maxCost;
-
-    @Schema(description = "Preço mínimo para busca", example = "1.50")
-    @Min(value = 0, message = "Min price should be at least 0")
-    private Double minPrice;
-
-    @Schema(description = "Preço máximo para busca", example = "5.00")
-    @Min(value = 0, message = "Max price should be at least 0")
-    private Double maxPrice;
 }
