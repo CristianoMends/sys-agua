@@ -26,12 +26,6 @@ public class Product {
     @Column(nullable = false)
     private String unit;
 
-    @Column(nullable = false)
-    private Double price;
-
-    @Column(nullable = false)
-    private Double cost;
-
     private String brand;
 
     private String category;
@@ -40,11 +34,9 @@ public class Product {
 
     private LocalDate updatedAt;
 
-    public Product(String name, String unit, double price, double cost, String brand, String category) {
+    public Product(String name, String unit, String brand, String category) {
         this.name = name;
         this.unit = unit;
-        this.price = price;
-        this.cost = cost;
         this.brand = brand;
         this.category = category;
     }
@@ -56,8 +48,6 @@ public class Product {
                 this.unit,
                 this.brand,
                 this.category,
-                this.price,
-                this.cost,
                 this.registeredAt,
                 this.updatedAt
         );
