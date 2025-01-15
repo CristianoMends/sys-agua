@@ -1,24 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.shape.*?>
-<?import javafx.geometry.*?>
-<?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Rectangle?>
+<?import javafx.scene.text.Font?>
 
-<StackPane fx:id="rootPane"
-           prefHeight="600.0"
-           prefWidth="900.0"
-           style="-fx-background-color: white;" stylesheets="@../../styles/entregador.css"
-           xmlns="http://javafx.com/javafx/23.0.1"
-           xmlns:fx="http://javafx.com/fxml/1"
-           fx:controller="edu.pies.sysaguaapp.controllers.EntregadorController">
+<StackPane fx:id="rootPane" prefHeight="600.0" prefWidth="900.0" style="-fx-background-color: white;" stylesheets="@../../styles/entregador.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.pies.sysaguaapp.controllers.EntregadorController">
     <children>
-        <BorderPane fx:id="formCadastroEntregador" maxHeight="466.0" maxWidth="437.0" style="-fx-background-color: white; -fx-border-radius: 10; -fx-background-radius: 10;" visible="false">
+        <BorderPane fx:id="formCadastroEntregador" maxHeight="180.0" maxWidth="437.0" style="-fx-background-color: white; -fx-border-radius: 10; -fx-background-radius: 10;" visible="false">
             <center>
-                <StackPane minHeight="230.0" minWidth="437.0" BorderPane.alignment="CENTER_LEFT">
+                <StackPane minHeight="180.0" minWidth="437.0" BorderPane.alignment="CENTER_LEFT">
                     <children>
-                        <VBox fx:id="detailsFormEntregador" managed="true" minHeight="205.0" minWidth="365.0" spacing="5.0">
+                        <VBox fx:id="detailsFormEntregador" managed="true" minHeight="180.0" minWidth="365.0" spacing="5.0">
                             <children>
                                 <Label styleClass="label-field" text="NOME DO ENTREGADOR" />
                                 <TextField fx:id="nomeField" promptText="Nome" styleClass="text-field" />
@@ -28,7 +29,7 @@
                                 <Label fx:id="telefoneErrorLabel" style="-fx-text-fill: red;" text="Campo inválido" visible="false" />
                             </children>
                             <padding>
-                                <Insets left="20.0" right="20.0" />
+                                <Insets left="20.0" right="20.0" top="20.0" />
                             </padding>
                         </VBox>
                     </children>
@@ -88,5 +89,3 @@
         </VBox>
     </children>
 </StackPane>
-
-
