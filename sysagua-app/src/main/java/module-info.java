@@ -9,6 +9,7 @@ module edu.pies.sysaguaapp {
     requires java.xml.crypto;
     requires com.fasterxml.jackson.datatype.jsr310;
     requires com.fasterxml.jackson.databind;
+    requires static  lombok;
 
 
     opens edu.pies.sysaguaapp to javafx.fxml;
