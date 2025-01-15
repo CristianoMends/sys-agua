@@ -28,12 +28,6 @@ public class ViewProductDto {
     @Schema(description = "Categoria do produto", example = "Bebidas", maxLength = 30)
     private String category;
 
-    @Schema(description = "Preço do produto", example = "2.50")
-    private Double price;
-
-    @Schema(description = "Custo do produto", example = "1.50")
-    private Double cost;
-
     @Schema(description = "Data de registro do produto", example = "2024-12-19")
     private LocalDate registeredAt;
 

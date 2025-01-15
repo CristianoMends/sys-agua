@@ -28,9 +28,4 @@ public class UpdateProductDto {
     @Size(max = 30, message = "Category should not exceed 30 characters")
     private String category;
 
-    @Schema(description = "Preço do produto", example = "2.50")
-    private Double price;
-
-    @Schema(description = "Custo do produto", example = "1.50")
-    private Double cost;
 }
