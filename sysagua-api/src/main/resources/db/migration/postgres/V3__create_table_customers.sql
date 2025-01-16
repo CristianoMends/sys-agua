@@ -11,5 +11,5 @@ CREATE TABLE customers
     street VARCHAR(255),
     city VARCHAR(100),
     state VARCHAR(2),
-    CONSTRAINT customers_pkey PRIMARY KEY (customer_id)
+    CONSTRAINT customers_pkey PRIMARY KEY (id)
 );
