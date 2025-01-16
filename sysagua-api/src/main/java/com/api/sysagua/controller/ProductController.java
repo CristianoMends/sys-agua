@@ -45,7 +45,8 @@ public class ProductController implements ProductDoc {
             @RequestParam(required = false) LocalDate startUpdateDate,
             @RequestParam(required = false) LocalDate endUpdateDate,
             @RequestParam(required = false) LocalDate startRegisterDate,
-            @RequestParam(required = false) LocalDate endRegisterDate
+            @RequestParam(required = false) LocalDate endRegisterDate,
+            @RequestParam(required = false) Boolean active
     ) {
 
         var searchProductDto = new SearchProductDto(
@@ -57,7 +58,9 @@ public class ProductController implements ProductDoc {
                 startUpdateDate,
                 endUpdateDate,
                 startRegisterDate,
-                endRegisterDate
+                endRegisterDate,
+                active
+
         );
 
         List<ViewProductDto> products = productService.getProducts(searchProductDto)
@@ -75,10 +78,21 @@ public class ProductController implements ProductDoc {
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String unit,
             @RequestParam(required = false) String brand,
-            @RequestParam(required = false) String category
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) Boolean active
     ) {
-        UpdateProductDto productDto = new UpdateProductDto(name, unit,brand, category);
+        UpdateProductDto productDto = new UpdateProductDto(name, unit,brand, category, active);
         this.productService.updateProduct(id, productDto);
         return ResponseEntity.noContent().build();
     }
+
+    @DeleteMapping("{id}")
+    @Override
+    public ResponseEntity<Void> delete(
+            @PathVariable Long id
+    ){
+      this.productService.delete(id);
+      return ResponseEntity.noContent().build();
+    }
+
 }

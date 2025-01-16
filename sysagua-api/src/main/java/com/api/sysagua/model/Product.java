@@ -30,15 +30,18 @@ public class Product {
 
     private String category;
 
-    private LocalDate registeredAt;
+    private LocalDate createdAt;
 
     private LocalDate updatedAt;
 
-    public Product(String name, String unit, String brand, String category) {
+    private Boolean active;
+
+    public Product(String name, String unit, String brand, String category, Boolean active) {
         this.name = name;
         this.unit = unit;
         this.brand = brand;
         this.category = category;
+        this.active = active;
     }
 
     public ViewProductDto toView() {
@@ -48,8 +51,9 @@ public class Product {
                 this.unit,
                 this.brand,
                 this.category,
-                this.registeredAt,
-                this.updatedAt
+                this.createdAt,
+                this.updatedAt,
+                this.active
         );
     }
 }

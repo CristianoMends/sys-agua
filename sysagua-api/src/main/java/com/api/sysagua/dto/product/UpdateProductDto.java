@@ -28,4 +28,6 @@ public class UpdateProductDto {
     @Size(max = 30, message = "Category should not exceed 30 characters")
     private String category;
 
+    @Schema(description = "Se o produto não está ativo, então foi deletado", example = "true")
+    private Boolean active;
 }

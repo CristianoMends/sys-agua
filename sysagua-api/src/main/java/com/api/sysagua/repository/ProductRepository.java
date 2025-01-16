@@ -17,9 +17,10 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
         and     upper(p.category) like upper(concat('%', :category, '%'))
         and     upper(p.unit) like upper(concat('%', :unit, '%'))
         and     upper(p.brand) like upper(concat('%', :brand, '%'))
-        and     ((:registerUpdateInit is null or :registerUpdateEnd is null) or p.updatedAt between :registerUpdateInit and :registerUpdateEnd)
-        and     ((:registerDateInit is null or :registerDateEnd is null) or p.registeredAt between :registerDateInit and :registerDateEnd)
-        order by p.name, p.category
+        and     ((:updatedAtStart is null or :updatedAtEnd is null) or p.updatedAt between :updatedAtStart and :updatedAtEnd)
+        and     ((:createdAtInit is null or :createdAtEnd is null) or p.createdAt between :createdAtInit and :createdAtEnd)
+        and     (:active is null or p.active = :active)
+        order by p.createdAt, p.name, p.category
     """)
     List<Product> findByFilters(
             @Param("id") Long id,
@@ -27,10 +28,11 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             @Param("category") String category,
             @Param("unit") String unit,
             @Param("brand") String brand,
-            @Param("registerUpdateInit") LocalDate registerUpdateInit,
-            @Param("registerUpdateEnd") LocalDate registerUpdateEnd,
-            @Param("registerDateInit") LocalDate registerDateInit,
-            @Param("registerDateEnd") LocalDate registerDateEnd
+            @Param("updatedAtStart") LocalDate updatedAtStart,
+            @Param("updatedAtEnd") LocalDate updatedAtEnd,
+            @Param("createdAtInit") LocalDate createdAtInit,
+            @Param("createdAtEnd") LocalDate createdAtEnd,
+            @Param("active") Boolean active
     );
 
 

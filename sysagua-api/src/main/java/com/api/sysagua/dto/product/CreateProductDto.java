@@ -37,7 +37,8 @@ public class CreateProductDto {
                 name,
                 unit,
                 brand,
-                category
+                category,
+                true
         );
     }
 }

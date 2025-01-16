@@ -29,8 +29,11 @@ public class ViewProductDto {
     private String category;
 
     @Schema(description = "Data de registro do produto", example = "2024-12-19")
-    private LocalDate registeredAt;
+    private LocalDate createdAt;
 
     @Schema(description = "Data de atualização do produto", example = "2024-12-29")
     private LocalDate updatedAt;
+
+    @Schema(description = "Se o produto não está ativo, então foi deletado", example = "true")
+    private Boolean active;
 }

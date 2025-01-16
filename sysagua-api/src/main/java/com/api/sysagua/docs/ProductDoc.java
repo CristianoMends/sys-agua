@@ -94,7 +94,8 @@ public interface ProductDoc {
             LocalDate startUpdateDate,
             LocalDate endUpdateDate,
             LocalDate startRegisterDate,
-            LocalDate endRegisterDate
+            LocalDate endRegisterDate,
+            Boolean active
     );
 
     @Operation(
@@ -148,6 +149,54 @@ public interface ProductDoc {
             String name,
             String unit,
             String brand,
-            String category
+            String category,
+            Boolean active
     );
+
+    @Operation(
+            summary = "Deletar um produto",
+            description = "Deleta um produto do sistema com base no ID fornecido.",
+            security = @SecurityRequirement(name = "Bearer")
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "204",
+                    description = "Produto deletado com sucesso",
+                    content = @Content()
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "ID do produto fornecido é inválido",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ResponseError.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Produto não encontrado",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ResponseError.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Usuário não autorizado",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ResponseError.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Erro inesperado",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ResponseError.class)
+                    )
+            )
+    })
+    ResponseEntity<Void> delete(Long id);
+
 }

@@ -6,6 +6,7 @@ import com.api.sysagua.dto.product.UpdateProductDto;
 import com.api.sysagua.exception.BusinessException;
 import com.api.sysagua.model.Product;
 import com.api.sysagua.repository.ProductRepository;
+import com.api.sysagua.repository.StockRepository;
 import com.api.sysagua.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,11 +22,13 @@ public class ProductServiceImpl implements ProductService {
     @Autowired
     private ProductRepository productRepository;
 
+    @Autowired
+    private StockRepository stockRepository;
+
     @Override
     public void registerProduct(CreateProductDto productDto) {
         var productToSave = productDto.toModel();
-        productToSave.setRegisteredAt(LocalDate.now(ZoneOffset.of("-03:00")));
-        productToSave.setUpdatedAt(LocalDate.now(ZoneOffset.of("-03:00")));
+        productToSave.setCreatedAt(LocalDate.now(ZoneOffset.of("-03:00")));
 
         this.productRepository.save(productToSave);
     }
@@ -52,7 +55,8 @@ public class ProductServiceImpl implements ProductService {
                 p.getStartUpdateDate(),
                 p.getEndUpdateDate(),
                 p.getStartRegisterDate(),
-                p.getEndRegisterDate()
+                p.getEndRegisterDate(),
+                p.getActive()
         );
     }
 
@@ -66,7 +70,37 @@ public class ProductServiceImpl implements ProductService {
         if (dto.getUnit()       != null) p.setUnit(     dto.getUnit());
         if (dto.getName()       != null) p.setName(     dto.getName());
 
+        if (dto.getActive() != null){
+            p.setActive(   dto.getActive());
+
+            if (dto.getActive().equals(false)){
+                var stockByProduct = this.stockRepository.findProduct(p.getId());
+
+                if (stockByProduct.get().getQuantity() > 0){
+                    throw new BusinessException("The product cannot be inactive because it is still in stock.");
+                }
+
+                p.setActive(dto.getActive());
+            }
+        }
+
         p.setUpdatedAt(LocalDate.now(ZoneOffset.of("-03:00")));
+        this.productRepository.save(p);
+    }
+
+    @Override
+    public void delete(Long id) {
+        var p = this.productRepository.findById(id).orElseThrow(
+                () -> new BusinessException("Product not found", HttpStatus.NOT_FOUND)
+        );
+
+        var stockByProduct = this.stockRepository.findProduct(p.getId());
+
+        if (stockByProduct.get().getQuantity() > 0){
+            throw new BusinessException("The product cannot be deleted because it is still in stock.");
+        }
+
+        p.setActive(false);
         this.productRepository.save(p);
     }
 }

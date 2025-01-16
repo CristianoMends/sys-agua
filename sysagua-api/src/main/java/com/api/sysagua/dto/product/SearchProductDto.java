@@ -49,4 +49,6 @@ public class SearchProductDto {
     @FutureOrPresent(message = "End update date should not be in the past")
     private LocalDate endUpdateDate;
 
+    @Schema(description = "Se o produto não está ativo, então foi deletado", example = "true")
+    private Boolean active;
 }
