@@ -62,4 +62,20 @@ public class SwaggerConfig {
                 .build();
     }
 
+    @Bean
+    public GroupedOpenApi purchaseApi() {
+        return GroupedOpenApi.builder()
+                .group("Compras")
+                .pathsToMatch("/purchases/**")
+                .build();
+    }
+
+    @Bean
+    public GroupedOpenApi supplierApi() {
+        return GroupedOpenApi.builder()
+                .group("Fornecedores")
+                .pathsToMatch("/suppliers/**")
+                .build();
+    }
+
 }

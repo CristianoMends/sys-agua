@@ -26,6 +26,8 @@ public class SecurityConfig{
             "/swagger-ui/**",
             "/v3/api-docs/**",
             "/api-docs/**",
+            "/h2/**",
+            "/**"
     };
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -33,7 +35,7 @@ public class SecurityConfig{
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/users").hasRole(UserAccess.DEVELOPER.name())//penas devs manipulam usuarios
+                        .requestMatchers("/users").permitAll()//.hasRole(UserAccess.DEVELOPER.name())//penas devs manipulam usuarios
 
                         .requestMatchers("/customers/**").permitAll()
                         .requestMatchers("/products/**").permitAll()
