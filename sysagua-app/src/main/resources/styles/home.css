@@ -4,7 +4,7 @@
     -fx-border-color: transparent; /* Remove a borda */
     -fx-focus-color: transparent; /* Remove o efeito de foco (se houver) */
     -fx-text-fill: black;
-    -fx-font-size: 14px;
+    -fx-font-size: 16px;
     -fx-font-weight: normal;
     -fx-background-radius: 5;
     -fx-alignment: center-left; /* Alinha o texto à esquerda */
@@ -22,12 +22,15 @@
     -fx-text-fill: black;
     /*-fx-focus-color: transparent;*/
     -fx-padding: 5;
+    -fx-font-size: 16px;
     -fx-alignment: center-left;
 }
 
 .submenu-button:hover {
-    -fx-background-color: #707FDD;
-    -fx-font-weight: bold;
+    /*-fx-background-color: #707FDD;*/
+    /*-fx-font-weight: bold;*/
+    -fx-background-color: #707FDD10;
+    -fx-text-fill: #5A6ACF;
 }
 
 #topMenu {
@@ -44,7 +47,7 @@
 }
 
 #submenu{
-    -fx-background-color: #F1F2F780;
+    -fx-background-color: white;
 }
 
 #contentBody {
