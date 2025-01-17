@@ -15,8 +15,6 @@ public class Produto {
     private String category;
     private String line;
     private String ncm;
-    private String registeredAt;
-    private String updatedAt;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -38,11 +36,5 @@ public class Produto {
 
     public String getCategory() { return category; }
     public void setCategory(String category) { this.category = category; }
-
-    public String getRegisteredAt() { return registeredAt; }
-    public void setRegisteredAt(String registeredAt) { this.registeredAt = registeredAt; }
-
-    public String getUpdatedAt() { return updatedAt; }
-    public void setUpdatedAt(String updatedAt) { this.updatedAt = updatedAt; }
 }
 
