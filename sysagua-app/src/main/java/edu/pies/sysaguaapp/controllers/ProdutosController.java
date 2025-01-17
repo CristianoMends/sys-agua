@@ -9,11 +9,14 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class ProdutosController{
@@ -89,10 +92,18 @@ public class ProdutosController{
     @FXML
     private Label categoriaErrorLabel;
 
+    @FXML
+    private Button btnSalvar;
+
+    @FXML
+    private Button btnCancelar;
+
     private ObservableList<Produto> produtosObservable;
     private int paginaAtual = 0;
     private final int itensPorPagina = 18;
     private int totalPaginas;
+    private Produto produtoEditando = null;
+
 
     public ProdutosController() {
         this.produtoService = new ProdutoService();
@@ -103,6 +114,7 @@ public class ProdutosController{
     public void initialize() {
         configurarTabela();
         carregarProdutos();
+        showMenuContext();
 
         // Validar números
         configurarValidacaoNumerica(custoField);
@@ -126,6 +138,10 @@ public class ProdutosController{
         configurarValidacaoTexto(descricaoField);
     }
 
+
+    /*---------------------- modal ---------*/
+
+
     private void showOverlay() {
         overlay.maxWidth(rootPane.widthProperty().get());
         overlay.maxHeight(rootPane.heightProperty().get());
@@ -140,7 +156,14 @@ public class ProdutosController{
         overlay.setManaged(false);
     }
 
-    /*---------------------- modal ---------*/
+    @FXML
+    private void updateButtonText() {
+        if (produtoEditando != null) {
+            btnSalvar.setText("Editar");
+        } else {
+            btnSalvar.setText("Salvar");
+        }
+    }
 
     @FXML
     private void handleSalvar() {
@@ -163,9 +186,14 @@ public class ProdutosController{
 
         try {
             String token = TokenManager.getInstance().getToken();
-//            Produto produtoCriado = produtoService.criarProduto(novoProduto, token);
-//            produtosObservable.add(produtoCriado);
-            produtoService.criarProduto(novoProduto, token);
+            if (produtoEditando != null) {
+                novoProduto.setId(produtoEditando.getId());
+                produtoService.editarProduto(novoProduto, token);
+                produtosObservable.set(produtosObservable.indexOf(produtoEditando), novoProduto);
+            } else {
+                produtoService.criarProduto(novoProduto, token);
+                produtosObservable.add(novoProduto);
+            }
 
 
         } catch (Exception e) {
@@ -246,6 +274,75 @@ public class ProdutosController{
     private void hideForm() {
         formCadastroProduto.setVisible(false);
         formCadastroProduto.setManaged(false);
+    }
+
+    private void showMenuContext(){
+        ContextMenu contextMenu = new ContextMenu();
+
+        MenuItem editarItem = new MenuItem("Editar Produto");
+        MenuItem clonarItem = new MenuItem("Clonar Produto");
+        MenuItem inativarItem = new MenuItem("Inativar Produto");
+
+        // Adiciona as opções ao menu
+        contextMenu.getItems().addAll(editarItem, clonarItem, inativarItem);
+
+        // Ação para Editar Produto
+        editarItem.setOnAction(event -> handleEditarProduto());
+
+        // Ação para Clonar Produto
+        clonarItem.setOnAction(event -> handleClonarProduto());
+
+        // Ação para Inativar Produto
+        inativarItem.setOnAction(event -> handleInativarProduto());
+
+        tabelaProdutos.setOnMouseClicked(event -> {
+            if (event.getButton() == MouseButton.SECONDARY && !tabelaProdutos.getSelectionModel().isEmpty()) {
+                contextMenu.show(tabelaProdutos, event.getScreenX(), event.getScreenY());
+            } else {
+                contextMenu.hide();
+            }
+        });
+    }
+
+    private void handleEditarProduto() {
+        Produto produtoSelecionado = (Produto) tabelaProdutos.getSelectionModel().getSelectedItem();
+
+        if (produtoSelecionado != null) {
+            try{
+                preencherCampos(produtoSelecionado);
+                produtoEditando = produtoSelecionado;
+                updateButtonText();
+                showOverlay();
+                listProductView.setDisable(true);
+                showForm();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    private void preencherCampos(Produto produto) {
+        nomeField.setText(produto.getName());
+        categoriaField.setText(produto.getCategory());
+        unidadeField.setText(produto.getUnit());
+        precoUnitarioField.setText(String.valueOf(produto.getPrice()));
+        custoField.setText(String.valueOf(produto.getCost()));
+        marcaField.setText(produto.getBrand());
+
+    }
+
+    private void handleClonarProduto() {
+        Object produtoSelecionado = tabelaProdutos.getSelectionModel().getSelectedItem();
+        if (produtoSelecionado != null) {
+            System.out.println("Clonar Produto: " + produtoSelecionado);
+        }
+    }
+
+    private void handleInativarProduto() {
+        Object produtoSelecionado = tabelaProdutos.getSelectionModel().getSelectedItem();
+        if (produtoSelecionado != null) {
+            System.out.println("Inativar Produto: " + produtoSelecionado);
+        }
     }
 
     /* --------------------- tabela -------------*/
