@@ -84,8 +84,8 @@
            <bottom>
                   <HBox alignment="CENTER_RIGHT" minWidth="437.0" prefHeight="45.0" spacing="20.0" BorderPane.alignment="CENTER_RIGHT">
                       <children>
-                          <Button onAction="#handleCancelar" style="-fx-background-color: #FEBAC6; -fx-text-fill: #F2383A;" styleClass="menu-button" text="Cancelar" />
-                          <Button onAction="#handleSalvar" style="-fx-background-color: #DDE4F0; -fx-text-fill: #5A6ACF;" styleClass="menu-button" text="Salvar" />
+                          <Button fx:id="btnCancelar" onAction="#handleCancelar" style="-fx-background-color: #FEBAC6; -fx-text-fill: #F2383A;" styleClass="menu-button" text="Cancelar" />
+                          <Button fx:id="btnSalvar" onAction="#handleSalvar" style="-fx-background-color: #DDE4F0; -fx-text-fill: #5A6ACF;" styleClass="menu-button" text="Salvar" />
                       </children>
                <padding>
                   <Insets right="20.0" />

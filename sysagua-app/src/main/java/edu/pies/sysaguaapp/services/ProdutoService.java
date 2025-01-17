@@ -60,4 +60,26 @@ public class ProdutoService {
             throw new Exception("Erro ao criar produto: " + response.body());
         }
     }
+
+    public Produto editarProduto(Produto produto, String token) throws Exception {
+        String produtoJson = objectMapper.writeValueAsString(produto);
+        String urlComId = BASE_URL + "/" + produto.getId();
+        System.out.println(urlComId);
+        System.out.println(produtoJson);
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(urlComId))
+                .PUT(HttpRequest.BodyPublishers.ofString(produtoJson))
+                .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer " + token)
+                .build();
+
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() == 200) {
+            return objectMapper.readValue(response.body(), Produto.class);
+        } else {
+            throw new Exception("Erro ao editar produto: " + response.body());
+        }
+    }
 }
