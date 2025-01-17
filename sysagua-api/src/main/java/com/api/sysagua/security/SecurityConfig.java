@@ -37,6 +37,9 @@ public class SecurityConfig{
 
                         .requestMatchers("/customers/**").permitAll()
                         .requestMatchers("/products/**").permitAll()
+                        .requestMatchers("/stock/**").permitAll()
+                        .requestMatchers("/purchases/**").permitAll()
+                        .requestMatchers("/suppliers/**").permitAll()
                         .requestMatchers(freeRoutes).permitAll()//rotas liberadas
                         .anyRequest().authenticated()//libera demais rotas pra usuario autenticados
                 )
