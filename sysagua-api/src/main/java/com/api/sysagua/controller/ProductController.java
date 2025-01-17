@@ -71,17 +71,12 @@ public class ProductController implements ProductDoc {
         return ResponseEntity.ok().body(products);
     }
 
-    @PutMapping()
+    @PutMapping("{id}")
     @CrossOrigin
     public ResponseEntity<Void> update(
-            @RequestParam Long id,
-            @RequestParam(required = false) String name,
-            @RequestParam(required = false) String unit,
-            @RequestParam(required = false) String brand,
-            @RequestParam(required = false) String category,
-            @RequestParam(required = false) Boolean active
+            @PathVariable Long id,
+            @RequestBody UpdateProductDto productDto
     ) {
-        UpdateProductDto productDto = new UpdateProductDto(name, unit,brand, category, active);
         this.productService.updateProduct(id, productDto);
         return ResponseEntity.noContent().build();
     }
