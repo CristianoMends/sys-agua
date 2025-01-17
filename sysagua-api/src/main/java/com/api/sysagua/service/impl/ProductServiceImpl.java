@@ -96,7 +96,7 @@ public class ProductServiceImpl implements ProductService {
 
         var stockByProduct = this.stockRepository.findProduct(p.getId());
 
-        if (stockByProduct.get().getQuantity() > 0){
+        if (stockByProduct.isPresent() && stockByProduct.get().getQuantity() > 0){
             throw new BusinessException("The product cannot be deleted because it is still in stock.");
         }
 

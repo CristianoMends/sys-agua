@@ -1,6 +1,7 @@
 package com.api.sysagua.docs;
 
 import com.api.sysagua.dto.product.CreateProductDto;
+import com.api.sysagua.dto.product.UpdateProductDto;
 import com.api.sysagua.dto.product.ViewProductDto;
 import com.api.sysagua.exception.ResponseError;
 import io.swagger.v3.oas.annotations.Operation;
@@ -145,12 +146,7 @@ public interface ProductDoc {
             )
     })
     ResponseEntity<Void> update(
-            Long id,
-            String name,
-            String unit,
-            String brand,
-            String category,
-            Boolean active
+            Long id, UpdateProductDto productDto
     );
 
     @Operation(
