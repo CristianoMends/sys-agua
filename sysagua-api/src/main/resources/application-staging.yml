@@ -1,0 +1,37 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:sysagua_db
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+    initialize: true
+  sql:
+    init:
+      mode: always  # Garante que os arquivos SQL sejam executados em todos os perfis
+
+  jpa:
+    show-sql: true  # Desativa a exibição de SQL no console em produção
+    generate-ddl: true  # Desativa a geração automática do DDL
+    database-platform: org.hibernate.dialect.H2Dialect
+    properties:
+      hibernate.show_sql: true
+      javax:
+        persistence:
+          schema-generation:
+            scripts:
+              action: none
+    hibernate:
+      ddl-auto: create  # Comportamento do Hibernate para atualizar o banco de dados
+  flyway:
+    locations: classpath:db/migration/h2  # Caminho para scripts de migração com Flyway
+    baseline-on-migrate: true  # Permite migrações em bancos de dados existentes
+
+  h2:
+    console:
+      enabled: true
+      path: /h2
+
+security:
+  config:
+    jwt-secret-key: qwe123  # Chave secreta para geração de tokens JWT
+    jwt-expiration-time: 12  # Tempo de expiração dos tokens JWT (em horas)

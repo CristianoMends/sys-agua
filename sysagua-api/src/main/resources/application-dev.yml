@@ -4,6 +4,7 @@ spring:
     username: ${DB_USERNAME}  # Nome de usuário do banco de dados
     password: ${DB_PASSWORD}  # Senha do banco de dados
     driver-class-name: org.postgresql.Driver  # Driver para PostgreSQL
+    initialize: true
 
   servlet:
     multipart:
@@ -11,13 +12,15 @@ spring:
       max-request-size: 10MB  # Limite de tamanho para requisições
 
   jpa:
-    show-sql: false  # Desativa a exibição de SQL no console em produção
-    generate-ddl: false  # Desativa a geração automática do DDL
+    show-sql: true  # Desativa a exibição de SQL no console em produção
+    generate-ddl: true  # Desativa a geração automática do DDL
+    properties:
+      hibernate.show_sql: true
     hibernate:
       ddl-auto: update  # Comportamento do Hibernate para atualizar o banco de dados
-    flyway:
-      locations: classpath:db/migration  # Caminho para scripts de migração com Flyway
-      baseline-on-migrate: true  # Permite migrações em bancos de dados existentes
+  flyway:
+    locations: classpath:db/migration/postgres  # Caminho para scripts de migração com Flyway
+    baseline-on-migrate: true  # Permite migrações em bancos de dados existentes
 
 security:
   config:
