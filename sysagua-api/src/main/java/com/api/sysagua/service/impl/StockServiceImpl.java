@@ -24,9 +24,6 @@ public class StockServiceImpl implements StockService {
     @Autowired
     private ProductRepository productRepository;
 
-    @Autowired
-    private ProductPurchaseRepository productPurchaseRepository;
-
     @Override
     public void addProduct(AddProductDto dto) {
 
