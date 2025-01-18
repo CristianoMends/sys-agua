@@ -1,5 +1,5 @@
 package edu.pies.sysaguaapp.controllers;
-import edu.pies.sysaguaapp.models.ClientesCadastro;
+import edu.pies.sysaguaapp.models.Clientes;
 import edu.pies.sysaguaapp.services.ClientesService;
 import edu.pies.sysaguaapp.services.TokenManager;
 import javafx.animation.PauseTransition;
@@ -12,13 +12,14 @@ import javafx.scene.layout.*;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
-import java.time.LocalDate;
+import java.io.IOException;
 import java.util.List;
 
 public class ClientesController {
 
+
     private final ClientesService clienteService;
-    private ObservableList<ClientesCadastro> clientesObservable;
+    private ObservableList<Clientes> clientesObservable;
 
     @FXML
     private StackPane rootPane;
@@ -42,7 +43,7 @@ public class ClientesController {
     @FXML
     private TextField stateField;
 
-    private ClientesCadastro.Address address;
+    private Clientes.Address address;
 
     @FXML
     private TextField telefoneField;
@@ -76,7 +77,7 @@ public class ClientesController {
 
 
     @FXML
-    private TableView<ClientesCadastro> tabelaClientes;
+    private TableView<Clientes> tabelaClientes;
 
 
     private int paginaAtual = 0;
@@ -115,8 +116,8 @@ public class ClientesController {
         overlay.setManaged(false);
     }
 
-        @FXML
-        private void handleSalvar() {
+    @FXML
+    private void handleSalvar() {
         try{
             String nome = nomeField.getText();
             String telefoneStr = telefoneField.getText();
@@ -126,37 +127,39 @@ public class ClientesController {
             String bairro = neighborhoodField.getText();
             String cidade = cityField.getText();
             String estado = stateField.getText();
-            boolean activeSave = true;
-            LocalDate createdAtSave = LocalDate.now();
+
+            if (nomeField.getText().isEmpty() || CNPJField.getText().isEmpty()) {
+                mostrarAlerta("Campos obrigatórios", "Preencha todos os campos obrigatórios.", "");
+                return; // Sai do método se a validação falhar
+            }
 
             // Cria o objeto Address
-            ClientesCadastro.Address clienteAddress = new ClientesCadastro.Address();
+            Clientes.Address clienteAddress = new Clientes.Address();
             clienteAddress.setNumber(numeroStr);
             clienteAddress.setStreet(rua);
             clienteAddress.setNeighborhood(bairro);
             clienteAddress.setCity(cidade);
             clienteAddress.setState(estado);
-
-            ClientesCadastro novoCliente = new ClientesCadastro();
+            Clientes novoCliente = new Clientes();
             novoCliente.setName(nome);
             novoCliente.setAddress(clienteAddress);
             novoCliente.setPhone(telefoneStr);
             novoCliente.setCnpj(cnpjStr);
-            novoCliente.setCreatedAt(createdAtSave);
-            novoCliente.setActive(activeSave);
 
             String token = TokenManager.getInstance().getToken();
-            ClientesCadastro clienteCriado = ClientesService.criarCliente(novoCliente, token);
+            Clientes clienteCriado = ClientesService.criarCliente(novoCliente, token);
             hideForm();
             hideOverlay();
             clearFieldForm();
             listClienteView.setDisable(false);
             showSucessMessage();
-            carregarClientes();
-            } catch (Exception e) {
-                e.printStackTrace();
-                mostrarAlerta("Erro inesperado", "Falha ao criar cliente", "Ocorreu um erro inesperado. Detalhes: " + e.getMessage());
-            }
+        } catch (IOException e) { // Captura exceções mais específicas
+            e.printStackTrace();
+            mostrarAlerta("Erro de Conexão", "Falha ao criar cliente", "Verifique sua conexão com a internet.");
+        } catch (Exception e) { // Captura outras exceções (menos específico)
+            e.printStackTrace();
+            mostrarAlerta("Erro Inesperado", "Falha ao criar cliente", "Ocorreu um erro inesperado.");
+        }
         }
     private void mostrarAlerta(String title, String header, String content) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -228,7 +231,7 @@ public class ClientesController {
     private void carregarClientes() {
         try {
             String token = TokenManager.getInstance().getToken();
-            List<ClientesCadastro> todosClientes = clienteService.buscarClientes(token);
+            List<Clientes> todosClientes = clienteService.buscarClientes(token);
 
             // Calcula o total de páginas
             totalPaginas = (int) Math.ceil((double) todosClientes.size() / itensPorPagina);
@@ -236,7 +239,7 @@ public class ClientesController {
             // Filtra os produtos para a página atual
             int inicio = paginaAtual * itensPorPagina;
             int fim = Math.min(inicio + itensPorPagina, todosClientes.size());
-            List<ClientesCadastro> clientesPagina = todosClientes.subList(inicio, fim);
+            List<Clientes> clientesPagina = todosClientes.subList(inicio, fim);
 
             // Atualiza a lista observável
             clientesObservable.setAll(clientesPagina);
@@ -270,14 +273,14 @@ public class ClientesController {
 
     private void irParaPagina(int pagina) {
         paginaAtual = pagina;
-        carregarClientes();
+//        carregarClientes();
     }
 
     @FXML
     private void handlePaginaAnterior() {
         if (paginaAtual > 0) {
             paginaAtual--;
-            carregarClientes();
+//            carregarClientes();
         }
     }
 
@@ -285,35 +288,35 @@ public class ClientesController {
     private void handleProximaPagina() {
         if (paginaAtual < totalPaginas - 1) {
             paginaAtual++;
-            carregarClientes();
+//            carregarClientes();
         }
     }
 
 
     private void configurarTabela() {
         // Configuração das colunas da tabela
-        TableColumn<ClientesCadastro, String> colunaNome = new TableColumn<>("Nome");
-        colunaNome.setCellValueFactory(new PropertyValueFactory<>("Nome"));
+        TableColumn<Clientes, String> colunaNome = new TableColumn<>("Nome");
+        colunaNome.setCellValueFactory(new PropertyValueFactory<>("name"));
 
-        TableColumn<ClientesCadastro, String> colunaNumero = new TableColumn<>("Numero");
-        colunaNumero.setCellValueFactory(new PropertyValueFactory<>("numero"));
+        TableColumn<Clientes, String> colunaNumero = new TableColumn<>("Numero");
+        colunaNumero.setCellValueFactory(new PropertyValueFactory<>("address.number"));
 
-        TableColumn<ClientesCadastro, String> colunaRua = new TableColumn<>("Rua");
-        colunaRua.setCellValueFactory(new PropertyValueFactory<>("rua"));
+        TableColumn<Clientes, String> colunaRua = new TableColumn<>("Rua");
+        colunaRua.setCellValueFactory(new PropertyValueFactory<>("address.street"));
 
-        TableColumn<ClientesCadastro, String> colunaBairro = new TableColumn<>("Bairro");
-        colunaBairro.setCellValueFactory(new PropertyValueFactory<>("bairro"));
+        TableColumn<Clientes, String> colunaBairro = new TableColumn<>("Bairro");
+        colunaBairro.setCellValueFactory(new PropertyValueFactory<>("address.neighborhood"));
 
-        TableColumn<ClientesCadastro, String> colunaCidade = new TableColumn<>("Cidade");
-        colunaCidade.setCellValueFactory(new PropertyValueFactory<>("cidade"));
+        TableColumn<Clientes, String> colunaCidade = new TableColumn<>("Cidade");
+        colunaCidade.setCellValueFactory(new PropertyValueFactory<>("address.city"));
 
-        TableColumn<ClientesCadastro, String> colunaEstado = new TableColumn<>("Estado");
-        colunaEstado.setCellValueFactory(new PropertyValueFactory<>("estado"));
+        TableColumn<Clientes, String> colunaEstado = new TableColumn<>("Estado");
+        colunaEstado.setCellValueFactory(new PropertyValueFactory<>("address.state"));
 
-        TableColumn<ClientesCadastro, String> colunaTelefone = new TableColumn<>("Telefone");
-        colunaTelefone.setCellValueFactory(new PropertyValueFactory<>("telefone"));
+        TableColumn<Clientes, String> colunaTelefone = new TableColumn<>("Telefone");
+        colunaTelefone.setCellValueFactory(new PropertyValueFactory<>("phone"));
 
-        TableColumn<ClientesCadastro, String> colunaCnpj = new TableColumn<>("CNPJ");
+        TableColumn<Clientes, String> colunaCnpj = new TableColumn<>("CNPJ");
         colunaCnpj.setCellValueFactory(new PropertyValueFactory<>("cnpj"));
 
         tabelaClientes.getColumns().addAll(colunaNome, colunaNumero, colunaRua, colunaBairro, colunaCidade, colunaEstado, colunaTelefone , colunaCnpj);
