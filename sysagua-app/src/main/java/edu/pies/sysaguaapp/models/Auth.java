@@ -3,12 +3,12 @@ package edu.pies.sysaguaapp.models;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
-public class ClienteLogin {
+public class Auth {
     private final StringProperty email;
     private final StringProperty senha;
 
 
-    public ClienteLogin(String email, String senha) {
+    public Auth(String email, String senha) {
         this.email = new SimpleStringProperty(email);
         this.senha = new SimpleStringProperty(senha);
     }
