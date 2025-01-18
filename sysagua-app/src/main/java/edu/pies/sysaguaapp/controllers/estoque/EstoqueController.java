@@ -67,7 +67,6 @@ public class EstoqueController {
     }
 
     private void configurarTabela() {
-        // Configuração das colunas da tabela
         TableColumn<Estoque, String> colunaProduto = new TableColumn<>("Produto");
         colunaProduto.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getProduto().getName()));
 
@@ -159,7 +158,7 @@ public class EstoqueController {
     @FXML
     private void handleMovimentacoes() {
         btnMovimentacoes.setOnAction(event -> {
-            // Implementar lógica para movimentações
+            // Implementar
             System.out.println("Movimentações");
         });
     }
@@ -167,7 +166,7 @@ public class EstoqueController {
     @FXML
     private void handleConfiguracoes() {
         btnConfiguracoes.setOnAction(event -> {
-            // Implementar lógica para configurações
+            // Implementar
             System.out.println("Configurações");
         });
     }
