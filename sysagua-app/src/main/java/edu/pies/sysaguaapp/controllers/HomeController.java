@@ -84,7 +84,7 @@ public class HomeController implements Initializable {
 
     @FXML
     private void handleEstoque() {
-        showMessage("Estoque");
+        loadView("/views/Estoque/Estoque.fxml");
         hideSubmenu();
     }
 
