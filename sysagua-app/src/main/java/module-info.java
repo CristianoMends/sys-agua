@@ -7,7 +7,6 @@ module edu.pies.sysaguaapp {
     requires org.kordamp.bootstrapfx.core;
     requires java.net.http;
     requires java.xml.crypto;
-    requires com.fasterxml.jackson.datatype.jsr310;
     requires com.fasterxml.jackson.databind;
 
 

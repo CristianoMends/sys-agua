@@ -5,7 +5,7 @@
 
 <?import javafx.geometry.Insets?>
 <BorderPane xmlns:fx="http://javafx.com/fxml"
-            fx:controller="edu.pies.sysaguaapp.controllers.LoginController" stylesheets="@../styles/loginstyle.css">
+            fx:controller="edu.pies.sysaguaapp.controllers.AuthController" stylesheets="@../styles/loginstyle.css">
 
     <!-- Mensagem de boas-vindas no topo -->
     <top>
