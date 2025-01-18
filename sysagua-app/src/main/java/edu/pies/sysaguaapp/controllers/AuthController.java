@@ -1,5 +1,4 @@
 package edu.pies.sysaguaapp.controllers;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.pies.sysaguaapp.services.AuthService;
 import edu.pies.sysaguaapp.services.TokenManager;
 import javafx.event.ActionEvent;
@@ -10,7 +9,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
-public class LoginController {
+public class AuthController {
 
     private final AuthService authService;
 
@@ -23,7 +22,7 @@ public class LoginController {
     @FXML
     private Label errorLabel; //exibir mensagens de erro
 
-    public LoginController() {
+    public AuthController() {
         this.authService = new AuthService();
     }
 

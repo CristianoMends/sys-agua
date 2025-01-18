@@ -1,5 +1,7 @@
 package edu.pies.sysaguaapp.models;
-import java.time.LocalDate;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 
 public class ClientesCadastro {
     private Long id;
@@ -44,10 +46,7 @@ public class ClientesCadastro {
     }
     private Address address;
     private String phone;
-    private LocalDate createdAt;
-    private boolean active;
     private String cnpj;
-
     // Getters e Setters
     public void setName(String name) {
         this.name = name;
@@ -55,37 +54,28 @@ public class ClientesCadastro {
     public String getName() {
         return name;
     }
-
+    public Long getId() {
+        return id;
+    }
+    public void setId(Long id) {
+        this.id = id;
+    }
     public void setPhone(String phone) {
         this.phone = phone;
     }
     public String getPhone() {
         return phone;
     }
-
     public void setCnpj(String cnpj) {
         this.cnpj = cnpj;
     }
     public String getCnpj() {
         return cnpj;
     }
-
-    public void setActive(boolean active) {
-        this.active = active;
-    }
-    public boolean isActive() {
-        return active;
-    }
     public void setAddress(Address address) {
         this.address = address;
     }
     public Address getAddress() {
         return address;
-    }
-    public void setCreatedAt(LocalDate createdAt) {
-        this.createdAt = createdAt;
-    }
-    public LocalDate getCreatedAt() {
-        return createdAt;
     }
 }
