@@ -1,8 +1,7 @@
 package edu.pies.sysaguaapp.services;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import edu.pies.sysaguaapp.models.ClientesCadastro;
+import edu.pies.sysaguaapp.models.Clientes;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -20,8 +19,7 @@ public class ClientesService {
         this.httpClient = HttpClient.newHttpClient();
         this.objectMapper = new ObjectMapper();
     }
-
-    public List<ClientesCadastro> buscarClientes(String token) throws Exception {
+    public List<Clientes> buscarClientes(String token) throws Exception {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(BASE_URL))
                 .GET()
@@ -32,18 +30,14 @@ public class ClientesService {
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
         if (response.statusCode() == 200) {
-            return objectMapper.readValue(response.body(), new TypeReference<List<ClientesCadastro>>() {
+            return objectMapper.readValue(response.body(), new TypeReference<List<Clientes>>() {
             });
         } else {
             throw new Exception("Erro ao buscar clientes: " + response.body());
         }
     }
 
-    public static ClientesCadastro criarCliente(ClientesCadastro clientes, String token) throws Exception {
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule());
-
+    public static Clientes criarCliente(Clientes clientes, String token) throws Exception {
         // Converter o objeto Produto para JSON
 
         String clienteJson = objectMapper.writeValueAsString(clientes);
@@ -63,7 +57,7 @@ public class ClientesService {
 
         // Verificar a resposta
         if (response.statusCode() == 201) {
-            return objectMapper.readValue(response.body(), ClientesCadastro.class);
+            return objectMapper.readValue(response.body(), Clientes.class);
         } else if (response.statusCode() == 400) {
             System.out.println("Erro ao criar cliente: " + response.body());
         } else {
