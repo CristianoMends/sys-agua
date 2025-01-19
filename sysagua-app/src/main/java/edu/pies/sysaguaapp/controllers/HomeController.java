@@ -150,7 +150,7 @@ public class HomeController implements Initializable {
 
     @FXML
     private void handleEntregador() {
-        showMessage("Todos os entregadores");
+        loadView("/views/Entregador/Entregador.fxml");
         hideSubmenu();
     }
 

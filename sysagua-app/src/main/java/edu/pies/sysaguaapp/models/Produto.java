@@ -1,12 +1,10 @@
 package edu.pies.sysaguaapp.models;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.*;
 
 import java.math.BigDecimal;
-
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -22,8 +20,8 @@ public class Produto {
     private String category;
     private String line;
     private String ncm;
-    private String createdAt;
-    private String updatedAt;
-    private String active;
+    private String createdat;
+    private String updatedat;
+    private Boolean active;
 }
 

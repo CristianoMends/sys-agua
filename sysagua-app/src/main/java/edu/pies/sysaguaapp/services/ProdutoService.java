@@ -60,4 +60,38 @@ public class ProdutoService {
             throw new Exception("Erro ao criar produto: " + response.body());
         }
     }
+
+    public Produto editarProduto(Produto produto, String token) throws Exception {
+//        Produto produtoEditado = new Produto();
+//        produtoEditado.setId(produto.getId());
+//        produtoEditado.setName(produto.getName());
+//        produtoEditado.setUnit(produto.getUnit());
+//        produtoEditado.setBrand(produto.getBrand());
+//        produtoEditado.setCategory(produto.getCategory());
+//        produtoEditado.setCreatedAt(produto.getCreatedAt());
+//        produtoEditado.setUpdatedAt(produto.getUpdatedAt());
+//        produtoEditado.setActive(produto.getActive());
+
+        String produtoJson = objectMapper.writeValueAsString(produto);
+        String urlComId = BASE_URL + "/" + produto.getId();
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(urlComId))
+                .PUT(HttpRequest.BodyPublishers.ofString(produtoJson))
+                .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer " + token)
+                .build();
+
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() == 200 || response.statusCode() == 204) {
+            if (response.body().isEmpty()) {
+                return produto;
+            } else {
+                return objectMapper.readValue(response.body(), Produto.class);
+            }
+        } else {
+            throw new Exception("Erro ao editar produto: " + response.body());
+        }
+    }
 }
