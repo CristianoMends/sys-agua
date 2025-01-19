@@ -188,8 +188,19 @@ public class ProdutosController{
             String token = TokenManager.getInstance().getToken();
             if (produtoEditando != null) {
                 novoProduto.setId(produtoEditando.getId());
+                novoProduto.setCreatedAt(produtoEditando.getCreatedAt());
+                novoProduto.setUpdatedAt(LocalDate.now().toString());
+                novoProduto.setActive(true);
                 produtoService.editarProduto(novoProduto, token);
                 produtosObservable.set(produtosObservable.indexOf(produtoEditando), novoProduto);
+//                "id": 3,
+//                        "name": "Garrafa de Água 1.5L",
+//                        "unit": "L",
+//                        "brand": "Cristalina",
+//                        "category": "Água Mineral",
+//                        "createdAt": "2025-01-12",
+//                        "updatedAt": "2025-01-12",
+//                        "active": true
             } else {
                 produtoService.criarProduto(novoProduto, token);
                 produtosObservable.add(novoProduto);
