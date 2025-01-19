@@ -7,33 +7,30 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDate;
-
 @Entity
-@Table(name = "customers")
+@Table(name = "suppliers")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Customer {
+public class Supplier {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
+    @Column(nullable = false)
     private Long id;
-    private String name;
+
+    private String socialReason;
+    private String cnpj;
     @Embedded
     private AddressDto address;
     private String phone;
-    private LocalDate createdAt;
     private Boolean active;
-    private String cnpj;
 
-    public Customer(String name, AddressDto address, String phone, String cnpj){
-        setName(name);
-        setAddress(address);
-        setPhone(phone);
-        setCnpj(cnpj);
+    public Supplier(String socialReason, String cnpj, AddressDto address, String phone) {
+        this.socialReason = socialReason;
+        this.cnpj = cnpj;
+        this.address = address;
+        this.phone = phone;
     }
-
 }

@@ -53,4 +53,29 @@ public class SwaggerConfig {
                 .pathsToMatch("/customers/**")
                 .build();
     }
+
+    @Bean
+    public GroupedOpenApi stockApi() {
+        return GroupedOpenApi.builder()
+                .group("Estoque")
+                .pathsToMatch("/stock/**")
+                .build();
+    }
+
+    @Bean
+    public GroupedOpenApi purchaseApi() {
+        return GroupedOpenApi.builder()
+                .group("Compras")
+                .pathsToMatch("/purchases/**")
+                .build();
+    }
+
+    @Bean
+    public GroupedOpenApi supplierApi() {
+        return GroupedOpenApi.builder()
+                .group("Fornecedores")
+                .pathsToMatch("/suppliers/**")
+                .build();
+    }
+
 }

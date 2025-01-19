@@ -28,15 +28,12 @@ public class ViewProductDto {
     @Schema(description = "Categoria do produto", example = "Bebidas", maxLength = 30)
     private String category;
 
-    @Schema(description = "Preço do produto", example = "2.50")
-    private Double price;
-
-    @Schema(description = "Custo do produto", example = "1.50")
-    private Double cost;
-
     @Schema(description = "Data de registro do produto", example = "2024-12-19")
-    private LocalDate registeredAt;
+    private LocalDate createdAt;
 
     @Schema(description = "Data de atualização do produto", example = "2024-12-29")
     private LocalDate updatedAt;
+
+    @Schema(description = "Se o produto não está ativo, então foi deletado", example = "true")
+    private Boolean active;
 }
