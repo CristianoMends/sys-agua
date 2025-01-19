@@ -188,8 +188,8 @@ public class ProdutosController{
             String token = TokenManager.getInstance().getToken();
             if (produtoEditando != null) {
                 novoProduto.setId(produtoEditando.getId());
-                novoProduto.setCreatedAt(produtoEditando.getCreatedAt());
-                novoProduto.setUpdatedAt(LocalDate.now().toString());
+                novoProduto.setCreatedat(produtoEditando.getCreatedat());
+//                novoProduto.setUpdatedat(LocalDate.now().toString());
                 novoProduto.setActive(true);
                 produtoService.editarProduto(novoProduto, token);
                 produtosObservable.set(produtosObservable.indexOf(produtoEditando), novoProduto);

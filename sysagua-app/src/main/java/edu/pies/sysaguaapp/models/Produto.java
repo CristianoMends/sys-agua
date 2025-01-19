@@ -1,12 +1,15 @@
 package edu.pies.sysaguaapp.models;
 
-import java.math.BigDecimal;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
 
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 public class Produto {
     private Long id;
     private String name;
@@ -19,6 +22,6 @@ public class Produto {
     private String ncm;
     private String createdat;
     private String updatedat;
-    private boolean active;
+    private Boolean active;
 }
 
