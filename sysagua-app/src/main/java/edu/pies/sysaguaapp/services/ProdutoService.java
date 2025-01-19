@@ -62,10 +62,19 @@ public class ProdutoService {
     }
 
     public Produto editarProduto(Produto produto, String token) throws Exception {
-        String produtoJson = objectMapper.writeValueAsString(produto);
+        // Create a new object with only the required attributes
+        Produto produtoEditado = new Produto();
+        produtoEditado.setId(produto.getId());
+        produtoEditado.setName(produto.getName());
+        produtoEditado.setUnit(produto.getUnit());
+        produtoEditado.setBrand(produto.getBrand());
+        produtoEditado.setCategory(produto.getCategory());
+        produtoEditado.setCreatedAt(produto.getCreatedAt());
+        produtoEditado.setUpdatedAt(produto.getUpdatedAt());
+        produtoEditado.setActive(produto.getActive());
+
+        String produtoJson = objectMapper.writeValueAsString(produtoEditado);
         String urlComId = BASE_URL + "/" + produto.getId();
-        System.out.println(urlComId);
-        System.out.println(produtoJson);
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(urlComId))
@@ -76,8 +85,12 @@ public class ProdutoService {
 
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
-        if (response.statusCode() == 200) {
-            return objectMapper.readValue(response.body(), Produto.class);
+        if (response.statusCode() == 200 || response.statusCode() == 204) {
+            if (response.body().isEmpty()) {
+                return produtoEditado;
+            } else {
+                return objectMapper.readValue(response.body(), Produto.class);
+            }
         } else {
             throw new Exception("Erro ao editar produto: " + response.body());
         }
