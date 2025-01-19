@@ -20,8 +20,8 @@ public class Produto {
     private String category;
     private String line;
     private String ncm;
-    private String createdAt;
-    private String updatedAt;
+    private String createdat;
+    private String updatedat;
     private Boolean active;
 }
 
