@@ -9,6 +9,7 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
@@ -61,6 +62,14 @@ public class EntregadorController {
     @FXML
     private Label telefoneErrorLabel;
 
+    @FXML
+    private Button btnSalvar;
+
+    @FXML
+    private Button btnCancelar;
+
+    private Entregador entregadorEditando = null;
+
     private ObservableList<Entregador> entregadorObservable;
     private int paginaAtual = 0;
     private final int itensPorPagina = 18;
@@ -75,6 +84,7 @@ public class EntregadorController {
     public void initialize() {
         configurarTabela();
         carregarEntregadores();
+        showMenuContext();
 
         // Validar texto
         configurarValidacaoTexto(nomeField);
@@ -105,6 +115,15 @@ public class EntregadorController {
     /*---------------------- modal ---------*/
 
     @FXML
+    private void updateButtonText() {
+        if (entregadorEditando != null) {
+            btnSalvar.setText("Editar");
+        } else {
+            btnSalvar.setText("Salvar");
+        }
+    }
+
+    @FXML
     private void handleSalvar() {
         String nome = nomeField.getText();
         String telefone = telefoneField.getText();
@@ -117,7 +136,14 @@ public class EntregadorController {
 
         try {
             String token = TokenManager.getInstance().getToken();
-            entregadorService.cadastrarEntregador(novoEntregador, token);
+            if (entregadorEditando != null) {
+                novoEntregador.setId(entregadorEditando.getId());
+                entregadorService.atualizarEntregador(novoEntregador, token);
+                entregadorObservable.set(entregadorObservable.indexOf(entregadorEditando), novoEntregador);
+            } else {
+                entregadorService.cadastrarEntregador(novoEntregador, token);
+                entregadorObservable.add(novoEntregador);
+            }
 
 
         } catch (Exception e) {
@@ -179,12 +205,74 @@ public class EntregadorController {
         formCadastroEntregador.setManaged(false);
     }
 
+    private void showMenuContext(){
+        ContextMenu contextMenu = new ContextMenu();
+
+        MenuItem editarItem = new MenuItem("Editar");
+        MenuItem clonarItem = new MenuItem("Clonar");
+        MenuItem inativarItem = new MenuItem("Inativar");
+
+        contextMenu.getItems().addAll(editarItem, clonarItem, inativarItem);
+
+        editarItem.setOnAction(event -> handleEditarProduto());
+
+        clonarItem.setOnAction(event -> handleClonarProduto());
+
+        inativarItem.setOnAction(event -> handleInativarProduto());
+
+        tabelaEntregador.setOnMouseClicked(event -> {
+            if (event.getButton() == MouseButton.SECONDARY && !tabelaEntregador.getSelectionModel().isEmpty()) {
+                contextMenu.show(tabelaEntregador, event.getScreenX(), event.getScreenY());
+            } else {
+                contextMenu.hide();
+            }
+        });
+    }
+
+    private void handleEditarProduto() {
+        Entregador entregadorSelecionado = (Entregador) tabelaEntregador.getSelectionModel().getSelectedItem();
+
+        if (entregadorSelecionado != null) {
+            try{
+                preencherCampos(entregadorSelecionado);
+                entregadorEditando = entregadorSelecionado;
+                updateButtonText();
+                showOverlay();
+                listEntregadorView.setDisable(true);
+                showForm();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    private void preencherCampos(Entregador entregador) {
+        nomeField.setText(entregador.getNome());
+        telefoneField.setText(entregador.getTelefone());
+
+    }
+
+    private void handleClonarProduto() {
+        Object entregadorSelecionado = tabelaEntregador.getSelectionModel().getSelectedItem();
+        if (entregadorSelecionado != null) {
+            System.out.println("Clonar: " + entregadorSelecionado);
+        }
+    }
+
+    private void handleInativarProduto() {
+        Object entregadorSelecionado = tabelaEntregador.getSelectionModel().getSelectedItem();
+        if (entregadorSelecionado != null) {
+            System.out.println("Inativar: " + entregadorSelecionado);
+        }
+    }
+
+
     /* --------------------- tabela -------------*/
 
     private void configurarTabela() {
         // Configuração das colunas da tabela
         TableColumn<Entregador, String> colunaNome = new TableColumn<>("Nome");
-        colunaNome.setCellValueFactory(new PropertyValueFactory<>("name"));
+        colunaNome.setCellValueFactory(new PropertyValueFactory<>("nome"));
 
         TableColumn<Entregador, String> colunaTelefone = new TableColumn<>("Telefone");
         colunaTelefone.setCellValueFactory(new PropertyValueFactory<>("telefone"));

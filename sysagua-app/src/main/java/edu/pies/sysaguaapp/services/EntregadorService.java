@@ -11,7 +11,7 @@ import java.net.http.HttpResponse;
 import java.util.List;
 
 public class EntregadorService {
-    private static final String BASE_URL = "http://localhost:8080/delivery";
+    private static final String BASE_URL = "http://localhost:8080/entregador";
     private final HttpClient httpClient;
     private final ObjectMapper objectMapper;
 
@@ -58,6 +58,25 @@ public class EntregadorService {
             return null;
         } else {
             throw new Exception("Erro ao cadastrar: " + response.body());
+        }
+    }
+
+    public Entregador atualizarEntregador(Entregador entregador, String token) throws Exception {
+        String entregadorJson = objectMapper.writeValueAsString(entregador);
+
+        String urlEntregador = BASE_URL + "/" + entregador.getId();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(urlEntregador))
+                .PUT(HttpRequest.BodyPublishers.ofString(entregadorJson))
+                .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer " + token)
+                .build();
+
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        if (response.statusCode() == 204) {
+            return null;
+        } else {
+            throw new Exception("Erro ao atualizar: " + response.body());
         }
     }
 }

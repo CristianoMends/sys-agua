@@ -7,6 +7,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Entregador {
+    private Long id;
     private String nome;
     private String telefone;
 }
