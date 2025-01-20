@@ -5,7 +5,6 @@ import com.api.sysagua.dto.stock.SearchStockDto;
 import com.api.sysagua.dto.stock.UpdateStockDto;
 import com.api.sysagua.exception.BusinessException;
 import com.api.sysagua.model.Stock;
-import com.api.sysagua.repository.ProductPurchaseRepository;
 import com.api.sysagua.repository.ProductRepository;
 import com.api.sysagua.repository.StockRepository;
 import com.api.sysagua.service.StockService;
