@@ -1,6 +1,7 @@
 package edu.pies.sysaguaapp.controllers;
 
 import edu.pies.sysaguaapp.models.Entregador;
+import edu.pies.sysaguaapp.models.Produto;
 import edu.pies.sysaguaapp.services.EntregadorService;
 import edu.pies.sysaguaapp.services.TokenManager;
 import javafx.animation.PauseTransition;
@@ -208,17 +209,15 @@ public class EntregadorController {
     private void showMenuContext(){
         ContextMenu contextMenu = new ContextMenu();
 
-        MenuItem editarItem = new MenuItem("Editar");
-        MenuItem clonarItem = new MenuItem("Clonar");
-        MenuItem inativarItem = new MenuItem("Inativar");
+        MenuItem editarItem = new MenuItem("Editar entregador");
+        MenuItem inativarItem = new MenuItem("Inativar entregador");
 
-        contextMenu.getItems().addAll(editarItem, clonarItem, inativarItem);
+        contextMenu.getItems().addAll(editarItem, inativarItem);
 
-        editarItem.setOnAction(event -> handleEditarProduto());
+        editarItem.setOnAction(event -> handleEditarEntregador());
 
-        clonarItem.setOnAction(event -> handleClonarProduto());
 
-        inativarItem.setOnAction(event -> handleInativarProduto());
+        inativarItem.setOnAction(event -> handleInativarEntregador());
 
         tabelaEntregador.setOnMouseClicked(event -> {
             if (event.getButton() == MouseButton.SECONDARY && !tabelaEntregador.getSelectionModel().isEmpty()) {
@@ -229,7 +228,7 @@ public class EntregadorController {
         });
     }
 
-    private void handleEditarProduto() {
+    private void handleEditarEntregador() {
         Entregador entregadorSelecionado = (Entregador) tabelaEntregador.getSelectionModel().getSelectedItem();
 
         if (entregadorSelecionado != null) {
@@ -252,14 +251,7 @@ public class EntregadorController {
 
     }
 
-    private void handleClonarProduto() {
-        Object entregadorSelecionado = tabelaEntregador.getSelectionModel().getSelectedItem();
-        if (entregadorSelecionado != null) {
-            System.out.println("Clonar: " + entregadorSelecionado);
-        }
-    }
-
-    private void handleInativarProduto() {
+    private void handleInativarEntregador() {
         Object entregadorSelecionado = tabelaEntregador.getSelectionModel().getSelectedItem();
         if (entregadorSelecionado != null) {
             System.out.println("Inativar: " + entregadorSelecionado);
