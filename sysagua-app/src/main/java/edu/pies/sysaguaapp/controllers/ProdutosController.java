@@ -9,11 +9,14 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class ProdutosController{
@@ -54,6 +57,9 @@ public class ProdutosController{
     private TextField unidadeField;
 
     @FXML
+    private TextField lineField;
+
+    @FXML
     private TextField ncmFiel;
 
     @FXML
@@ -89,10 +95,18 @@ public class ProdutosController{
     @FXML
     private Label categoriaErrorLabel;
 
+    @FXML
+    private Button btnSalvar;
+
+    @FXML
+    private Button btnCancelar;
+
     private ObservableList<Produto> produtosObservable;
     private int paginaAtual = 0;
     private final int itensPorPagina = 18;
     private int totalPaginas;
+    private Produto produtoEditando = null;
+
 
     public ProdutosController() {
         this.produtoService = new ProdutoService();
@@ -103,28 +117,12 @@ public class ProdutosController{
     public void initialize() {
         configurarTabela();
         carregarProdutos();
-
-        // Validar números
-        configurarValidacaoNumerica(custoField);
-        configurarValidacaoNumerica(precoUnitarioField);
-        configurarValidacaoNumerica(cestField);
-        configurarValidacaoNumerica(gtinField);
-
-        // Validar texto
-        configurarValidacaoTexto(nomeField);
-        nomeField.textProperty().addListener((obs, oldText, newText) -> {
-            nomeErrorLabel.setVisible(newText.trim().isEmpty());
-        });
-
-        configurarValidacaoTexto(categoriaField);
-        categoriaField.textProperty().addListener((obs, oldText, newText) -> {
-            categoriaErrorLabel.setVisible(newText.trim().isEmpty());
-        });
-
-        configurarValidacaoTexto(marcaField);
-        configurarValidacaoTexto(unidadeField);
-        configurarValidacaoTexto(descricaoField);
+        showMenuContext();
     }
+
+
+    /*---------------------- modal ---------*/
+
 
     private void showOverlay() {
         overlay.maxWidth(rootPane.widthProperty().get());
@@ -140,32 +138,48 @@ public class ProdutosController{
         overlay.setManaged(false);
     }
 
-    /*---------------------- modal ---------*/
+    @FXML
+    private void updateButtonText() {
+        if (produtoEditando != null) {
+            btnSalvar.setText("Editar");
+        } else {
+            btnSalvar.setText("Salvar");
+        }
+    }
 
     @FXML
     private void handleSalvar() {
         String nome = nomeField.getText();
         String categoria = categoriaField.getText();
-        String unidade = unidadeField.getText();
-        BigDecimal precoUnitario = new BigDecimal(precoUnitarioField.getText());
-        BigDecimal custo = new BigDecimal(custoField.getText());
+        BigDecimal custo = new BigDecimal(custoField.getText().replace(",", "."));
+        BigDecimal precoUnitario = new BigDecimal(precoUnitarioField.getText().replace(",", "."));
         String marca = marcaField.getText();
+        String line = lineField.getText();
+        String unidade = unidadeField.getText();
 
         //Fazer o tratamento correto de texto e numeros
+        validarCampos();
 
         Produto novoProduto = new Produto();
         novoProduto.setName(nome);
         novoProduto.setCategory(categoria);
-        novoProduto.setUnit(unidade);
-        novoProduto.setPrice(precoUnitario);
-        novoProduto.setBrand(marca);
         novoProduto.setCost(custo);
+        novoProduto.setPrice(precoUnitario);
+        novoProduto.setUnit(unidade);
+        novoProduto.setBrand(marca);
+        novoProduto.setLine(line);
 
         try {
             String token = TokenManager.getInstance().getToken();
-//            Produto produtoCriado = produtoService.criarProduto(novoProduto, token);
-//            produtosObservable.add(produtoCriado);
-            produtoService.criarProduto(novoProduto, token);
+            if (produtoEditando != null) {
+                novoProduto.setId(produtoEditando.getId());
+                novoProduto.setActive(true);
+                produtoService.editarProduto(novoProduto, token);
+                produtosObservable.set(produtosObservable.indexOf(produtoEditando), novoProduto);
+            } else {
+                produtoService.criarProduto(novoProduto, token);
+                produtosObservable.add(novoProduto);
+            }
 
 
         } catch (Exception e) {
@@ -246,6 +260,86 @@ public class ProdutosController{
     private void hideForm() {
         formCadastroProduto.setVisible(false);
         formCadastroProduto.setManaged(false);
+    }
+
+    private void showMenuContext(){
+        ContextMenu contextMenu = new ContextMenu();
+
+        MenuItem editarItem = new MenuItem("Editar Produto");
+        MenuItem clonarItem = new MenuItem("Clonar Produto");
+        MenuItem inativarItem = new MenuItem("Inativar Produto");
+
+        // Adiciona as opções ao menu
+        contextMenu.getItems().addAll(editarItem, clonarItem, inativarItem);
+
+        // Ação para Editar Produto
+        editarItem.setOnAction(event -> handleEditarProduto());
+
+        // Ação para Clonar Produto
+        clonarItem.setOnAction(event -> handleClonarProduto());
+
+        // Ação para Inativar Produto
+        inativarItem.setOnAction(event -> handleInativarProduto());
+
+        tabelaProdutos.setOnMouseClicked(event -> {
+            if (event.getButton() == MouseButton.SECONDARY && !tabelaProdutos.getSelectionModel().isEmpty()) {
+                contextMenu.show(tabelaProdutos, event.getScreenX(), event.getScreenY());
+            } else {
+                contextMenu.hide();
+            }
+        });
+    }
+
+    private void handleEditarProduto() {
+        Produto produtoSelecionado = (Produto) tabelaProdutos.getSelectionModel().getSelectedItem();
+
+        if (produtoSelecionado != null) {
+            try{
+                clearFieldForm();
+                preencherCampos(produtoSelecionado);
+                produtoEditando = produtoSelecionado;
+                updateButtonText();
+                showOverlay();
+                listProductView.setDisable(true);
+                showForm();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    private void preencherCampos(Produto produto) {
+        nomeField.setText(produto.getName());
+        categoriaField.setText(produto.getCategory());
+        custoField.setText(String.valueOf(produto.getCost()));
+        precoUnitarioField.setText(String.valueOf(produto.getPrice()));
+        marcaField.setText(produto.getBrand());
+        lineField.setText(produto.getLine());
+        unidadeField.setText(produto.getUnit());
+    }
+
+    private void handleClonarProduto() {
+        Produto produtoSelecionado = (Produto) tabelaProdutos.getSelectionModel().getSelectedItem();
+        if (produtoSelecionado != null) {
+            try {
+                clearFieldForm();
+                preencherCampos(produtoSelecionado);
+                produtoEditando = null;
+                updateButtonText();
+                showOverlay();
+                listProductView.setDisable(true);
+                showForm();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    private void handleInativarProduto() {
+        Object produtoSelecionado = tabelaProdutos.getSelectionModel().getSelectedItem();
+        if (produtoSelecionado != null) {
+            System.out.println("Inativar Produto: " + produtoSelecionado);
+        }
     }
 
     /* --------------------- tabela -------------*/
@@ -353,9 +447,32 @@ public class ProdutosController{
 
     /*--------- validações ----------*/
 
+    private void validarCampos() {
+        // Validar números
+        configurarValidacaoNumerica(custoField);
+        configurarValidacaoNumerica(precoUnitarioField);
+        configurarValidacaoNumerica(cestField);
+        configurarValidacaoNumerica(gtinField);
+
+        // Validar texto
+        configurarValidacaoTexto(nomeField);
+        nomeField.textProperty().addListener((obs, oldText, newText) -> {
+            nomeErrorLabel.setVisible(newText.trim().isEmpty());
+        });
+
+        configurarValidacaoTexto(categoriaField);
+        categoriaField.textProperty().addListener((obs, oldText, newText) -> {
+            categoriaErrorLabel.setVisible(newText.trim().isEmpty());
+        });
+
+        configurarValidacaoTexto(marcaField);
+        configurarValidacaoTexto(unidadeField);
+        configurarValidacaoTexto(descricaoField);
+    }
+
     private void configurarValidacaoNumerica(TextField textField) {
         TextFormatter<String> formatter = new TextFormatter<>(change -> {
-            if (change.getText().matches("\\d*([.]\\d*)?")) { // Permite números e ponto decimal
+            if (change.getText().matches("\\d*([,]\\d*)?")) { // Permite números e ponto decimal
                 return change;
             }
             return null; // Rejeita mudanças inválidas
@@ -382,7 +499,6 @@ public class ProdutosController{
         pause.setOnFinished(event -> successMessage.setVisible(false));
         pause.play();
     }
-
 
 
 
