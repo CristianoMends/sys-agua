@@ -62,15 +62,6 @@ public class ProdutoService {
     }
 
     public Produto editarProduto(Produto produto, String token) throws Exception {
-//        Produto produtoEditado = new Produto();
-//        produtoEditado.setId(produto.getId());
-//        produtoEditado.setName(produto.getName());
-//        produtoEditado.setUnit(produto.getUnit());
-//        produtoEditado.setBrand(produto.getBrand());
-//        produtoEditado.setCategory(produto.getCategory());
-//        produtoEditado.setCreatedAt(produto.getCreatedAt());
-//        produtoEditado.setUpdatedAt(produto.getUpdatedAt());
-//        produtoEditado.setActive(produto.getActive());
 
         String produtoJson = objectMapper.writeValueAsString(produto);
         String urlComId = BASE_URL + "/" + produto.getId();

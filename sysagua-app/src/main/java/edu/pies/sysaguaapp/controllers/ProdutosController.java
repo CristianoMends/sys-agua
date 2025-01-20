@@ -57,6 +57,9 @@ public class ProdutosController{
     private TextField unidadeField;
 
     @FXML
+    private TextField lineField;
+
+    @FXML
     private TextField ncmFiel;
 
     @FXML
@@ -115,27 +118,6 @@ public class ProdutosController{
         configurarTabela();
         carregarProdutos();
         showMenuContext();
-
-        // Validar números
-        configurarValidacaoNumerica(custoField);
-        configurarValidacaoNumerica(precoUnitarioField);
-        configurarValidacaoNumerica(cestField);
-        configurarValidacaoNumerica(gtinField);
-
-        // Validar texto
-        configurarValidacaoTexto(nomeField);
-        nomeField.textProperty().addListener((obs, oldText, newText) -> {
-            nomeErrorLabel.setVisible(newText.trim().isEmpty());
-        });
-
-        configurarValidacaoTexto(categoriaField);
-        categoriaField.textProperty().addListener((obs, oldText, newText) -> {
-            categoriaErrorLabel.setVisible(newText.trim().isEmpty());
-        });
-
-        configurarValidacaoTexto(marcaField);
-        configurarValidacaoTexto(unidadeField);
-        configurarValidacaoTexto(descricaoField);
     }
 
 
@@ -169,38 +151,31 @@ public class ProdutosController{
     private void handleSalvar() {
         String nome = nomeField.getText();
         String categoria = categoriaField.getText();
-        String unidade = unidadeField.getText();
-        BigDecimal precoUnitario = new BigDecimal(precoUnitarioField.getText());
-        BigDecimal custo = new BigDecimal(custoField.getText());
+        BigDecimal custo = new BigDecimal(custoField.getText().replace(",", "."));
+        BigDecimal precoUnitario = new BigDecimal(precoUnitarioField.getText().replace(",", "."));
         String marca = marcaField.getText();
+        String line = lineField.getText();
+        String unidade = unidadeField.getText();
 
         //Fazer o tratamento correto de texto e numeros
+        validarCampos();
 
         Produto novoProduto = new Produto();
         novoProduto.setName(nome);
         novoProduto.setCategory(categoria);
-        novoProduto.setUnit(unidade);
-        novoProduto.setPrice(precoUnitario);
-        novoProduto.setBrand(marca);
         novoProduto.setCost(custo);
+        novoProduto.setPrice(precoUnitario);
+        novoProduto.setUnit(unidade);
+        novoProduto.setBrand(marca);
+        novoProduto.setLine(line);
 
         try {
             String token = TokenManager.getInstance().getToken();
             if (produtoEditando != null) {
                 novoProduto.setId(produtoEditando.getId());
-                novoProduto.setCreatedat(produtoEditando.getCreatedat());
-//                novoProduto.setUpdatedat(LocalDate.now().toString());
                 novoProduto.setActive(true);
                 produtoService.editarProduto(novoProduto, token);
                 produtosObservable.set(produtosObservable.indexOf(produtoEditando), novoProduto);
-//                "id": 3,
-//                        "name": "Garrafa de Água 1.5L",
-//                        "unit": "L",
-//                        "brand": "Cristalina",
-//                        "category": "Água Mineral",
-//                        "createdAt": "2025-01-12",
-//                        "updatedAt": "2025-01-12",
-//                        "active": true
             } else {
                 produtoService.criarProduto(novoProduto, token);
                 produtosObservable.add(novoProduto);
@@ -320,6 +295,7 @@ public class ProdutosController{
 
         if (produtoSelecionado != null) {
             try{
+                clearFieldForm();
                 preencherCampos(produtoSelecionado);
                 produtoEditando = produtoSelecionado;
                 updateButtonText();
@@ -335,17 +311,27 @@ public class ProdutosController{
     private void preencherCampos(Produto produto) {
         nomeField.setText(produto.getName());
         categoriaField.setText(produto.getCategory());
-        unidadeField.setText(produto.getUnit());
-        precoUnitarioField.setText(String.valueOf(produto.getPrice()));
         custoField.setText(String.valueOf(produto.getCost()));
+        precoUnitarioField.setText(String.valueOf(produto.getPrice()));
         marcaField.setText(produto.getBrand());
-
+        lineField.setText(produto.getLine());
+        unidadeField.setText(produto.getUnit());
     }
 
     private void handleClonarProduto() {
-        Object produtoSelecionado = tabelaProdutos.getSelectionModel().getSelectedItem();
+        Produto produtoSelecionado = (Produto) tabelaProdutos.getSelectionModel().getSelectedItem();
         if (produtoSelecionado != null) {
-            System.out.println("Clonar Produto: " + produtoSelecionado);
+            try {
+                clearFieldForm();
+                preencherCampos(produtoSelecionado);
+                produtoEditando = null;
+                updateButtonText();
+                showOverlay();
+                listProductView.setDisable(true);
+                showForm();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
@@ -461,9 +447,32 @@ public class ProdutosController{
 
     /*--------- validações ----------*/
 
+    private void validarCampos() {
+        // Validar números
+        configurarValidacaoNumerica(custoField);
+        configurarValidacaoNumerica(precoUnitarioField);
+        configurarValidacaoNumerica(cestField);
+        configurarValidacaoNumerica(gtinField);
+
+        // Validar texto
+        configurarValidacaoTexto(nomeField);
+        nomeField.textProperty().addListener((obs, oldText, newText) -> {
+            nomeErrorLabel.setVisible(newText.trim().isEmpty());
+        });
+
+        configurarValidacaoTexto(categoriaField);
+        categoriaField.textProperty().addListener((obs, oldText, newText) -> {
+            categoriaErrorLabel.setVisible(newText.trim().isEmpty());
+        });
+
+        configurarValidacaoTexto(marcaField);
+        configurarValidacaoTexto(unidadeField);
+        configurarValidacaoTexto(descricaoField);
+    }
+
     private void configurarValidacaoNumerica(TextField textField) {
         TextFormatter<String> formatter = new TextFormatter<>(change -> {
-            if (change.getText().matches("\\d*([.]\\d*)?")) { // Permite números e ponto decimal
+            if (change.getText().matches("\\d*([,]\\d*)?")) { // Permite números e ponto decimal
                 return change;
             }
             return null; // Rejeita mudanças inválidas
@@ -490,7 +499,6 @@ public class ProdutosController{
         pause.setOnFinished(event -> successMessage.setVisible(false));
         pause.play();
     }
-
 
 
 
