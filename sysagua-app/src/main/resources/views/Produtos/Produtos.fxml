@@ -55,7 +55,7 @@
                           <Label styleClass="label-field" text="MARCA" />
                           <TextField fx:id="marcaField" promptText="Marca" styleClass="text-field" />
                           <Label styleClass="label-field" text="LINHA" />
-                          <TextField fx:id="linhaField" promptText="Linha" styleClass="text-field" />
+                          <TextField fx:id="lineField" promptText="Linha" styleClass="text-field" />
                           <Label styleClass="label-field" text="UNIDADE" />
                           <TextField fx:id="unidadeField" promptText="Unidade" styleClass="text-field" />
                           </children>
