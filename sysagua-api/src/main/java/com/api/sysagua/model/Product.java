@@ -4,7 +4,7 @@ import com.api.sysagua.dto.product.ViewProductDto;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -23,20 +23,33 @@ public class Product {
     @Column(nullable = false)
     private String name;
 
+    private Double price;
+
+    private Double cost;
+
     @Column(nullable = false)
     private String unit;
 
     private String brand;
 
-    private String category;
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private ProductCategory category;
 
-    private LocalDate createdAt;
 
-    private LocalDate updatedAt;
+    @ManyToOne
+    @JoinColumn(name = "line_id")
+    private ProductLine line;
+
+    private String ncm;
+
+    private LocalDateTime createdAt;
+
+    private LocalDateTime updatedAt;
 
     private Boolean active;
 
-    public Product(String name, String unit, String brand, String category, Boolean active) {
+    public Product(String name, String unit, String brand, ProductCategory category, Boolean active) {
         this.name = name;
         this.unit = unit;
         this.brand = brand;
@@ -48,12 +61,16 @@ public class Product {
         return new ViewProductDto(
                 this.id,
                 this.name,
+                this.price,
+                this.cost,
                 this.unit,
                 this.brand,
                 this.category,
                 this.createdAt,
                 this.updatedAt,
-                this.active
+                this.active,
+                this.line,
+                this.ncm
         );
     }
 }
