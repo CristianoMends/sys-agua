@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -28,16 +28,16 @@ public class SearchPurchaseDto {
     private Boolean active;
 
     @Schema(description = "Data inicial de atualização da compra", example = "2025-01-01T00:00:00Z")
-    private ZonedDateTime updatedAtStart;
+    private LocalDateTime updatedAtStart;
 
     @Schema(description = "Data final de atualização da compra", example = "2025-01-15T23:59:59Z")
-    private ZonedDateTime updatedAtEnd;
+    private LocalDateTime updatedAtEnd;
 
     @Schema(description = "Data inicial de criação da compra", example = "2025-01-01T00:00:00Z")
-    private ZonedDateTime createdAtStart;
+    private LocalDateTime createdAtStart;
 
     @Schema(description = "Data final de criação da compra", example = "2025-01-15T23:59:59Z")
-    private ZonedDateTime createdAtEnd;
+    private LocalDateTime createdAtEnd;
 
     @Schema(description = "Identificador único do fornecedor associado à compra", example = "3")
     private Long supplierId;

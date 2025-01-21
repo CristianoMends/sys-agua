@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -31,10 +31,10 @@ public class PurchaseController implements PurchaseDoc {
             @RequestParam(value = "totalValueStart", required = false) Double totalValueStart,
             @RequestParam(value = "totalValueEnd", required = false) Double totalValueEnd,
             @RequestParam(value = "active", required = false) Boolean active,
-            @RequestParam(value = "updatedAtStart", required = false) ZonedDateTime updatedAtStart,
-            @RequestParam(value = "updatedAtEnd", required = false) ZonedDateTime updatedAtEnd,
-            @RequestParam(value = "createdAtStart", required = false) ZonedDateTime createdAtStart,
-            @RequestParam(value = "createdAtEnd", required = false) ZonedDateTime createdAtEnd,
+            @RequestParam(value = "updatedAtStart", required = false) LocalDateTime updatedAtStart,
+            @RequestParam(value = "updatedAtEnd", required = false) LocalDateTime updatedAtEnd,
+            @RequestParam(value = "createdAtStart", required = false) LocalDateTime createdAtStart,
+            @RequestParam(value = "createdAtEnd", required = false) LocalDateTime createdAtEnd,
             @RequestParam(value = "supplierId", required = false) Long supplierId,
             @RequestParam(value = "productId", required = false) Long productId
     ) {

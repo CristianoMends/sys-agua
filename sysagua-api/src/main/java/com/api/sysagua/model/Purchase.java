@@ -5,7 +5,7 @@ import com.api.sysagua.dto.purchase.ViewPurchaseDto;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -13,7 +13,6 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@ToString
 @Table(name = "purchases")
 public class Purchase {
     @Id
@@ -22,8 +21,8 @@ public class Purchase {
     private Long id;
     private Double totalValue;
     private Boolean active;
-    private ZonedDateTime updatedAt;
-    private ZonedDateTime createdAt;
+    private LocalDateTime updatedAt;
+    private LocalDateTime createdAt;
 
     @OneToMany(mappedBy = "purchase", cascade = CascadeType.ALL,orphanRemoval = true)
     private List<ProductPurchase> productPurchases;

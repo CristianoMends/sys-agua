@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table
@@ -17,20 +17,34 @@ import java.time.LocalDate;
 public class Stock {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(nullable = false)
+    @Column(name = "id", nullable = false)
     private Long id;
 
+    @Column(name = "initial_quantity", nullable = false)
+    private int initialQuantity;
+
+    @Column(name = "total_entries", nullable = false)
+    private int totalEntries;
+
+    @Column(name = "total_withdrawals", nullable = false)
+    private int totalWithdrawals;
+
+    @Transient
+    private int currentQuantity;
+
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at", nullable = false)
+    private LocalDateTime updatedAt;
+
     @ManyToOne
-    @JoinColumn(name = "product_id")
+    @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
-    private Double price;
-    private Double cost;
-    private int quantity;
-    private int entries;
-    private int exits;
-    private LocalDate addedAt;
-    private LocalDate updatedAt;
-
+    @PostLoad
+    public void calculateCurrentQuantity() {
+        this.currentQuantity = initialQuantity + totalEntries - totalWithdrawals;
+    }
 
 }

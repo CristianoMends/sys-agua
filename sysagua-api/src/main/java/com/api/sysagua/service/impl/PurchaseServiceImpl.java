@@ -40,7 +40,7 @@ public class PurchaseServiceImpl implements PurchaseService {
         purchase.setSupplier(supplier);
         purchase.updateTotalValue();
         purchase.setActive(true);
-        purchase.setCreatedAt(ZonedDateTime.now(ZoneId.of("America/Sao_Paulo")));
+        purchase.setCreatedAt(ZonedDateTime.now(ZoneId.of("America/Sao_Paulo")).toLocalDateTime());
         this.purchaseRepository.save(purchase);
     }
 
@@ -59,7 +59,7 @@ public class PurchaseServiceImpl implements PurchaseService {
         }
 
         purchase.setActive(true);
-        purchase.setUpdatedAt(ZonedDateTime.now(ZoneId.of("America/Sao_Paulo")));
+        purchase.setUpdatedAt(ZonedDateTime.now(ZoneId.of("America/Sao_Paulo")).toLocalDateTime());
         this.purchaseRepository.save(purchase);
     }
 
@@ -88,7 +88,7 @@ public class PurchaseServiceImpl implements PurchaseService {
     public void delete(Long id) {
         Purchase purchase = findPurchaseById(id);
         purchase.setActive(false);
-        purchase.setUpdatedAt(ZonedDateTime.now(ZoneId.of("America/Sao_Paulo")));
+        purchase.setUpdatedAt(ZonedDateTime.now(ZoneId.of("America/Sao_Paulo")).toLocalDateTime());
         this.purchaseRepository.save(purchase);
     }
 
