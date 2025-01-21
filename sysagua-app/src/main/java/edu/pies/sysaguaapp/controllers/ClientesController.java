@@ -1,4 +1,5 @@
 package edu.pies.sysaguaapp.controllers;
+
 import edu.pies.sysaguaapp.models.Address;
 import edu.pies.sysaguaapp.models.Clientes;
 import edu.pies.sysaguaapp.services.ClientesService;
@@ -17,12 +18,10 @@ import javafx.util.Duration;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
-
 import static edu.pies.sysaguaapp.services.ClientesService.editarCliente;
 import static edu.pies.sysaguaapp.services.ClientesService.excluirCliente;
 
 public class ClientesController {
-
 
     private final ClientesService clienteService;
     private ObservableList<Clientes> clientesObservable;
@@ -84,11 +83,9 @@ public class ClientesController {
     @FXML
     private TableView<Clientes> tabelaClientes;
 
-
     private int paginaAtual = 0;
     private final int itensPorPagina = 18;
     private int totalPaginas;
-
 
     public ClientesController() {
         this.clienteService = new ClientesService();
@@ -123,7 +120,7 @@ public class ClientesController {
 
     @FXML
     private void handleSalvar() {
-        try{
+        try {
             String nome = nomeField.getText();
             String telefoneStr = telefoneField.getText();
             String cnpjStr = CNPJField.getText();
@@ -165,7 +162,8 @@ public class ClientesController {
             e.printStackTrace();
             mostrarAlerta("Erro Inesperado", "Falha ao criar cliente", "Ocorreu um erro inesperado.");
         }
-        }
+    }
+
     private void mostrarAlerta(String title, String header, String content) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);
@@ -278,14 +276,14 @@ public class ClientesController {
 
     private void irParaPagina(int pagina) {
         paginaAtual = pagina;
-//        carregarClientes();
+        carregarClientes();
     }
 
     @FXML
     private void handlePaginaAnterior() {
         if (paginaAtual > 0) {
             paginaAtual--;
-//            carregarClientes();
+            carregarClientes();
         }
     }
 
@@ -293,10 +291,9 @@ public class ClientesController {
     private void handleProximaPagina() {
         if (paginaAtual < totalPaginas - 1) {
             paginaAtual++;
-//            carregarClientes();
+            carregarClientes();
         }
     }
-
 
     private void configurarTabela() {
         // Configuração das colunas da tabela
@@ -324,82 +321,10 @@ public class ClientesController {
         TableColumn<Clientes, String> colunaCnpj = new TableColumn<>("CNPJ");
         colunaCnpj.setCellValueFactory(new PropertyValueFactory<>("cnpj"));
 
-        TableColumn<Clientes, Void> colunaAcoes = new TableColumn<>("Ações");
 
-        colunaAcoes.setCellFactory(param -> new TableCell<>() {
-            private final Button btnEditar = new Button("Editar");
-            private final Button btnExcluir = new Button("Excluir");
-            private final HBox actionButtons = new HBox(5, btnEditar, btnExcluir);
-
-            {
-                btnEditar.setOnAction(event -> {
-                    Clientes cliente = getTableView().getItems().get(getIndex());
-                    try {
-                        editarCliente(cliente);
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-                });
-
-                btnExcluir.setOnAction(event -> {
-                    Clientes cliente = getTableView().getItems().get(getIndex());
-                    try {
-                        excluirCliente(cliente);
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-                });
-            }
-            @Override
-            protected void updateItem(Void item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty) {
-                    setGraphic(null);
-                } else {
-                    setGraphic(actionButtons);
-                }
-            }
-        });
-
-        tabelaClientes.getColumns().addAll(colunaNome, colunaNumero, colunaRua, colunaBairro, colunaCidade, colunaEstado, colunaTelefone , colunaCnpj, colunaAcoes);
+        tabelaClientes.getColumns().addAll(colunaNome, colunaNumero, colunaRua, colunaBairro, colunaCidade,colunaEstado, colunaTelefone, colunaCnpj);
         tabelaClientes.setItems(clientesObservable);
     }
-    private void editarCliente(Clientes cliente) throws Exception {
-        Clientes clienteAtualizado = obterDadosAtualizados(cliente);
-        ClientesService.editarCliente(cliente.getId(), clienteAtualizado);
-        System.out.println("Cliente atualizado com sucesso!");
-    }
-
-    private void excluirCliente(Clientes cliente) throws Exception {
-        ClientesService.excluirCliente(cliente.getId());
-        System.out.println("Cliente excluído com sucesso!");
-    }
-
-    private boolean confirmarExclusao() {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Confirmação de Exclusão");
-        alert.setHeaderText("Você tem certeza que deseja excluir este cliente?");
-        alert.setContentText("Essa ação não poderá ser desfeita.");
-
-        // Exibe o alerta e aguarda a resposta do usuário
-        Optional<ButtonType> result = alert.showAndWait();
-
-        // Retorna true se o usuário clicar em OK, false caso contrário
-        return result.isPresent() && result.get() == ButtonType.OK;
-    }
-
-    private Clientes obterDadosAtualizados(Clientes cliente) {
-        try {
-            ClientesService clientesService = new ClientesService();
-            String token = TokenManager.getInstance().getToken();
-
-            return clientesService.buscarClientePorId(cliente.getId(), token);
-        } catch (Exception e) {
-            System.err.println("Erro ao obter dados atualizados: " + e.getMessage());
-            return cliente; // Retorna o cliente original em caso de erro
-        }
-    }
-
 
     private void showSucessMessage() {
         successMessage.setVisible(true);
