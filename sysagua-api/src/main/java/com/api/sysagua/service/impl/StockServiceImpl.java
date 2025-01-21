@@ -12,7 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 
 @Service
@@ -26,69 +27,79 @@ public class StockServiceImpl implements StockService {
     @Override
     public void addProduct(AddProductDto dto) {
 
-        //busca um produto com o id informado
         var product = this.productRepository
-                        .findById(dto.getProductId())
-                        //lança exeção se o produto não foi encontrado
-                        .orElseThrow(() -> new BusinessException(
-                                String.format("Product with id %d Not found",dto.getProductId())
-                                ,HttpStatus.NOT_FOUND));
+                .findById(dto.getProductId())
+                .orElseThrow(() -> new BusinessException(
+                        String.format("Product with id %d Not found", dto.getProductId())
+                        , HttpStatus.NOT_FOUND));
 
-        if (!product.getActive()){//se o produto não está ativo, não é possivel adicionar ao estoque
-            throw new BusinessException(String.format("Product with id %d is not active",dto.getProductId()));
+        if (!product.getActive()) {//se o produto não está ativo, não é possivel adicionar ao estoque
+            throw new BusinessException(String.format("Product with id %d is not active", dto.getProductId()));
         }
 
         var stock = this.stockRepository.findProduct(product.getId());
 
         if (stock.isPresent()) {
-            stock.get().setQuantity(stock.get().getQuantity() + dto.getQuantity());
-            stock.get().setEntries(stock.get().getEntries() + dto.getQuantity());
-            stock.get().setCost(dto.getCost());
-            stock.get().setUpdatedAt(LocalDate.now());
+            stock.get().setTotalEntries(stock.get().getTotalEntries() + dto.getQuantity());
+            stock.get().setUpdatedAt(LocalDateTime.now().atZone(ZoneId.of("America/Sao_Paulo")).toLocalDateTime());
             this.stockRepository.save(stock.get());
-        } else {
-            var stockToSave = new Stock();
-            stockToSave.setProduct(product);
-            stockToSave.setQuantity(dto.getQuantity());
-            stockToSave.setEntries(dto.getQuantity());
-            stockToSave.setPrice(dto.getPrice());
-            stockToSave.setCost(dto.getCost());
-            stockToSave.setExits(0);
-            stockToSave.setAddedAt(LocalDate.now());
-            this.stockRepository.save(stockToSave);
+            return;
         }
+
+        var newStock = new Stock();
+        newStock.setProduct(product);
+        newStock.setInitialQuantity(dto.getQuantity());
+        newStock.setTotalEntries(0);
+        newStock.setTotalWithdrawals(0);
+        newStock.setCreatedAt(LocalDateTime.now().atZone(ZoneId.of("America/Sao_Paulo")).toLocalDateTime());
+        this.stockRepository.save(newStock);
     }
 
     @Override
     public List<Stock> getStock(SearchStockDto dto) {
-
-        return this.stockRepository.findByFilters(
+        if (dto.getProductName() == null) dto.setProductName("");
+        return this.stockRepository.list(
                 dto.getId(),
-                dto.getQuantityStart(),
-                dto.getQuantityEnd(),
-                dto.getExitsStart(),
-                dto.getExitsEnd(),
-                dto.getAddedAtStart(),
-                dto.getAddedAtEnd(),
-                dto.getEntriesStart(),
-                dto.getEntriesEnd(),
-                dto.getProductId()
+                dto.getInitialQuantityStart(),
+                dto.getInitialQuantityEnd(),
+                dto.getTotalEntriesStart(),
+                dto.getTotalEntriesEnd(),
+                dto.getTotalWithdrawalsStart(),
+                dto.getTotalWithdrawalsEnd(),
+                dto.getCreatedAtStart(),
+                dto.getCreatedAtEnd(),
+                dto.getUpdatedAtStart(),
+                dto.getUpdatedAtEnd(),
+                dto.getProductId(),
+                dto.getProductName()
         );
     }
 
+
     @Override
-    public void updateStock(UpdateStockDto dto) {
-        var stock = this.stockRepository.findProduct(dto.getProductId()).orElseThrow(
-                () -> new BusinessException(String.format("Stock of product with id %d not found", dto.getProductId()), HttpStatus.NOT_FOUND)
+    public void updateStock(Long id, UpdateStockDto dto) {
+        var stock = this.stockRepository.findById(id).orElseThrow(
+                () -> new BusinessException(String.format("Stock with id %d not found", id), HttpStatus.NOT_FOUND)
         );
 
-        if (dto.getCost() != null) stock.setCost(stock.getCost());
-        if (dto.getQuantity() != null) stock.setQuantity(dto.getQuantity());
-        if (dto.getPrice() != null) stock.setPrice(dto.getPrice());
-        if (dto.getExits() != null) stock.setExits(dto.getExits());
-        if (dto.getEntries() != null) stock.setEntries(dto.getEntries());
+        if (dto.getProductId() != null){
+            var product = this.productRepository.findById(dto.getProductId()).orElseThrow(
+                    () -> new BusinessException("Product not found",HttpStatus.NOT_FOUND)
+            );
 
-        stock.setUpdatedAt(LocalDate.now());
+            if (!product.getActive()) {//se o produto não está ativo, não é possivel adicionar ao estoque
+                throw new BusinessException(String.format("Product with id %d is not active", dto.getProductId()));
+            }
+
+            stock.setProduct(product);
+        }
+        if (dto.getQuantity() != null) {
+            if (stock.getTotalEntries() > 0){
+                stock.setCurrentQuantity(dto.getQuantity());
+            }
+        }
+
+        stock.setUpdatedAt(LocalDateTime.now());
         this.stockRepository.save(stock);
     }
 }

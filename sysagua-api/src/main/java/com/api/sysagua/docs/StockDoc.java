@@ -1,7 +1,7 @@
 package com.api.sysagua.docs;
 
 import com.api.sysagua.dto.stock.AddProductDto;
-import com.api.sysagua.dto.stock.SearchStockDto;
+import com.api.sysagua.dto.stock.UpdateStockDto;
 import com.api.sysagua.exception.ResponseError;
 import com.api.sysagua.model.Stock;
 import io.swagger.v3.oas.annotations.Operation;
@@ -13,7 +13,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface StockDoc {
@@ -79,15 +79,18 @@ public interface StockDoc {
     @GetMapping
     ResponseEntity<List<Stock>> list(
             Long id,
-            Integer quantityStart,
-            Integer quantityEnd,
-            Integer exitsStart,
-            Integer exitsEnd,
-            LocalDate addedAtStart,
-            LocalDate addedAtEnd,
-            Integer entriesStart,
-            Integer entriesEnd,
-            Long productId
+            Integer initialQuantityStart,
+            Integer initialQuantityEnd,
+            Integer totalEntriesStart,
+            Integer totalEntriesEnd,
+            Integer totalWithdrawalsStart,
+            Integer totalWithdrawalsEnd,
+            LocalDateTime createdAtStart,
+            LocalDateTime createdAtEnd,
+            LocalDateTime updatedAtStart,
+            LocalDateTime updatedAtEnd,
+            Long productId,
+            String productName
     );
 
     @Operation(
@@ -135,12 +138,8 @@ public interface StockDoc {
             )
     })
     ResponseEntity<Void> update(
-            Long productId,
-            Double price,
-            Double cost,
-            Integer quantity,
-            Integer entries,
-            Integer exits
+            Long id,
+            UpdateStockDto update
     );
 
 

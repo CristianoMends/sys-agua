@@ -5,44 +5,37 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 public interface StockRepository extends JpaRepository<Stock, Long> {
-
     @Query("""
             select s from Stock s
             where (:id is null or s.id = :id) 
-            and (
-                    (:quantityStart is null or :quantityEnd is null) or s.quantity between :quantityStart and :quantityEnd
-                ) 
-            and (
-                    (:exitsStart is null or :exitsEnd is null) or s.exits between :exitsStart and :exitsEnd
-                ) 
-            and (
-                    (:addedAtStart is null or :addedAtEnd is null) or s.addedAt between :addedAtStart and :addedAtEnd
-                ) 
-            and (
-                    (:entriesStart is null or :entriesEnd is null) or s.entries between :entriesStart and :entriesEnd
-                )
-            and (
-                    :productId is null or s.product.id = :productId 
-                )
-            order by s.updatedAt ASC
-            """)
-    List<Stock> findByFilters(
+            and ((:initialQuantityStart is null or :initialQuantityEnd is null) or s.initialQuantity between :initialQuantityStart and :initialQuantityEnd) 
+            and ((:totalEntriesStart is null or :totalEntriesEnd is null) or s.totalEntries between :totalEntriesStart and :totalEntriesEnd) 
+            and ((:totalWithdrawalsStart is null or :totalWithdrawalsEnd is null) or s.totalWithdrawals between :totalWithdrawalsStart and :totalWithdrawalsEnd) 
+            and ((CAST(:createdAtStart AS timestamp) is null or CAST(:createdAtEnd AS timestamp) is null) or s.createdAt between :createdAtStart and :createdAtEnd )
+            and ((CAST(:updatedAtStart AS timestamp) is null or CAST(:updatedAtEnd AS timestamp) is null) or s.updatedAt between :updatedAtStart and :updatedAtEnd )
+            and (:productId is null or s.product.id = :productId )
+            and (:productName is null or s.product.name like concat('%', :productName, '%'))
+            order by s.createdAt""")
+    List<Stock> list(
             @Param("id") Long id,
-            @Param("quantityStart") Integer quantityStart,
-            @Param("quantityEnd") Integer quantityEnd,
-            @Param("exitsStart") Integer exitsStart,
-            @Param("exitsEnd") Integer exitsEnd,
-            @Param("addedAtStart") LocalDate addedAtStart,
-            @Param("addedAtEnd") LocalDate addedAtEnd,
-            @Param("entriesStart") Integer entriesStart,
-            @Param("entriesEnd") Integer entriesEnd,
-            @Param("productId") Long productId
-            );
+            @Param("initialQuantityStart") Integer initialQuantityStart,
+            @Param("initialQuantityEnd") Integer initialQuantityEnd,
+            @Param("totalEntriesStart") Integer totalEntriesStart,
+            @Param("totalEntriesEnd") Integer totalEntriesEnd,
+            @Param("totalWithdrawalsStart") Integer totalWithdrawalsStart,
+            @Param("totalWithdrawalsEnd") Integer totalWithdrawalsEnd,
+            @Param("createdAtStart") LocalDateTime createdAtStart,
+            @Param("createdAtEnd") LocalDateTime createdAtEnd,
+            @Param("updatedAtStart") LocalDateTime updatedAtStart,
+            @Param("updatedAtEnd") LocalDateTime updatedAtEnd,
+            @Param("productId") Long productId,
+            @Param("productName") String productName);
+
 
     @Query("select s from Stock s where s.product.id = :id")
     Optional<Stock> findProduct(@Param("id") Long id);

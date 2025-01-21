@@ -4,7 +4,6 @@ import com.api.sysagua.docs.ProductDoc;
 import com.api.sysagua.dto.product.CreateProductDto;
 import com.api.sysagua.dto.product.SearchProductDto;
 import com.api.sysagua.dto.product.UpdateProductDto;
-import com.api.sysagua.dto.product.ViewProductDto;
 import com.api.sysagua.model.Product;
 import com.api.sysagua.service.ProductService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -15,7 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -36,36 +35,47 @@ public class ProductController implements ProductDoc {
 
     @GetMapping
     @CrossOrigin
-    public ResponseEntity<List<ViewProductDto>> list(
+    public ResponseEntity<List<Product>> list(
             @RequestParam(required = false) Long id,
             @RequestParam(required = false) String name,
+            @RequestParam(required = false) Double priceStart,
+            @RequestParam(required = false) Double priceEnd,
+            @RequestParam(required = false) Double costStart,
+            @RequestParam(required = false) Double costEnd,
             @RequestParam(required = false) String category,
             @RequestParam(required = false) String unit,
             @RequestParam(required = false) String brand,
-            @RequestParam(required = false) LocalDate startUpdateDate,
-            @RequestParam(required = false) LocalDate endUpdateDate,
-            @RequestParam(required = false) LocalDate startRegisterDate,
-            @RequestParam(required = false) LocalDate endRegisterDate,
-            @RequestParam(required = false) Boolean active
+            @RequestParam(required = false) LocalDateTime startUpdateDate,
+            @RequestParam(required = false) LocalDateTime endUpdateDate,
+            @RequestParam(required = false) LocalDateTime startRegisterDate,
+            @RequestParam(required = false) LocalDateTime endRegisterDate,
+            @RequestParam(required = false) Boolean active,
+            @RequestParam(required = false) String line,
+            @RequestParam(required = false) String ncm
     ) {
 
         var searchProductDto = new SearchProductDto(
                 id,
                 name,
+                priceStart,
+                priceEnd,
+                costStart,
+                costEnd,
                 unit,
                 brand,
                 category,
-                startUpdateDate,
-                endUpdateDate,
                 startRegisterDate,
                 endRegisterDate,
-                active
+                startUpdateDate,
+                endUpdateDate,
+                active,
+                ncm,
+                line
 
         );
 
-        List<ViewProductDto> products = productService.getProducts(searchProductDto)
+        List<Product> products = productService.getProducts(searchProductDto)
                 .stream()
-                .map(Product::toView)
                 .toList();
 
         return ResponseEntity.ok().body(products);

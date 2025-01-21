@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface PurchaseRepository extends JpaRepository<Purchase, Long> {
@@ -27,10 +27,10 @@ public interface PurchaseRepository extends JpaRepository<Purchase, Long> {
             @Param("totalValueStart") Double totalValueStart,
             @Param("totalValueEnd") Double totalValueEnd,
             @Param("active") Boolean active,
-            @Param("updatedAtStart") ZonedDateTime updatedAtStart,
-            @Param("updatedAtEnd") ZonedDateTime updatedAtEnd,
-            @Param("createdAtStart") ZonedDateTime createdAtStart,
-            @Param("createdAtEnd") ZonedDateTime createdAtEnd,
+            @Param("updatedAtStart") LocalDateTime updatedAtStart,
+            @Param("updatedAtEnd") LocalDateTime updatedAtEnd,
+            @Param("createdAtStart") LocalDateTime createdAtStart,
+            @Param("createdAtEnd") LocalDateTime createdAtEnd,
             @Param("supplierId") Long supplierId,
             @Param("productId") Long productId);
 

@@ -5,6 +5,8 @@ import com.api.sysagua.dto.product.SearchProductDto;
 import com.api.sysagua.dto.product.UpdateProductDto;
 import com.api.sysagua.exception.BusinessException;
 import com.api.sysagua.model.Product;
+import com.api.sysagua.repository.ProductCategoryRepository;
+import com.api.sysagua.repository.ProductLineRepository;
 import com.api.sysagua.repository.ProductRepository;
 import com.api.sysagua.repository.StockRepository;
 import com.api.sysagua.service.ProductService;
@@ -12,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 
@@ -25,12 +27,38 @@ public class ProductServiceImpl implements ProductService {
     @Autowired
     private StockRepository stockRepository;
 
-    @Override
-    public void registerProduct(CreateProductDto productDto) {
-        var productToSave = productDto.toModel();
-        productToSave.setCreatedAt(LocalDate.now(ZoneOffset.of("-03:00")));
+    @Autowired
+    private ProductCategoryRepository productCategoryRepository;
 
-        this.productRepository.save(productToSave);
+    @Autowired
+    private ProductLineRepository productLineRepository;
+
+    @Override
+    public void registerProduct(CreateProductDto dto) {
+
+        var line = this.productLineRepository.findById(dto.getLineId()).orElseThrow(
+                () -> new BusinessException("Product Line not found",HttpStatus.NOT_FOUND)
+        );
+
+        var cat = this.productCategoryRepository.findById(dto.getCategoryId()).orElseThrow(
+                () -> new BusinessException("Product category not found",HttpStatus.NOT_FOUND)
+        );
+
+        if (cat.getActive().equals(false)) throw new BusinessException("Category is inactive");
+        if (line.getActive().equals(false)) throw new BusinessException("Line is inactive");
+
+        var product = new Product();
+        product.setPrice(dto.getPrice());
+        product.setCost(dto.getCost());
+        product.setActive(true);
+        product.setName(dto.getName());
+        product.setBrand(dto.getBrand());
+        product.setNcm(dto.getNcm());
+        product.setUnit(dto.getUnit());
+        product.setCategory(cat);
+        product.setLine(line);
+        product.setCreatedAt(LocalDateTime.now(ZoneOffset.of("-03:00")));
+        this.productRepository.save(product);
     }
 
     @Override
@@ -39,16 +67,28 @@ public class ProductServiceImpl implements ProductService {
         if (p.getCategory() == null ) p.setCategory("");
         if (p.getUnit()     == null ) p.setUnit("");
         if (p.getBrand()    == null ) p.setBrand("");
+        if (p.getLine()    == null  ) p.setLine("");
+        if (p.getNcm()      == null) p.setNcm("");
 
 
         if (p.getStartUpdateDate() != null && p.getEndRegisterDate() != null
                 && p.getStartUpdateDate().isAfter(p.getEndRegisterDate())) {
-            throw new BusinessException("Start date cannot be after end date.", HttpStatus.BAD_REQUEST);
+            throw new BusinessException("Start date cannot be after end date in update date.", HttpStatus.BAD_REQUEST);
         }
 
+        if (p.getStartRegisterDate() != null && p.getEndRegisterDate() != null
+                && p.getStartRegisterDate().isAfter(p.getEndRegisterDate())) {
+            throw new BusinessException("Start date cannot be after end date in creation date.", HttpStatus.BAD_REQUEST);
+        }
+
+        System.out.println(p);
         return this.productRepository.findByFilters(
                 p.getId(),
                 p.getName(),
+                p.getPriceStart(),
+                p.getPriceEnd(),
+                p.getCostStart(),
+                p.getCostEnd(),
                 p.getCategory(),
                 p.getUnit(),
                 p.getBrand(),
@@ -56,7 +96,9 @@ public class ProductServiceImpl implements ProductService {
                 p.getEndUpdateDate(),
                 p.getStartRegisterDate(),
                 p.getEndRegisterDate(),
-                p.getActive()
+                p.getActive(),
+                p.getNcm(),
+                p.getLine()
         );
     }
 
@@ -65,26 +107,31 @@ public class ProductServiceImpl implements ProductService {
         Product p = this.productRepository.findById(id).orElseThrow(()->
                 new BusinessException("Product not found",HttpStatus.NOT_FOUND));
 
-        if (dto.getBrand()      != null) p.setBrand(    dto.getBrand());
-        if (dto.getCategory()   != null) p.setCategory( dto.getCategory());
-        if (dto.getUnit()       != null) p.setUnit(     dto.getUnit());
-        if (dto.getName()       != null) p.setName(     dto.getName());
+        if (dto.getCategoryId() != null){
+            var cat = this.productCategoryRepository.findById(dto.getCategoryId()).orElseThrow(
+                    () -> new BusinessException("Product category not found",HttpStatus.NOT_FOUND)
+            );
 
-        if (dto.getActive() != null){
-            p.setActive(   dto.getActive());
-
-            if (dto.getActive().equals(false)){
-                var stockByProduct = this.stockRepository.findProduct(p.getId());
-
-                if (stockByProduct.get().getQuantity() > 0){
-                    throw new BusinessException("The product cannot be inactive because it is still in stock.");
-                }
-
-                p.setActive(dto.getActive());
-            }
+            p.setCategory(cat);
         }
 
-        p.setUpdatedAt(LocalDate.now(ZoneOffset.of("-03:00")));
+        if (dto.getLineId() != null){
+            var line = this.productLineRepository.findById(dto.getLineId()).orElseThrow(
+                    () -> new BusinessException("Product line not found",HttpStatus.NOT_FOUND)
+            );
+
+            p.setLine(line);
+        }
+
+        if (dto.getNcm()        != null) p.setNcm(dto.getNcm());
+        if (dto.getBrand()      != null) p.setBrand(    dto.getBrand());
+        if (dto.getUnit()       != null) p.setUnit(     dto.getUnit());
+        if (dto.getName()       != null) p.setName(     dto.getName());
+        if (dto.getPrice()      != null) p.setPrice(dto.getPrice());
+        if (dto.getCost()       != null) p.setCost(dto.getCost());
+
+        p.setUpdatedAt(LocalDateTime.now(ZoneOffset.of("-03:00")));
+        p.setActive(true);
         this.productRepository.save(p);
     }
 
@@ -96,7 +143,7 @@ public class ProductServiceImpl implements ProductService {
 
         var stockByProduct = this.stockRepository.findProduct(p.getId());
 
-        if (stockByProduct.isPresent() && stockByProduct.get().getQuantity() > 0){
+        if (stockByProduct.isPresent() && stockByProduct.get().getCurrentQuantity() > 0){
             throw new BusinessException("The product cannot be deleted because it is still in stock.");
         }
 

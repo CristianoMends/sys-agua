@@ -2,8 +2,8 @@ package com.api.sysagua.docs;
 
 import com.api.sysagua.dto.product.CreateProductDto;
 import com.api.sysagua.dto.product.UpdateProductDto;
-import com.api.sysagua.dto.product.ViewProductDto;
 import com.api.sysagua.exception.ResponseError;
+import com.api.sysagua.model.Product;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -12,7 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.ResponseEntity;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ProductDoc {
@@ -66,7 +66,7 @@ public interface ProductDoc {
                     description = "Produtos encontrados com sucesso",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = ViewProductDto.class)
+                            schema = @Schema(implementation = Product.class)
                     )
             ),
             @ApiResponse(
@@ -86,17 +86,23 @@ public interface ProductDoc {
                     )
             )
     })
-    ResponseEntity<List<ViewProductDto>> list(
+    ResponseEntity<List<Product>> list(
             Long id,
             String name,
+            Double priceStart,
+            Double priceEnd,
+            Double costStart,
+            Double costEnd,
             String category,
             String unit,
             String brand,
-            LocalDate startUpdateDate,
-            LocalDate endUpdateDate,
-            LocalDate startRegisterDate,
-            LocalDate endRegisterDate,
-            Boolean active
+            LocalDateTime startUpdateDate,
+            LocalDateTime endUpdateDate,
+            LocalDateTime startRegisterDate,
+            LocalDateTime endRegisterDate,
+            Boolean active,
+            String line,
+            String ncm
     );
 
     @Operation(

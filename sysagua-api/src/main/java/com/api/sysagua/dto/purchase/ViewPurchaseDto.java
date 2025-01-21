@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -24,10 +24,10 @@ public class ViewPurchaseDto {
     private Double totalValue;
 
     @Schema(description = "Data e hora da criação da compra", example = "2025-01-14T10:00:00Z")
-    private ZonedDateTime createdAt;
+    private LocalDateTime createdAt;
 
     @Schema(description = "Data e hora da criação da compra", example = "2025-01-14T10:00:00Z")
-    private ZonedDateTime updatedAt;
+    private LocalDateTime updatedAt;
 
     @Schema(description = "Se a compra está ativa no sistema", example = "2025-01-14T10:00:00Z")
     private Boolean active;

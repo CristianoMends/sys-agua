@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -17,29 +17,38 @@ public class SearchStockDto {
     private Long id;
 
     @Schema(description = "Quantidade mínima do estoque", example = "10")
-    private Integer quantityStart;
+    private Integer initialQuantityStart;
 
     @Schema(description = "Quantidade máxima do estoque", example = "100")
-    private Integer quantityEnd;
-
-    @Schema(description = "Quantidade de saídas mínima", example = "5")
-    private Integer exitsStart;
-
-    @Schema(description = "Quantidade de saídas máxima", example = "50")
-    private Integer exitsEnd;
-
-    @Schema(description = "Data de adição inicial do estoque", example = "2023-01-01")
-    private LocalDate addedAtStart;
-
-    @Schema(description = "Data de adição final do estoque", example = "2023-12-31")
-    private LocalDate addedAtEnd;
+    private Integer initialQuantityEnd;
 
     @Schema(description = "Quantidade de entradas mínima", example = "5")
-    private Integer entriesStart;
+    private Integer totalEntriesStart;
 
     @Schema(description = "Quantidade de entradas máxima", example = "50")
-    private Integer entriesEnd;
+    private Integer totalEntriesEnd;
 
-    @Schema(description = "Id do produto", example = "2")
+    @Schema(description = "Quantidade de saídas mínima", example = "5")
+    private Integer totalWithdrawalsStart;
+
+    @Schema(description = "Quantidade de saídas máxima", example = "50")
+    private Integer totalWithdrawalsEnd;
+
+    @Schema(description = "Data de adição inicial do estoque", example = "2023-01-01T00:00:00")
+    private LocalDateTime createdAtStart;
+
+    @Schema(description = "Data de adição final do estoque", example = "2023-12-31T23:59:59")
+    private LocalDateTime createdAtEnd;
+
+    @Schema(description = "Data de atualização inicial do estoque", example = "2023-01-01T00:00:00")
+    private LocalDateTime updatedAtStart;
+
+    @Schema(description = "Data de atualização final do estoque", example = "2023-12-31T23:59:59")
+    private LocalDateTime updatedAtEnd;
+
+    @Schema(description = "ID do produto", example = "2")
     private Long productId;
+
+    @Schema(description = "Nome do produto", example = "Garrafa de Água")
+    private String productName;
 }

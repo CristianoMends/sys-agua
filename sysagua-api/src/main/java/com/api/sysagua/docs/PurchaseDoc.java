@@ -4,11 +4,9 @@ package com.api.sysagua.docs;
 import com.api.sysagua.dto.purchase.CreatePurchaseDto;
 import com.api.sysagua.dto.purchase.UpdatePurchaseDto;
 import com.api.sysagua.dto.purchase.ViewPurchaseDto;
-import com.api.sysagua.exception.ResponseError;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -16,7 +14,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Tag(name = "Purchase Controller", description = "Controlador responsável pela gestão das compras.")
@@ -48,10 +46,10 @@ public interface PurchaseDoc {
             @Parameter(description = "Valor total mínimo") @RequestParam(value = "totalValueStart", required = false) Double totalValueStart,
             @Parameter(description = "Valor total máximo") @RequestParam(value = "totalValueEnd", required = false) Double totalValueEnd,
             @Parameter(description = "Status ativo da compra") @RequestParam(value = "active", required = false) Boolean active,
-            @Parameter(description = "Data de atualização inicial") @RequestParam(value = "updatedAtStart", required = false) ZonedDateTime updatedAtStart,
-            @Parameter(description = "Data de atualização final") @RequestParam(value = "updatedAtEnd", required = false) ZonedDateTime updatedAtEnd,
-            @Parameter(description = "Data de criação inicial") @RequestParam(value = "createdAtStart", required = false) ZonedDateTime createdAtStart,
-            @Parameter(description = "Data de criação final") @RequestParam(value = "createdAtEnd", required = false) ZonedDateTime createdAtEnd,
+            @Parameter(description = "Data de atualização inicial") @RequestParam(value = "updatedAtStart", required = false) LocalDateTime updatedAtStart,
+            @Parameter(description = "Data de atualização final") @RequestParam(value = "updatedAtEnd", required = false) LocalDateTime updatedAtEnd,
+            @Parameter(description = "Data de criação inicial") @RequestParam(value = "createdAtStart", required = false) LocalDateTime createdAtStart,
+            @Parameter(description = "Data de criação final") @RequestParam(value = "createdAtEnd", required = false) LocalDateTime createdAtEnd,
             @Parameter(description = "ID do fornecedor") @RequestParam(value = "supplierId", required = false) Long supplierId,
             @Parameter(description = "ID do produto") @RequestParam(value = "productId", required = false) Long productId);
 
