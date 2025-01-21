@@ -16,6 +16,12 @@ public class UpdateProductDto {
     @Size(max = 50, message = "Name should not exceed 50 characters")
     private String name;
 
+    @Schema(description = "Valor de custo do produto", example = "47.59")
+    private Double cost;
+
+    @Schema(description = "Preço de venda do produto ao ser adicionado ao estoque", example = "50.00")
+    private Double price;
+
     @Schema(description = "Unidade de medida do produto", example = "litro", maxLength = 20)
     @Size(max = 20, message = "Unit should not exceed 20 characters")
     private String unit;
@@ -24,10 +30,12 @@ public class UpdateProductDto {
     @Size(max = 30, message = "Brand should not exceed 30 characters")
     private String brand;
 
-    @Schema(description = "Categoria do produto", example = "Bebidas", maxLength = 30)
-    @Size(max = 30, message = "Category should not exceed 30 characters")
-    private String category;
+    @Schema(description = "id unico da categoria do produto", example = "1")
+    private Long categoryId;
 
-    @Schema(description = "Se o produto não está ativo, então foi deletado", example = "true")
-    private Boolean active;
+    @Schema(description = "id unico da linha do produto", example = "1")
+    private Long lineId;
+
+    @Schema(description = "A Nomenclatura Comum do Mercosul (NCM)", example = "2201.10.00")
+    private String ncm;
 }
