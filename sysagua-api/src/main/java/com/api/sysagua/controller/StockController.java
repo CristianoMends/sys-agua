@@ -13,7 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -35,32 +35,47 @@ public class StockController implements StockDoc {
     @CrossOrigin
     public ResponseEntity<List<Stock>> list(
             @RequestParam(value = "id", required = false) Long id,
-            @RequestParam(value = "quantityStart", required = false) Integer quantityStart,
-            @RequestParam(value = "quantityEnd", required = false) Integer quantityEnd,
-            @RequestParam(value = "exitsStart", required = false) Integer exitsStart,
-            @RequestParam(value = "exitsEnd", required = false) Integer exitsEnd,
-            @RequestParam(value = "addedAtStart", required = false) LocalDate addedAtStart,
-            @RequestParam(value = "addedAtEnd", required = false) LocalDate addedAtEnd,
-            @RequestParam(value = "entriesStart", required = false) Integer entriesStart,
-            @RequestParam(value = "entriesEnd", required = false) Integer entriesEnd,
-            @RequestParam(value = "productId", required = false) Long productId
+            @RequestParam(value = "initialQuantityStart", required = false) Integer initialQuantityStart,
+            @RequestParam(value = "initialQuantityEnd", required = false) Integer initialQuantityEnd,
+            @RequestParam(value = "totalEntriesStart", required = false) Integer totalEntriesStart,
+            @RequestParam(value = "totalEntriesEnd", required = false) Integer totalEntriesEnd,
+            @RequestParam(value = "totalWithdrawalsStart", required = false) Integer totalWithdrawalsStart,
+            @RequestParam(value = "totalWithdrawalsEnd", required = false) Integer totalWithdrawalsEnd,
+            @RequestParam(value = "createdAtStart", required = false) LocalDateTime createdAtStart,
+            @RequestParam(value = "createdAtEnd", required = false) LocalDateTime createdAtEnd,
+            @RequestParam(value = "updatedAtStart", required = false) LocalDateTime updatedAtStart,
+            @RequestParam(value = "updatedAtEnd", required = false) LocalDateTime updatedAtEnd,
+            @RequestParam(value = "productId", required = false) Long productId,
+            @RequestParam(value = "productName", required = false) String productName
     ) {
-        var search = new SearchStockDto(id, quantityStart, quantityEnd, exitsStart, exitsEnd, addedAtStart, addedAtEnd, entriesStart, entriesEnd, productId);
-        return ResponseEntity.ok(this.service.getStock(search));
+
+        var search = new SearchStockDto(
+                id,
+                initialQuantityStart,
+                initialQuantityEnd,
+                totalEntriesStart,
+                totalEntriesEnd,
+                totalWithdrawalsStart,
+                totalWithdrawalsEnd,
+                createdAtStart,
+                createdAtEnd,
+                updatedAtStart,
+                updatedAtEnd,
+                productId,
+                productName
+        );
+
+        List<Stock> stockList = this.service.getStock(search);
+
+        return ResponseEntity.ok(stockList);
     }
 
-    @PutMapping("{productId}")
-    @CrossOrigin
+
     public ResponseEntity<Void> update(
-            @PathVariable Long productId,
-            @RequestParam(value = "price",required = false) Double price,
-            @RequestParam(value = "const", required = false) Double cost,
-            @RequestParam(value = "quantity", required = false) Integer quantity,
-            @RequestParam(value = "entries",required = false) Integer entries,
-            @RequestParam(value = "exits",required = false) Integer exits
+            @PathVariable Long id,
+            @RequestBody UpdateStockDto update
     ) {
-        var update = new UpdateStockDto(productId, price,cost,quantity,entries,exits);
-        this.service.updateStock(update);
+        this.service.updateStock(id,update);
         return ResponseEntity.noContent().build();
     }
 

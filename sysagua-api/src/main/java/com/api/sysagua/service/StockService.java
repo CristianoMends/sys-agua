@@ -13,6 +13,6 @@ public interface StockService {
 
     List<Stock> getStock(SearchStockDto dto);
 
-    void updateStock(UpdateStockDto dto);
+    void updateStock(Long id,UpdateStockDto dto);
 
 }
