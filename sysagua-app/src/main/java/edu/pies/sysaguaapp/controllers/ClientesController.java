@@ -16,6 +16,10 @@ import javafx.util.Duration;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
+
+import static edu.pies.sysaguaapp.services.ClientesService.editarCliente;
+import static edu.pies.sysaguaapp.services.ClientesService.excluirCliente;
 
 public class ClientesController {
 
@@ -320,9 +324,82 @@ public class ClientesController {
         TableColumn<Clientes, String> colunaCnpj = new TableColumn<>("CNPJ");
         colunaCnpj.setCellValueFactory(new PropertyValueFactory<>("cnpj"));
 
-        tabelaClientes.getColumns().addAll(colunaNome, colunaNumero, colunaRua, colunaBairro, colunaCidade, colunaEstado, colunaTelefone , colunaCnpj);
+        TableColumn<Clientes, Void> colunaAcoes = new TableColumn<>("Ações");
+
+        colunaAcoes.setCellFactory(param -> new TableCell<>() {
+            private final Button btnEditar = new Button("Editar");
+            private final Button btnExcluir = new Button("Excluir");
+            private final HBox actionButtons = new HBox(5, btnEditar, btnExcluir);
+
+            {
+                btnEditar.setOnAction(event -> {
+                    Clientes cliente = getTableView().getItems().get(getIndex());
+                    try {
+                        editarCliente(cliente);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+
+                btnExcluir.setOnAction(event -> {
+                    Clientes cliente = getTableView().getItems().get(getIndex());
+                    try {
+                        excluirCliente(cliente);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+            }
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setGraphic(null);
+                } else {
+                    setGraphic(actionButtons);
+                }
+            }
+        });
+
+        tabelaClientes.getColumns().addAll(colunaNome, colunaNumero, colunaRua, colunaBairro, colunaCidade, colunaEstado, colunaTelefone , colunaCnpj, colunaAcoes);
         tabelaClientes.setItems(clientesObservable);
     }
+    private void editarCliente(Clientes cliente) throws Exception {
+        Clientes clienteAtualizado = obterDadosAtualizados(cliente);
+        ClientesService.editarCliente(cliente.getId(), clienteAtualizado);
+        System.out.println("Cliente atualizado com sucesso!");
+    }
+
+    private void excluirCliente(Clientes cliente) throws Exception {
+        ClientesService.excluirCliente(cliente.getId());
+        System.out.println("Cliente excluído com sucesso!");
+    }
+
+    private boolean confirmarExclusao() {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Confirmação de Exclusão");
+        alert.setHeaderText("Você tem certeza que deseja excluir este cliente?");
+        alert.setContentText("Essa ação não poderá ser desfeita.");
+
+        // Exibe o alerta e aguarda a resposta do usuário
+        Optional<ButtonType> result = alert.showAndWait();
+
+        // Retorna true se o usuário clicar em OK, false caso contrário
+        return result.isPresent() && result.get() == ButtonType.OK;
+    }
+
+    private Clientes obterDadosAtualizados(Clientes cliente) {
+        try {
+            ClientesService clientesService = new ClientesService();
+            String token = TokenManager.getInstance().getToken();
+
+            return clientesService.buscarClientePorId(cliente.getId(), token);
+        } catch (Exception e) {
+            System.err.println("Erro ao obter dados atualizados: " + e.getMessage());
+            return cliente; // Retorna o cliente original em caso de erro
+        }
+    }
+
 
     private void showSucessMessage() {
         successMessage.setVisible(true);
