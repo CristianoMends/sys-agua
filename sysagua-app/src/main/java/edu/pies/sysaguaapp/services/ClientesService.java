@@ -2,8 +2,6 @@ package edu.pies.sysaguaapp.services;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.pies.sysaguaapp.models.Clientes;
-import edu.pies.sysaguaapp.models.Produto;
-
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -90,4 +88,34 @@ public class ClientesService {
         throw new Exception("Erro ao editar cliente: " + response.body());
     }
     }
+    public static Clientes inativarCliente(Clientes cliente, String token) throws Exception {
+        cliente.setActive(false);
+    
+        String clienteJson = objectMapper.writeValueAsString(cliente);
+        String urlComId = BASE_URL + "/" + cliente.getId();
+        
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(urlComId))
+                .PUT(HttpRequest.BodyPublishers.ofString(clienteJson)) // Envia a atualização do cliente
+                .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer " + token)
+                .build();
+    
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+    
+        if (response.statusCode() == 200 || response.statusCode() == 204) {
+            if (response.body().isEmpty()) {
+                return cliente;
+            } else {
+                try {
+                    return objectMapper.readValue(response.body(), Clientes.class);
+                } catch (IOException e) {
+                    throw new Exception("Erro ao processar a resposta do servidor: " + e.getMessage());
+                }
+            }
+        } else {
+            throw new Exception("Erro ao inativar cliente: " + response.body());
+        }
+    }
+    
 }
