@@ -19,14 +19,14 @@
             <top>
                 <HBox alignment="CENTER" maxHeight="100.0" prefHeight="50.0" spacing="100.0" BorderPane.alignment="CENTER">
                     <children>
-                        <Button mnemonicParsing="false" onAction="#handleDetailsClienteModal" style="-fx-border-color: #5A6ACF; -fx-border-width: 0 0 1px 0;" styleClass="switchDetails" text="CLIENTES" />
+                        <Button mnemonicParsing="false" onAction="#handleDetailsClienteModal" style="-fx-border-color: #5A6ACF; -fx-border-width: 0 0 1px 0;" styleClass="switchDetails" text="Cliente" />
                     </children>
                 </HBox>
             </top>
             <center>
                 <VBox fx:id="detailsFormCliente" managed="true" minHeight="205.0" minWidth="365.0" spacing="5.0">
                     <children>
-                        <Label styleClass="label-field" text="NOME DA EMPRESA" />
+                        <Label styleClass="label-field" text="Nome da Empresa" />
                         <TextField fx:id="nomeField" promptText="Nome da Empresa" styleClass="text-field" />
                         <VBox fx:id="addressBox" spacing="5.0">
                         <Label styleClass="label-field" text="Número" />
@@ -44,15 +44,15 @@
                             <children>
                                 <VBox maxHeight="50.0" prefHeight="200.0">
                                     <children>
-                                        <Label styleClass="label-field" text="TELEFONE" />
-                                        <TextField fx:id="telefoneField" promptText="Telefone" styleClass="text-field" />
+                                        <Label styleClass="label-field" text="Telefone" />
+                                        <TextField fx:id="telefoneField" promptText="+XX (XX) XXXXX-XXXX" styleClass="text-field" />
                                     </children>
                                 </VBox>
                                 <Region maxWidth="120.0" prefHeight="200.0" prefWidth="120.0" />
                                 <VBox maxHeight="50.0" prefHeight="200.0">
                                     <children>
-                                        <Label styleClass="label-field" text="CNPJ" />
-                                        <TextField fx:id="CNPJField" promptText="CNPJ" styleClass="text-field" />
+                                        <Label styleClass="label-field" text="Cnpj" />
+                                        <TextField fx:id="CNPJField" promptText="00.000.000/0000-00" styleClass="text-field" />
                                     </children>
                                 </VBox>
                             </children>
