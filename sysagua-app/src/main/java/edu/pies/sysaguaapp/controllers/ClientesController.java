@@ -2,6 +2,7 @@ package edu.pies.sysaguaapp.controllers;
 
 import edu.pies.sysaguaapp.models.Address;
 import edu.pies.sysaguaapp.models.Clientes;
+import edu.pies.sysaguaapp.models.Produto;
 import edu.pies.sysaguaapp.services.ClientesService;
 import edu.pies.sysaguaapp.services.TokenManager;
 import javafx.animation.PauseTransition;
@@ -11,20 +12,15 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
-
-import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
-import static edu.pies.sysaguaapp.services.ClientesService.editarCliente;
-import static edu.pies.sysaguaapp.services.ClientesService.excluirCliente;
 
 public class ClientesController {
 
-    private final ClientesService clienteService;
-    private ObservableList<Clientes> clientesObservable;
+    private ClientesService clienteService;
 
     @FXML
     private StackPane rootPane;
@@ -57,9 +53,6 @@ public class ClientesController {
     private TextField CNPJField;
 
     @FXML
-    private Label nomeLabelErrorField;
-
-    @FXML
     private BorderPane formCadastroClientes;
 
     @FXML
@@ -81,11 +74,18 @@ public class ClientesController {
     private HBox paginationContainer;
 
     @FXML
-    private TableView<Clientes> tabelaClientes;
+    private Button btnSalvar;
 
+    @FXML
+    private Button btnCancelar;
+
+    @FXML
+    private TableView<Clientes> tabelaClientes;
+    private ObservableList<Clientes> clientesObservable;
     private int paginaAtual = 0;
     private final int itensPorPagina = 18;
     private int totalPaginas;
+    private Clientes clienteEditado = null;
 
     public ClientesController() {
         this.clienteService = new ClientesService();
@@ -96,12 +96,7 @@ public class ClientesController {
     public void initialize() {
         configurarTabela();
         carregarClientes();
-        configurarValidacaoTexto(nomeField);
-        configurarValidacaoTexto(numberField);
-        configurarValidacaoTexto(streetField);
-        configurarValidacaoTexto(neighborhoodField);
-        configurarValidacaoTexto(cityField);
-        configurarValidacaoTexto(stateField);
+        showMenuContext();
     }
 
     private void showOverlay() {
@@ -119,8 +114,16 @@ public class ClientesController {
     }
 
     @FXML
+    private void updateButtonText() {
+        if (clienteEditado != null) {
+            btnSalvar.setText("Editar");
+        } else {
+            btnSalvar.setText("Salvar");
+        }
+    }
+
+    @FXML
     private void handleSalvar() {
-        try {
             String nome = nomeField.getText();
             String telefoneStr = telefoneField.getText();
             String cnpjStr = CNPJField.getText();
@@ -142,26 +145,48 @@ public class ClientesController {
             clienteAddress.setNeighborhood(bairro);
             clienteAddress.setCity(cidade);
             clienteAddress.setState(estado);
+
+            if (clienteAddress.getStreet().isEmpty() || clienteAddress.getCity().isEmpty() || clienteAddress.getState().isEmpty()) {
+                mostrarAlerta("Endereço inválido", "Certifique-se de preencher todos os campos do endereço.", "");
+                return; // Sai do método se o endereço não estiver completo
+            }
+
             Clientes novoCliente = new Clientes();
             novoCliente.setName(nome);
             novoCliente.setAddress(clienteAddress);
             novoCliente.setPhone(telefoneStr);
             novoCliente.setCnpj(cnpjStr);
 
-            String token = TokenManager.getInstance().getToken();
-            Clientes clienteCriado = ClientesService.criarCliente(novoCliente, token);
+            try{
+                String token = TokenManager.getInstance().getToken();
+                if (clienteEditado != null){
+                    novoCliente.setId(clienteEditado.getId());
+                    novoCliente.setActive(true);
+                    ClientesService.editarCliente(novoCliente, token);
+                    clientesObservable.set(clientesObservable.indexOf(clienteEditado), novoCliente);
+                }
+                else{
+                    ClientesService.criarCliente(novoCliente, token);
+                    clientesObservable.add(novoCliente);
+                }        
+        } catch (Exception e) {
+            e.printStackTrace();
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Erro");
+            alert.setHeaderText("Falha ao criar cliente");
+            System.out.println(e.getMessage());
+            alert.setContentText(e.getMessage());
             hideForm();
             hideOverlay();
-            clearFieldForm();
-            listClienteView.setDisable(false);
-            showSucessMessage();
-        } catch (IOException e) { // Captura exceções mais específicas
-            e.printStackTrace();
-            mostrarAlerta("Erro de Conexão", "Falha ao criar cliente", "Verifique sua conexão com a internet.");
-        } catch (Exception e) { // Captura outras exceções (menos específico)
-            e.printStackTrace();
-            mostrarAlerta("Erro Inesperado", "Falha ao criar cliente", "Ocorreu um erro inesperado.");
+            alert.showAndWait();
+            return;
         }
+        hideForm();
+        hideOverlay();
+        clearFieldForm();
+        listClienteView.setDisable(false);
+        showSucessMessage();
+        carregarClientes();
     }
 
     private void mostrarAlerta(String title, String header, String content) {
@@ -181,7 +206,6 @@ public class ClientesController {
         neighborhoodField.clear();
         cityField.clear();
         stateField.clear();
-        nomeLabelErrorField.setVisible(false);
     }
 
     @FXML
@@ -199,7 +223,6 @@ public class ClientesController {
     }
 
     private void showModal(VBox toShow) {
-        // Exibe o modal atual
         toShow.setManaged(true);
         toShow.toFront();
         toShow.setVisible(true);
@@ -214,7 +237,7 @@ public class ClientesController {
     @FXML
     private void handleAddCliente() {
         if (!formCadastroClientes.isVisible()) {
-            showOverlay();
+            showOverlay();  
             showForm();
             listClienteView.setDisable(true);
         }
@@ -229,6 +252,87 @@ public class ClientesController {
     private void hideForm() {
         formCadastroClientes.setVisible(false);
         formCadastroClientes.setManaged(false);
+    }
+
+    private void showMenuContext(){
+        ContextMenu contextMenu = new ContextMenu();
+
+        MenuItem editarCliente= new MenuItem("Editar Cliente");
+        MenuItem inativarCliente = new MenuItem("Inativar Cliente");
+
+        // Adiciona as opções ao menu
+        contextMenu.getItems().addAll(editarCliente, inativarCliente);
+
+        // Ação para Editar Cliente
+        editarCliente.setOnAction(event -> handleEditarCliente());
+
+        // Ação para Inativar Cliente
+        inativarCliente.setOnAction(event -> handleInativarCliente());
+
+        tabelaClientes.setOnMouseClicked(event -> {
+            if (event.getButton() == MouseButton.SECONDARY && !tabelaClientes.getSelectionModel().isEmpty()) {
+                contextMenu.show(tabelaClientes, event.getScreenX(), event.getScreenY());
+            } else {
+                contextMenu.hide();
+            }
+        });
+    }
+
+    private void handleEditarCliente() {
+        Clientes clienteSelecionado = (Clientes) tabelaClientes.getSelectionModel().getSelectedItem();
+
+        if (clienteSelecionado != null) {
+            try{
+                clearFieldForm();
+                preencherCampos(clienteSelecionado);
+                clienteEditado = clienteSelecionado;
+                updateButtonText();
+                showOverlay();
+                listClienteView.setDisable(true);
+                showForm();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    private void preencherCampos(Clientes cliente) {
+        nomeField.setText(cliente.getName());
+        Address clienteAddress = cliente.getAddress();
+        if (clienteAddress != null) { // Verifica se o endereço não é nulo
+            numberField.setText(clienteAddress.getNumber());
+            streetField.setText(clienteAddress.getStreet());
+            neighborhoodField.setText(clienteAddress.getNeighborhood());
+            cityField.setText(clienteAddress.getCity());
+            stateField.setText(clienteAddress.getState());
+        } else {
+            // Caso o cliente não tenha endereço, limpa os campos relacionados
+            numberField.setText("");
+            streetField.setText("");
+            neighborhoodField.setText("");
+            cityField.setText("");
+            stateField.setText("");
+        }
+        telefoneField.setText(cliente.getPhone());
+        CNPJField.setText(cliente.getCnpj());
+    }
+
+    private void handleInativarCliente() {
+        Clientes clienteSelecionado = tabelaClientes.getSelectionModel().getSelectedItem();
+        if (clienteSelecionado != null) {
+            tabelaClientes.getItems().remove(clienteSelecionado);
+            showSuccessMessageInativarCliente("Cliente inativado com sucesso!");
+        }
+        else{
+            System.out.println("Nenhum cliente selecionado!");
+        }
+    }
+    private void showSuccessMessageInativarCliente(String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Sucesso");
+        alert.setHeaderText(null);
+        alert.setContentText(message); 
+        alert.showAndWait();
     }
 
     private void carregarClientes() {
@@ -300,7 +404,7 @@ public class ClientesController {
         TableColumn<Clientes, String> colunaNome = new TableColumn<>("Nome");
         colunaNome.setCellValueFactory(new PropertyValueFactory<>("name"));
 
-        TableColumn<Clientes, String> colunaNumero = new TableColumn<>("Numero");
+        TableColumn<Clientes, String> colunaNumero = new TableColumn<>("Número");
         colunaNumero.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getAddress().getNumber()));
 
         TableColumn<Clientes, String> colunaRua = new TableColumn<>("Rua");
@@ -334,13 +438,5 @@ public class ClientesController {
         PauseTransition pause = new PauseTransition(Duration.seconds(3));
         pause.setOnFinished(event -> successMessage.setVisible(false));
         pause.play();
-    }
-
-    private void configurarValidacaoTexto(TextField textField) {
-        textField.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (!newValue.matches("[\\p{L}\\s\\d.,-]*")) { // Permite letras, espaços, números, '.', ',' e '-'
-                textField.setText(oldValue);
-            }
-        });
     }
 }
