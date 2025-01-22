@@ -2,7 +2,6 @@ package edu.pies.sysaguaapp.controllers;
 
 import edu.pies.sysaguaapp.models.Address;
 import edu.pies.sysaguaapp.models.Clientes;
-import edu.pies.sysaguaapp.models.Produto;
 import edu.pies.sysaguaapp.services.ClientesService;
 import edu.pies.sysaguaapp.services.TokenManager;
 import javafx.animation.PauseTransition;
@@ -17,6 +16,7 @@ import javafx.scene.layout.*;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ClientesController {
 
@@ -166,7 +166,9 @@ public class ClientesController {
                     clientesObservable.set(clientesObservable.indexOf(clienteEditado), novoCliente);
                 }
                 else{
-                    ClientesService.criarCliente(novoCliente, token);
+                    novoCliente.setActive(true);
+                    Clientes novoClienteCriado = ClientesService.criarCliente(novoCliente, token);
+                    novoCliente.setId(novoClienteCriado.getId());
                     clientesObservable.add(novoCliente);
                 }        
         } catch (Exception e) {
@@ -320,8 +322,17 @@ public class ClientesController {
     private void handleInativarCliente() {
         Clientes clienteSelecionado = tabelaClientes.getSelectionModel().getSelectedItem();
         if (clienteSelecionado != null) {
-            tabelaClientes.getItems().remove(clienteSelecionado);
-            showSuccessMessageInativarCliente("Cliente inativado com sucesso!");
+            try{
+                String token = TokenManager.getInstance().getToken();
+                ClientesService.inativarCliente(clienteSelecionado, token);
+                tabelaClientes.getItems().remove(clienteSelecionado);
+                clientesObservable.remove(clienteSelecionado);
+                
+                showSuccessMessageInativarCliente("Cliente inativado com sucesso!");
+            } catch(Exception e){
+                e.printStackTrace();
+                System.out.println("Erro ao inativar cliente: " + e.getMessage());
+            }            
         }
         else{
             System.out.println("Nenhum cliente selecionado!");
@@ -340,13 +351,17 @@ public class ClientesController {
             String token = TokenManager.getInstance().getToken();
             List<Clientes> todosClientes = clienteService.buscarClientes(token);
 
-            // Calcula o total de páginas
-            totalPaginas = (int) Math.ceil((double) todosClientes.size() / itensPorPagina);
+
+            List<Clientes> clientesAtivos = todosClientes.stream()
+            .filter(cliente -> cliente.getActive())
+            .collect(Collectors.toList());
+
+            totalPaginas = (int) Math.ceil((double) clientesAtivos.size() / itensPorPagina);
 
             // Filtra os produtos para a página atual
             int inicio = paginaAtual * itensPorPagina;
-            int fim = Math.min(inicio + itensPorPagina, todosClientes.size());
-            List<Clientes> clientesPagina = todosClientes.subList(inicio, fim);
+            int fim = Math.min(inicio + itensPorPagina, clientesAtivos.size());
+            List<Clientes> clientesPagina = clientesAtivos.subList(inicio, fim);
 
             // Atualiza a lista observável
             clientesObservable.setAll(clientesPagina);
