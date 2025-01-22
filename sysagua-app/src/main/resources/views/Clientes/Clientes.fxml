@@ -30,7 +30,7 @@
                         <TextField fx:id="nomeField" promptText="Nome da Empresa" styleClass="text-field" />
                         <VBox fx:id="addressBox" spacing="5.0">
                         <Label styleClass="label-field" text="Número" />
-                        <TextField fx:id="numberField" promptText="Numero" styleClass="text-field" />
+                        <TextField fx:id="numberField" promptText="Número do Endereço" styleClass="text-field" />
                         <Label styleClass="label-field" text="Rua" />
                         <TextField fx:id="streetField" promptText="Rua" styleClass="text-field" />
                         <Label styleClass="label-field" text="Bairro" />
@@ -66,8 +66,8 @@
             <bottom>
                 <HBox alignment="CENTER_RIGHT" minWidth="437.0" prefHeight="45.0" spacing="10.0" BorderPane.alignment="CENTER_RIGHT">
                     <children>
-                        <Button onAction="#handleCancelar" style="-fx-background-color: #FEBAC6; -fx-text-fill: #F2383A;" styleClass="menu-button" text="Cancelar" />
-                        <Button onAction="#handleSalvar" style="-fx-background-color: #DDE4F0; -fx-text-fill: #5A6ACF;" styleClass="menu-button" text="Salvar" />
+                        <Button fx:id="btnCancelar" onAction="#handleCancelar" style="-fx-background-color: #FEBAC6; -fx-text-fill: #F2383A;" styleClass="menu-button" text="Cancelar" />
+                        <Button fx:id="btnSalvar" onAction="#handleSalvar" style="-fx-background-color: #DDE4F0; -fx-text-fill: #5A6ACF;" styleClass="menu-button" text="Salvar" />
                     </children>
                     <padding>
                         <Insets right="20.0" />
