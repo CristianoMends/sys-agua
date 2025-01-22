@@ -2,7 +2,9 @@ package edu.pies.sysaguaapp.services;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.pies.sysaguaapp.models.Clientes;
+import edu.pies.sysaguaapp.models.Produto;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -62,73 +64,30 @@ public class ClientesService {
         }
         return clientes;
     }
-    public static Clientes editarCliente(Long id, Clientes clienteAtualizado) throws Exception {
-        String token = TokenManager.getInstance().getToken();
-        if (token == null || token.isEmpty()) {
-            throw new Exception("Token não encontrado. Por favor, faça login.");
-        }
-
-        String clienteJson = objectMapper.writeValueAsString(clienteAtualizado);
-
-        // Criar a requisição PUT
+    public static Clientes editarCliente(Clientes cliente, String token) throws Exception {
+        String clienteJson = objectMapper.writeValueAsString(cliente);
+        String urlComId = BASE_URL + "/" + cliente.getId();
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(BASE_URL + "/" + id))
+                .uri(URI.create(urlComId))
                 .PUT(HttpRequest.BodyPublishers.ofString(clienteJson))
                 .header("Content-Type", "application/json")
                 .header("Authorization", "Bearer " + token)
                 .build();
 
-        // Enviar a requisição
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
-        // Verificar a resposta
-        if (response.statusCode() == 204) {
-            return clienteAtualizado;
-        } else if (response.statusCode() == 404) {
-            throw new Exception("Cliente não encontrado: " + response.body());
-        }
-        else {
-            throw new Exception("Erro ao editar cliente: " + response.body());
-        }
-    }
-
-    public Clientes buscarClientePorId(Long id, String token) throws Exception {
-        String url = BASE_URL + "/" + id;
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(url))
-                .GET()
-                .header("Content-Type", "application/json")
-                .header("Authorization", "Bearer " + token)
-                .build();
-
-        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-
-        if (response.statusCode() == 200) {
-            return objectMapper.readValue(response.body(), Clientes.class);
-        } else {
-            throw new Exception("Erro ao buscar cliente: " + response.body());
-        }
-    }
-
-    public static void excluirCliente(Long id) throws Exception {
-        String token = TokenManager.getInstance().getToken();
-        if (token == null || token.isEmpty()) {
-            throw new Exception("Token não encontrado. Por favor, faça login.");
-        }
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(BASE_URL + "/" + id))
-                .DELETE()
-                .header("Authorization", "Bearer " + token)
-                .build();
-
-        // Enviar a requisição
-        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-
-        // Verificar a resposta
         if (response.statusCode() == 200 || response.statusCode() == 204) {
-            System.out.println("Cliente excluído com sucesso.");
+        if (response.body().isEmpty()) {
+            return cliente; // Retorna o cliente sem alterações se não houver corpo na resposta
         } else {
-            throw new Exception("Erro ao excluir cliente: " + response.body());
+            try {
+                return objectMapper.readValue(response.body(), Clientes.class); // Tenta converter a resposta para o objeto Cliente
+            } catch (IOException e) {
+                throw new Exception("Erro ao processar a resposta do servidor: " + e.getMessage());
+            }
         }
+    } else {
+        throw new Exception("Erro ao editar cliente: " + response.body());
+    }
     }
 }
