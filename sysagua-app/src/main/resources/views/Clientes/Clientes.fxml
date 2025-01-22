@@ -45,7 +45,7 @@
                                 <VBox maxHeight="50.0" prefHeight="200.0">
                                     <children>
                                         <Label styleClass="label-field" text="Telefone" />
-                                        <TextField fx:id="telefoneField" promptText="+XX (XX) XXXXX-XXXX" styleClass="text-field" />
+                                        <TextField fx:id="telefoneField" promptText="5585982127976" styleClass="text-field" />
                                     </children>
                                 </VBox>
                                 <Region maxWidth="120.0" prefHeight="200.0" prefWidth="120.0" />
