@@ -8,6 +8,7 @@ public class Clientes {
     private Address address;
     private String phone;
     private String cnpj;
+    private Boolean active;
     // Getters e Setters
     public void setName(String name) {
         this.name = name;
@@ -38,5 +39,11 @@ public class Clientes {
     }
     public Address getAddress() {
         return address;
+    }
+    public void setActive(boolean active){
+        this.active = active;
+    }
+    public boolean getActive(){
+        return active;
     }
 }
