@@ -66,37 +66,44 @@ public class HomeController implements Initializable {
     @FXML
     private void handleDashboard() {
         showMessage("Dashboard");
+        hideSubmenu();
     }
 
 
     @FXML
     private void handleEntregas() {
         showMessage("Entregas");
+        hideSubmenu();
     }
 
     @FXML
     private void handleCompras() {
         showMessage("Compras");
+        hideSubmenu();
     }
 
     @FXML
     private void handleEstoque() {
-        showMessage("Estoque");
+        loadView("/views/Estoque/Estoque.fxml");
+        hideSubmenu();
     }
 
     @FXML
     private void handleFinanceiro() {
         showMessage("Caixa");
+        hideSubmenu();
     }
 
     @FXML
     private void handleRelatorio() {
         showMessage("Relatório");
+        hideSubmenu();
     }
 
     @FXML
     private void handleAjuda() {
         showMessage("Usuário");
+        hideSubmenu();
     }
 
     @FXML
@@ -114,6 +121,8 @@ public class HomeController implements Initializable {
 //                if (!submenu.contains(event.getX(), event.getY())) {
 //                }
             });
+            //não fechar ao clicar dentro do submenu
+            submenu.setOnMouseClicked(event -> event.consume());
         } else {
             hideSubmenu();
         }
@@ -130,21 +139,26 @@ public class HomeController implements Initializable {
     @FXML
     private void handleLoadClientesView() {
         loadView("/views/Clientes/Clientes.fxml");
+        hideSubmenu();
+
     }
 
     @FXML
     private void handleProdutos() {
         loadView("/views/Produtos/Produtos.fxml");
+        hideSubmenu();
     }
 
     @FXML
     private void handleEntregador() {
-        showMessage("Todos os entregadores");
+        loadView("/views/Entregador/Entregador.fxml");
+        hideSubmenu();
     }
 
     @FXML
     private void handleFornecedor() {
         showMessage("Todos os fornecedores");
+        hideSubmenu();
     }
 
     @FXML

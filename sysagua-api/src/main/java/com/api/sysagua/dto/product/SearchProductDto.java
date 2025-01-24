@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -21,6 +21,18 @@ public class SearchProductDto {
     @Size(max = 50, message = "Name should not exceed 50 characters")
     private String name;
 
+    @Schema(description = "Preço de venda inicial", example = "5.00")
+    private Double priceStart;
+
+    @Schema(description = "Preço de venda final", example = "50.00")
+    private Double priceEnd;
+
+    @Schema(description = "Preço de custo inicial", example = "1.00")
+    private Double costStart;
+
+    @Schema(description = "Preço de custo final", example = "100.00")
+    private Double costEnd;
+
     @Schema(description = "Unidade de medida do produto", example = "litro", maxLength = 20)
     @Size(max = 20, message = "Unit should not exceed 20 characters")
     private String unit;
@@ -33,35 +45,27 @@ public class SearchProductDto {
     @Size(max = 30, message = "Category should not exceed 30 characters")
     private String category;
 
-    @Schema(description = "Data inicial do registro para busca", example = "2023-01-01")
+    @Schema(description = "Data inicial do registro para busca", example = "2025-01-20T21:27:18.645684")
     @PastOrPresent(message = "Start register date should not be in the future")
-    private LocalDate startRegisterDate;
+    private LocalDateTime startRegisterDate;
 
-    @Schema(description = "Data final do registro para busca", example = "2023-12-31")
+    @Schema(description = "Data final do registro para busca", example = "2025-01-20T21:27:18.645684")
     @FutureOrPresent(message = "End register date should not be in the past")
-    private LocalDate endRegisterDate;
+    private LocalDateTime endRegisterDate;
 
-    @Schema(description = "Data inicial da atualização para busca", example = "2023-01-01")
+    @Schema(description = "Data inicial da atualização para busca", example = "2025-01-20T21:27:18.645684")
     @PastOrPresent(message = "Start update date should not be in the future")
-    private LocalDate startUpdateDate;
+    private LocalDateTime startUpdateDate;
 
-    @Schema(description = "Data final da atualização para busca", example = "2023-12-31")
-    @FutureOrPresent(message = "End update date should not be in the past")
-    private LocalDate endUpdateDate;
+    @Schema(description = "Data final da atualização para busca", example = "2025-01-20T21:27:18.645684")
+    private LocalDateTime endUpdateDate;
 
-    @Schema(description = "Custo mínimo para busca", example = "1.25")
-    @Min(value = 0, message = "Min cost should be at least 0")
-    private Double minCost;
+    @Schema(description = "Se o produto não está ativo, então foi deletado", example = "true")
+    private Boolean active;
 
-    @Schema(description = "Custo maximo para busca", example = "10.25")
-    @Min(value = 0, message = "Max cost should be at least 0")
-    private Double maxCost;
+    @Schema(description = "A Nomenclatura Comum do Mercosul (NCM)", example = "2201.10.00")
+    private String ncm;
 
-    @Schema(description = "Preço mínimo para busca", example = "1.50")
-    @Min(value = 0, message = "Min price should be at least 0")
-    private Double minPrice;
-
-    @Schema(description = "Preço máximo para busca", example = "5.00")
-    @Min(value = 0, message = "Max price should be at least 0")
-    private Double maxPrice;
+    @Schema(description = "Uma linha de produtos é uma categoria que lhe permite segmentar os seus produtos de acordo com determinadas especificações", example = "1")
+    private String line;
 }
