@@ -6,6 +6,7 @@ module edu.pies.sysaguaapp {
     requires com.dlsc.formsfx;
     requires org.kordamp.bootstrapfx.core;
     requires java.net.http;
+    requires java.xml.crypto;
     requires com.fasterxml.jackson.databind;
     requires static lombok;
 

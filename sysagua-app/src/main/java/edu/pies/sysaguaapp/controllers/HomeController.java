@@ -138,8 +138,9 @@ public class HomeController implements Initializable {
     //------------------submenu cadastros gerais ---------------------//
     @FXML
     private void handleLoadClientesView() {
-        showMessage("Todos os clientes");
+        loadView("/views/Clientes/Clientes.fxml");
         hideSubmenu();
+
     }
 
     @FXML
@@ -171,7 +172,7 @@ public class HomeController implements Initializable {
                     currentStage.close();
 
                     // Carrega a tela de login
-                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/LoginView.fxml"));
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/Login.fxml"));
                     Parent root = loader.load();
 
                     // Cria uma nova cena e exibe a nova janela
