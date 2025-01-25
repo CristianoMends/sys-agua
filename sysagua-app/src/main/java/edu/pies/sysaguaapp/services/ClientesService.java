@@ -53,14 +53,21 @@ public class ClientesService {
 
         // Verificar a resposta
         if (response.statusCode() == 201) {
-            return objectMapper.readValue(response.body(), Clientes.class);
+            if (response.body() != null && !response.body().isEmpty()) {
+                // Se o corpo não estiver vazio, desserializar e retornar o cliente
+                return objectMapper.readValue(response.body(), Clientes.class);
+            } else {
+                // Se o corpo estiver vazio, apenas retornar o cliente que foi enviado
+                System.out.println("Cliente criado com sucesso, mas sem dados retornados.");
+                return clientes;
+            }
         } else if (response.statusCode() == 400) {
             System.out.println("Erro ao criar cliente: " + response.body());
+            throw new Exception("Erro ao criar cliente: " + response.body());
         } else {
             System.out.println("Server response: " + response.body());
             throw new Exception("Erro ao criar cliente: " + response.body());
         }
-        return clientes;
     }
     public static Clientes editarCliente(Clientes cliente, String token) throws Exception {
         String clienteJson = objectMapper.writeValueAsString(cliente);
