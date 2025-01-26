@@ -1,0 +1,7 @@
+CREATE TABLE deliverer(
+    deliverer_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    phone VARCHAR(13) NOT NULL,
+    created_at TIMESTAMP NOT NULL,
+    active BOOLEAN NOT NULL
+);
