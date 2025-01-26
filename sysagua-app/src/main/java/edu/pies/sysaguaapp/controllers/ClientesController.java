@@ -33,17 +33,40 @@ public class ClientesController {
     private TextField nomeField;
 
     @FXML
+    private Label nomeErrorLabel;
+
+    @FXML
     private VBox addressBox;
     @FXML
     private TextField numberField;
+
+    @FXML
+    private Label numberErrorLabel;
+
     @FXML
     private TextField streetField;
+
+    @FXML
+    private Label streetErrorLabel;
+
+
     @FXML
     private TextField neighborhoodField;
+
+    @FXML
+    private Label neighborhoodErrorLabel;
+
     @FXML
     private TextField cityField;
+
+    @FXML
+    private Label cityErrorLabel;
+
     @FXML
     private TextField stateField;
+
+    @FXML
+    private Label stateErrorLabel;
 
     private Address address;
 
@@ -51,7 +74,13 @@ public class ClientesController {
     private TextField telefoneField;
 
     @FXML
+    private Label telefoneErrorLabel;
+
+    @FXML
     private TextField CNPJField;
+
+    @FXML
+    private Label cnpjErrorLabel;
 
     @FXML
     private BorderPane formCadastroClientes;
@@ -125,16 +154,18 @@ public class ClientesController {
 
     @FXML
     private void handleSalvar() {
-        if (!validarCamposComErros()) {
+        StringBuilder erroMensagem = new StringBuilder();
+
+        // Verifica se há campos inválidos
+        if (!validarCamposComErros(erroMensagem)) {
             // Caso algum campo tenha erro, não permite salvar
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Erro");
             alert.setHeaderText("Campos inválidos");
-            alert.setContentText("Por favor, corrija os campos inválidos.");
+            alert.setContentText(erroMensagem.toString()); // Exibe a mensagem detalhada
             alert.showAndWait();
             return; // Interrompe o salvamento
         }
-
             String nome = nomeField.getText();
             String telefoneStr = telefoneField.getText();
             String cnpjStr = CNPJField.getText();
@@ -192,52 +223,6 @@ public class ClientesController {
         listClienteView.setDisable(false);
         showSucessMessage();
         carregarClientes();
-    }
-    private boolean validarCamposComErros() {
-        boolean isValid = true;
-
-        // Validando número
-        if (numberField.getText().isEmpty() || !numberField.getText().matches("[\\d\\s]*")) {
-            numberField.setStyle("-fx-border-color: red;");
-            isValid = false;
-        } else {
-            numberField.setStyle(null); // Remove o estilo de erro se válido
-        }
-
-        // Validando telefone
-        if (telefoneField.getText().isEmpty() || !telefoneField.getText().matches("(\\d{2})?(\\d{2})\\d{8,9}")) {
-            telefoneField.setStyle("-fx-border-color: red;");
-            isValid = false;
-        } else {
-            telefoneField.setStyle(null);
-        }
-
-        // Validando CNPJ
-        if (CNPJField.getText().isEmpty() || !CNPJField.getText().matches("\\d{2}\\.\\d{3}\\.\\d{3}/\\d{4}-\\d{2}")) {
-            CNPJField.setStyle("-fx-border-color: red;");
-            isValid = false;
-        } else {
-            CNPJField.setStyle(null);
-        }
-
-        // Validando campos de texto
-        isValid &= validarCampoTexto(nomeField);
-        isValid &= validarCampoTexto(streetField);
-        isValid &= validarCampoTexto(neighborhoodField);
-        isValid &= validarCampoTexto(cityField);
-        isValid &= validarCampoTexto(stateField);
-
-        return isValid;
-    }
-
-    private boolean validarCampoTexto(TextField textField) {
-        if (textField.getText().isEmpty() || !textField.getText().matches("[\\p{L}\\s]*")) {
-            textField.setStyle("-fx-border-color: red;");
-            return false;
-        } else {
-            textField.setStyle(null); // Remove o estilo de erro se válido
-            return true;
-        }
     }
 
     private void mostrarAlerta(String title, String header, String content) {
@@ -499,13 +484,79 @@ public class ClientesController {
         configurarValidacaoNumerica(numberField);
         configurarValidacaoTelefone(telefoneField);
         configurarValidacaoCNPJ(CNPJField);
-
         // Validar Textos
         configurarValidacaoTexto(nomeField);
         configurarValidacaoTexto(streetField);
         configurarValidacaoTexto(neighborhoodField);
         configurarValidacaoTexto(cityField);
         configurarValidacaoTexto(stateField);
+    }
+    private boolean validarCamposComErros(StringBuilder erroMensagem) {
+        boolean isValid = true;
+
+        if (!validarCampoTexto(nomeField)) {
+            erroMensagem.append("- Nome\n");
+            isValid = false;
+        }
+
+        // Validando número
+        if (numberField.getText().isEmpty() || !numberField.getText().matches("[\\d\\s]*")) {
+            numberField.setStyle("-fx-border-color: red;");
+            erroMensagem.append("- Número\n");
+            isValid = false;
+        } else {
+            numberField.setStyle(null); // Remove o estilo de erro se válido
+        }
+
+        if (!validarCampoTexto(streetField)) {
+            erroMensagem.append("- Rua\n");
+            isValid = false;
+        }
+
+        if (!validarCampoTexto(neighborhoodField)) {
+            erroMensagem.append("- Bairro\n");
+            isValid = false;
+        }
+
+        if (!validarCampoTexto(cityField)) {
+            erroMensagem.append("- Cidade\n");
+            isValid = false;
+        }
+
+        if (!validarCampoTexto(stateField)) {
+            erroMensagem.append("- Estado\n");
+            isValid = false;
+        }
+
+        // Validando telefone
+        if (telefoneField.getText().isEmpty() || !telefoneField.getText().matches("(\\d{2})?(\\d{2})\\d{8,9}")) {
+            telefoneField.setStyle("-fx-border-color: red;");
+            erroMensagem.append("- Telefone\n");
+            isValid = false;
+        } else {
+            telefoneField.setStyle(null);
+        }
+
+        // Validando CNPJ
+        if (CNPJField.getText().isEmpty() || !CNPJField.getText().matches("\\d{2}\\.\\d{3}\\.\\d{3}/\\d{4}-\\d{2}")) {
+            CNPJField.setStyle("-fx-border-color: red;");
+            erroMensagem.append("- CNPJ\n");
+            isValid = false;
+        } else {
+            CNPJField.setStyle(null);
+        }
+
+        return isValid;
+    }
+
+    private boolean validarCampoTexto(TextField textField) {
+        if (textField.getText().isEmpty() || !textField.getText().matches("[\\p{L}\\s]*")) {
+            textField.setStyle("-fx-border-color: red;");
+            return false;
+        } else {
+            textField.setStyle(null); // Remove o estilo de erro se válido
+            return true;
+        }
     }
 
     private void configurarValidacaoNumerica(TextField textField) {
