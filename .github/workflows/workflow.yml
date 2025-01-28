@@ -1,4 +1,5 @@
-name: Continuous Integration for SysAgua
+name: Continuous Integration
+
 
 on:
   push:
