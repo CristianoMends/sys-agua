@@ -2,7 +2,6 @@ package edu.pies.sysaguaapp.models;
 
 import lombok.*;
 
-import java.math.BigDecimal;
 
 @Getter
 @Setter
@@ -10,8 +9,11 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class Estoque {
     private Long id;
-    private Produto produto;
-    private BigDecimal cost;
-    private int quantity;
-
+    private int initialQuantity;
+    private int totalEntries;
+    private int totalWithdrawals;
+    private int currentQuantity;
+    private String createdAt;
+    private String updatedAt;
+    private Produto product;
 }

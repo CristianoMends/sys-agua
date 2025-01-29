@@ -4,12 +4,16 @@ import edu.pies.sysaguaapp.services.TokenManager;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
 import javafx.scene.*;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
-public class AuthController {
+import java.net.URL;
+import java.util.ResourceBundle;
+
+public class AuthController implements Initializable {
 
     private final AuthService authService;
 
@@ -26,8 +30,16 @@ public class AuthController {
         this.authService = new AuthService();
     }
 
+    public void initialize(URL location, ResourceBundle resources) {
+        //testes
+        emailField.setText("dev@gmail.com");
+        senhaField.setText("dev123");
+    }
+
     @FXML
     private void handleLoginButtonAction(ActionEvent event) {
+
+
         String email = emailField.getText().trim();
         String senha = senhaField.getText().trim();
 
@@ -58,4 +70,5 @@ public class AuthController {
             errorLabel.setText("Email ou senha inválidos.");
         }
     }
+
 }

@@ -9,6 +9,7 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.TitledPane?>
 
 <StackPane fx:id="rootPane" minHeight="600.0" minWidth="800.0" stylesheets="@../styles/home.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.pies.sysaguaapp.controllers.HomeController">
     <VBox style="-fx-background-color: white">
@@ -54,13 +55,21 @@
                         </ImageView>
                     </graphic>
                 </Button>
-                <Button onAction="#handleCadastrosGerais" prefWidth="180" styleClass="menu-button" text="Cadastros Gerais">
-                    <graphic>
+                <TitledPane text="Cadastros Gerais" expanded="false" styleClass="menu-button">
+                    <!-- <graphic>
                         <ImageView fitHeight="16" fitWidth="16" pickOnBounds="true" preserveRatio="true">
                             <Image url="@../icons/homebar/cadastros.png" />
                         </ImageView>
-                    </graphic>
-                </Button>
+                    </graphic> -->
+                    <content>
+                        <VBox spacing="5">
+                            <Button onAction="#handleLoadClientesView" prefWidth="180" styleClass="submenu-button" text="Clientes" />
+                            <Button onAction="#handleProdutos" prefWidth="180" styleClass="submenu-button" text="Produtos" />
+                            <Button onAction="#handleEntregador" prefWidth="180" styleClass="submenu-button" text="Entregador" />
+                            <Button onAction="#handleFornecedor" prefWidth="180" styleClass="submenu-button" text="Fornecedor" />
+                        </VBox>
+                    </content>
+                </TitledPane>
                 <Button onAction="#handleEntregas" prefWidth="180" styleClass="menu-button" text="Entregas">
                     <graphic>
                         <ImageView fitHeight="16" fitWidth="16" pickOnBounds="true" preserveRatio="true">
@@ -114,14 +123,7 @@
             </VBox>
          <StackPane alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
             <children>
-                <VBox fx:id="submenu" managed="false" maxWidth="200.0" prefHeight="0.0" prefWidth="200.0" style="-fx-padding: 80 10 0 10;" visible="false">
-                    <Button onAction="#handleLoadClientesView" prefWidth="180" styleClass="submenu-button" text="Clientes" />
-                    <Button onAction="#handleProdutos" prefWidth="180" styleClass="submenu-button" text="Produtos" />
-                    <Button onAction="#handleEntregador" prefWidth="180" styleClass="submenu-button" text="Entregador" />
-                    <Button onAction="#handleFornecedor" prefWidth="180" styleClass="submenu-button" text="Fornecedor" />
-                </VBox>
-      
-                  <HBox fx:id="contentBody" minWidth="400.0" style="-fx-padding: 0 ;" HBox.hgrow="ALWAYS" />
+                <HBox fx:id="contentBody" minWidth="400.0" style="-fx-padding: 0 ;" HBox.hgrow="ALWAYS" />
             </children>
          </StackPane>
         </HBox>

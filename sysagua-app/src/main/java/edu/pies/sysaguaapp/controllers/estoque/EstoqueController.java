@@ -1,8 +1,10 @@
 package edu.pies.sysaguaapp.controllers.estoque;
 
 import edu.pies.sysaguaapp.models.Estoque;
+import edu.pies.sysaguaapp.models.Produto;
 import edu.pies.sysaguaapp.services.EstoqueService;
 import edu.pies.sysaguaapp.services.TokenManager;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -11,11 +13,13 @@ import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.math.RoundingMode;
 
 public class EstoqueController {
     private final EstoqueService estoqueService;
@@ -67,16 +71,22 @@ public class EstoqueController {
     }
 
     private void configurarTabela() {
-        TableColumn<Estoque, String> colunaProduto = new TableColumn<>("Produto");
-        colunaProduto.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getProduto().getName()));
+        TableColumn<Estoque, Long> colunaCodigo = new TableColumn<>("Código");
+        colunaCodigo.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getProduct().getId()));
 
-        TableColumn<Estoque, BigDecimal> colunaCusto = new TableColumn<>("Custo");
-        colunaCusto.setCellValueFactory(new PropertyValueFactory<>("cost"));
+        TableColumn<Estoque, String> colunaProduto = new TableColumn<>("Produto");
+        colunaProduto.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getProduct().getName()));
+
+        TableColumn<Estoque, String> colunaCusto = new TableColumn<>("Custo");
+        colunaCusto.setCellValueFactory(cellData -> {
+            BigDecimal cost = cellData.getValue().getProduct().getCost();
+            return new SimpleStringProperty(cost != null ? "R$ " + cost.setScale(4, RoundingMode.HALF_UP).toString() : "");
+        });
 
         TableColumn<Estoque, Integer> colunaQuantidade = new TableColumn<>("Quantidade");
-        colunaQuantidade.setCellValueFactory(new PropertyValueFactory<>("quantity"));
+        colunaQuantidade.setCellValueFactory(new PropertyValueFactory<>("currentQuantity"));
 
-        tabelaEstoque.getColumns().addAll(colunaProduto, colunaCusto, colunaQuantidade);
+        tabelaEstoque.getColumns().addAll(colunaCodigo, colunaProduto, colunaCusto, colunaQuantidade);
         tabelaEstoque.setItems(estoqueObservable);
     }
 
@@ -141,17 +151,40 @@ public class EstoqueController {
     }
 
     @FXML
-    private void handleAjustarEstoque(){
+    private void handleAjustarEstoque() {
+        ContextMenu contextMenu = new ContextMenu();
+
+        MenuItem ajustePositivoItem = new MenuItem("Ajuste Positivo");
+        MenuItem ajusteNegativoItem = new MenuItem("Ajuste Negativo");
+
+        ajustePositivoItem.setOnAction(event -> abrirAjusteEstoque(true));
+        ajusteNegativoItem.setOnAction(event -> abrirAjusteEstoque(false));
+
+        contextMenu.getItems().addAll(ajustePositivoItem, ajusteNegativoItem);
+
+        btnAjustarEstoque.setOnMouseClicked(event -> {
+            contextMenu.hide();
+            if (event.getButton() == MouseButton.PRIMARY) {
+                contextMenu.show(btnAjustarEstoque, event.getScreenX(), event.getScreenY());
+                btnAjustarEstoque.setDisable(true);
+                contextMenu.setOnHidden(e -> btnAjustarEstoque.setDisable(false));
+            }
+        });
+    }
+
+    private void abrirAjusteEstoque(boolean positivo) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/Estoque/AddProduto.fxml"));
-            Parent addProduto = loader.load();
-    
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/Estoque/AjusteEstoque.fxml"));
+            Parent ajusteEstoque = loader.load();
+
+            AjusteEstoqueController controller = loader.getController();
+            controller.setAjustePositivo(positivo);
+
             rootPane.getChildren().clear();
-            rootPane.getChildren().add(addProduto);
-            
+            rootPane.getChildren().add(ajusteEstoque);
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("Erro ao carregar tela de adicionar produto: " + e.getMessage());
+            System.out.println("Erro ao carregar tela de ajuste de estoque: " + e.getMessage());
         }
     }
 
