@@ -33,13 +33,12 @@ public class ClientesService {
             return objectMapper.readValue(response.body(), new TypeReference<List<Clientes>>() {
             });
         } else {
-            throw new Exception("Erro ao buscar clientes: " + response.body());
+            throw new Exception("Erro ao buscar clientes: ");
         }
     }
 
     public static Clientes criarCliente(Clientes clientes, String token) throws Exception {
         String clienteJson = objectMapper.writeValueAsString(clientes);
-        System.out.println("Sending client data: " + clienteJson);
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(BASE_URL))
@@ -53,14 +52,21 @@ public class ClientesService {
 
         // Verificar a resposta
         if (response.statusCode() == 201) {
-            return objectMapper.readValue(response.body(), Clientes.class);
+            if (response.body() != null && !response.body().isEmpty()) {
+                // Se o corpo não estiver vazio, desserializar e retornar o cliente
+                return objectMapper.readValue(response.body(), Clientes.class);
+            } else {
+                // Se o corpo estiver vazio, apenas retornar o cliente que foi enviado
+                System.out.println("Cliente criado com sucesso, mas sem dados retornados.");
+                return clientes;
+            }
         } else if (response.statusCode() == 400) {
             System.out.println("Erro ao criar cliente: " + response.body());
+            throw new Exception("Erro ao criar cliente: ");
         } else {
             System.out.println("Server response: " + response.body());
-            throw new Exception("Erro ao criar cliente: " + response.body());
+            throw new Exception("Erro ao criar cliente: ");
         }
-        return clientes;
     }
     public static Clientes editarCliente(Clientes cliente, String token) throws Exception {
         String clienteJson = objectMapper.writeValueAsString(cliente);
@@ -81,11 +87,11 @@ public class ClientesService {
             try {
                 return objectMapper.readValue(response.body(), Clientes.class); // Tenta converter a resposta para o objeto Cliente
             } catch (IOException e) {
-                throw new Exception("Erro ao processar a resposta do servidor: " + e.getMessage());
+                throw new Exception("Erro ao processar a resposta do servidor: ");
             }
         }
     } else {
-        throw new Exception("Erro ao editar cliente: " + response.body());
+        throw new Exception("Erro ao editar cliente: ");
     }
     }
     public static Clientes inativarCliente(Clientes cliente, String token) throws Exception {
@@ -110,11 +116,11 @@ public class ClientesService {
                 try {
                     return objectMapper.readValue(response.body(), Clientes.class);
                 } catch (IOException e) {
-                    throw new Exception("Erro ao processar a resposta do servidor: " + e.getMessage());
+                    throw new Exception("Erro ao processar a resposta do servidor: ");
                 }
             }
         } else {
-            throw new Exception("Erro ao inativar cliente: " + response.body());
+            throw new Exception("Erro ao inativar cliente: ");
         }
     }
     
