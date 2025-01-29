@@ -17,7 +17,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
-public class SecurityConfig{
+public class SecurityConfig {
 
     @Autowired
     SecurityFilter securityFilter;
@@ -29,10 +29,18 @@ public class SecurityConfig{
             "/h2/**",
             "/**"
     };
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
+                .headers(headers -> headers
+                        .contentSecurityPolicy(csp -> csp.policyDirectives(
+                                "default-src 'self'; " +
+                                        "script-src 'self' 'unsafe-inline'; " +
+                                        "style-src 'self' 'unsafe-inline'; " +
+                                        "frame-ancestors 'self'")) // Permite scripts e estilos inline
+                )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/users").permitAll()//.hasRole(UserAccess.DEVELOPER.name())//penas devs manipulam usuarios
@@ -55,7 +63,7 @@ public class SecurityConfig{
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder(){
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 }
