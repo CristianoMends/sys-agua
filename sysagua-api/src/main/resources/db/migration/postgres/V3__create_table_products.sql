@@ -1,4 +1,4 @@
-CREATE TABLE products (
+CREATE TABLE IF NOT EXISTS products (
     product_id BIGINT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     price DOUBLE PRECISION NOT NULL,
