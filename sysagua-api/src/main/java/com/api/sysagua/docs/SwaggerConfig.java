@@ -77,5 +77,12 @@ public class SwaggerConfig {
                 .pathsToMatch("/suppliers/**")
                 .build();
     }
+    @Bean
+    public GroupedOpenApi deliveryPersonApi() {
+        return GroupedOpenApi.builder()
+                .group("Entregadores")
+                .pathsToMatch("/deliveryPersons/**")
+                .build();
+    }
 
 }
