@@ -1,4 +1,4 @@
-package com.api.sysagua.dto.deliverer;
+package com.api.sysagua.dto.deliveryPerson;
 
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -13,7 +13,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UpdateDelivererDto {
+public class UpdateDeliveryPersonDto {
     @Schema(description = "Id do entregador.", example = "47")
     private Long id;
 
