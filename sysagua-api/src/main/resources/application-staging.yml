@@ -1,37 +1,29 @@
+#o perfil staging está configurado para executar um banco postgres na maquina host
+
 spring:
   datasource:
-    url: jdbc:h2:mem:sysagua_db
-    driver-class-name: org.h2.Driver
-    username: sa
-    password:
-    initialize: true
-  sql:
-    init:
-      mode: always  # Garante que os arquivos SQL sejam executados em todos os perfis
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/sysagua_db}  # Variável de ambiente para o URL do banco de dados, com valor default
+    username: ${DB_USERNAME:postgres}                       # Variável de ambiente para o nome de usuário do banco, com valor default
+    password: ${DB_PASSWORD:qwe123}                         # Variável de ambiente para a senha do banco, com valor default
+    driver-class-name: org.postgresql.Driver
 
   jpa:
-    show-sql: true  # Desativa a exibição de SQL no console em produção
-    generate-ddl: true  # Desativa a geração automática do DDL
-    database-platform: org.hibernate.dialect.H2Dialect
-    properties:
-      hibernate.show_sql: true
-      jakarta:
-        persistence:
-          schema-generation:
-            scripts:
-              action: none
+    show-sql: false                                          # Em produção, é recomendado desabilitar a exibição de SQL
+    generate-ddl: false                                      # Não gerar DDL automaticamente em produção
     hibernate:
-      ddl-auto: create  # Comportamento do Hibernate para atualizar o banco de dados
-  flyway:
-    locations: classpath:db/migration/h2  # Caminho para scripts de migração com Flyway
-    baseline-on-migrate: true  # Permite migrações em bancos de dados existentes
+      ddl-auto: none                                         # Evita que o Hibernate altere o banco automaticamente
+      format-sql: false                                       # Desabilitar formatação de SQL
+      enable_lazy_load_no_trans: false                        # Evita erros de carregamento fora de transações
 
+  flyway:
+    locations: classpath:db/migration/postgres                       # Localização dos scripts de migração do Flyway
+    baseline-on-migrate: true                                # Força o Flyway a manter o controle de versões no banco
+    enabled: true                                            # Habilitar o Flyway para gerenciar migrações
   h2:
     console:
-      enabled: true
-      path: /h2
+      enabled: false  # Desativa o console H2 em staging (não usado aqui)
 
 security:
   config:
-    jwt-secret-key: qwe123  # Chave secreta para geração de tokens JWT
-    jwt-expiration-time: 12  # Tempo de expiração dos tokens JWT (em horas)
+    key: ${JWT_SECRET_KEY:secrect-key}                         # Variável de ambiente para a chave JWT (pode ser definida no ambiente)
+    expiration: ${JWT_EXPIRATION:12}                     # Definir o tempo de expiração do JWT (hora)
