@@ -3,7 +3,6 @@ package edu.pies.sysaguaapp.services;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.pies.sysaguaapp.models.Estoque;
-import edu.pies.sysaguaapp.models.Produto;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -32,33 +31,26 @@ public class EstoqueService {
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
         if (response.statusCode() == 200) {
-            return objectMapper.readValue(response.body(), new TypeReference<List<Estoque>>() {
-            });
+            return objectMapper.readValue(response.body(), new TypeReference<List<Estoque>>() {});
         } else {
             throw new Exception("Erro ao buscar produtos: " + response.body());
         }
     }
 
-    public Produto addProduto(Produto produto, String token) throws Exception {
-        // Converter o objeto Produto para JSON
-        String produtoJson = objectMapper.writeValueAsString(produto);
+    public void addProdutoEstoque(Long productId, int quantity, String token) throws Exception {
+        String requestBody = String.format("{\"productId\": %d, \"quantity\": %d}", productId, quantity);
 
-        // Criar a requisição POST
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(BASE_URL))
-                .POST(HttpRequest.BodyPublishers.ofString(produtoJson))
+                .POST(HttpRequest.BodyPublishers.ofString(requestBody))
                 .header("Content-Type", "application/json")
                 .header("Authorization", "Bearer " + token)
                 .build();
 
-        // Enviar a requisição
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
-        // Verificar a resposta
-        if (response.statusCode() == 201) {
-            return null;
-        } else {
-            throw new Exception("Erro ao criar produto: " + response.body());
+        if (response.statusCode() != 201) {
+            throw new Exception("Erro ao adicionar produto ao estoque: " + response.body());
         }
     }
 }
