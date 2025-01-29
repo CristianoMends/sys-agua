@@ -1,5 +1,6 @@
 package edu.pies.sysaguaapp.controllers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.pies.sysaguaapp.models.Address;
 import edu.pies.sysaguaapp.models.Clientes;
 import edu.pies.sysaguaapp.services.ClientesService;
@@ -32,17 +33,40 @@ public class ClientesController {
     private TextField nomeField;
 
     @FXML
+    private Label nomeErrorLabel;
+
+    @FXML
     private VBox addressBox;
     @FXML
     private TextField numberField;
+
+    @FXML
+    private Label numberErrorLabel;
+
     @FXML
     private TextField streetField;
+
+    @FXML
+    private Label streetErrorLabel;
+
+
     @FXML
     private TextField neighborhoodField;
+
+    @FXML
+    private Label neighborhoodErrorLabel;
+
     @FXML
     private TextField cityField;
+
+    @FXML
+    private Label cityErrorLabel;
+
     @FXML
     private TextField stateField;
+
+    @FXML
+    private Label stateErrorLabel;
 
     private Address address;
 
@@ -50,7 +74,13 @@ public class ClientesController {
     private TextField telefoneField;
 
     @FXML
+    private Label telefoneErrorLabel;
+
+    @FXML
     private TextField CNPJField;
+
+    @FXML
+    private Label cnpjErrorLabel;
 
     @FXML
     private BorderPane formCadastroClientes;
@@ -124,6 +154,18 @@ public class ClientesController {
 
     @FXML
     private void handleSalvar() {
+        StringBuilder erroMensagem = new StringBuilder();
+
+        // Verifica se há campos inválidos
+        if (!validarCamposComErros(erroMensagem)) {
+            // Caso algum campo tenha erro, não permite salvar
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Erro");
+            alert.setHeaderText("Campos inválidos");
+            alert.setContentText(erroMensagem.toString()); // Exibe a mensagem detalhada
+            alert.showAndWait();
+            return; // Interrompe o salvamento
+        }
             String nome = nomeField.getText();
             String telefoneStr = telefoneField.getText();
             String cnpjStr = CNPJField.getText();
@@ -133,10 +175,7 @@ public class ClientesController {
             String cidade = cityField.getText();
             String estado = stateField.getText();
 
-            if (nomeField.getText().isEmpty() || CNPJField.getText().isEmpty()) {
-                mostrarAlerta("Campos obrigatórios", "Preencha todos os campos obrigatórios.", "");
-                return; // Sai do método se a validação falhar
-            }
+            validarCampos();
 
             // Cria o objeto Address
             Address clienteAddress = new Address();
@@ -146,10 +185,6 @@ public class ClientesController {
             clienteAddress.setCity(cidade);
             clienteAddress.setState(estado);
 
-            if (clienteAddress.getStreet().isEmpty() || clienteAddress.getCity().isEmpty() || clienteAddress.getState().isEmpty()) {
-                mostrarAlerta("Endereço inválido", "Certifique-se de preencher todos os campos do endereço.", "");
-                return; // Sai do método se o endereço não estiver completo
-            }
 
             Clientes novoCliente = new Clientes();
             novoCliente.setName(nome);
@@ -167,8 +202,7 @@ public class ClientesController {
                 }
                 else{
                     novoCliente.setActive(true);
-                    Clientes novoClienteCriado = ClientesService.criarCliente(novoCliente, token);
-                    novoCliente.setId(novoClienteCriado.getId());
+                    ClientesService.criarCliente(novoCliente, token);
                     clientesObservable.add(novoCliente);
                 }        
         } catch (Exception e) {
@@ -440,10 +474,136 @@ public class ClientesController {
         TableColumn<Clientes, String> colunaCnpj = new TableColumn<>("CNPJ");
         colunaCnpj.setCellValueFactory(new PropertyValueFactory<>("cnpj"));
 
-
         tabelaClientes.getColumns().addAll(colunaNome, colunaNumero, colunaRua, colunaBairro, colunaCidade,colunaEstado, colunaTelefone, colunaCnpj);
         tabelaClientes.setItems(clientesObservable);
     }
+
+    /*--------- validações ----------*/
+    private void validarCampos() {
+        // Validar números
+        configurarValidacaoNumerica(numberField);
+        configurarValidacaoTelefone(telefoneField);
+        configurarValidacaoCNPJ(CNPJField);
+        // Validar Textos
+        configurarValidacaoTexto(nomeField);
+        configurarValidacaoTexto(streetField);
+        configurarValidacaoTexto(neighborhoodField);
+        configurarValidacaoTexto(cityField);
+        configurarValidacaoTexto(stateField);
+    }
+    private boolean validarCamposComErros(StringBuilder erroMensagem) {
+        boolean isValid = true;
+
+        if (!validarCampoTexto(nomeField)) {
+            erroMensagem.append("- Nome\n");
+            isValid = false;
+        }
+
+        // Validando número
+        if (numberField.getText().isEmpty() || !numberField.getText().matches("[\\d\\s]*")) {
+            numberField.setStyle("-fx-border-color: red;");
+            erroMensagem.append("- Número\n");
+            isValid = false;
+        } else {
+            numberField.setStyle(null); // Remove o estilo de erro se válido
+        }
+
+        if (!validarCampoTexto(streetField)) {
+            erroMensagem.append("- Rua\n");
+            isValid = false;
+        }
+
+        if (!validarCampoTexto(neighborhoodField)) {
+            erroMensagem.append("- Bairro\n");
+            isValid = false;
+        }
+
+        if (!validarCampoTexto(cityField)) {
+            erroMensagem.append("- Cidade\n");
+            isValid = false;
+        }
+
+        if (!validarCampoTexto(stateField)) {
+            erroMensagem.append("- Estado\n");
+            isValid = false;
+        }
+
+        // Validando telefone
+        if (telefoneField.getText().isEmpty() || !telefoneField.getText().matches("(\\d{2})?(\\d{2})\\d{8,9}")) {
+            telefoneField.setStyle("-fx-border-color: red;");
+            erroMensagem.append("- Telefone\n");
+            isValid = false;
+        } else {
+            telefoneField.setStyle(null);
+        }
+
+        // Validando CNPJ
+        if (CNPJField.getText().isEmpty() || !CNPJField.getText().matches("\\d{2}\\.\\d{3}\\.\\d{3}/\\d{4}-\\d{2}")) {
+            CNPJField.setStyle("-fx-border-color: red;");
+            erroMensagem.append("- CNPJ\n");
+            isValid = false;
+        } else {
+            CNPJField.setStyle(null);
+        }
+
+        return isValid;
+    }
+
+    private boolean validarCampoTexto(TextField textField) {
+        if (textField.getText().isEmpty() || !textField.getText().matches("[\\p{L}\\s]*")) {
+            textField.setStyle("-fx-border-color: red;");
+            return false;
+        } else {
+            textField.setStyle(null); // Remove o estilo de erro se válido
+            return true;
+        }
+    }
+
+    private void configurarValidacaoNumerica(TextField textField) {
+        TextFormatter<String> formatter = new TextFormatter<>(change -> {
+            if (change.getText().matches(("[\\d\\s]*"))) { // Permite números e espaços
+                return change;
+            }
+            return null; // Rejeita mudanças inválidas
+        });
+        textField.setTextFormatter(formatter);
+    }
+
+    private void configurarValidacaoTelefone(TextField textField) {
+        TextFormatter<String> formatter = new TextFormatter<>(change -> {
+            String novoTexto = change.getControlNewText();
+
+            if (novoTexto.matches("(\\d{2})?(\\d{2})\\d{8,9}")) {
+                // Formato: Código do país (2 dígitos) + DDD (2 dígitos) + Número (8 ou 9 dígitos)
+                return change;
+            }
+
+            return null; // Rejeita mudanças inválidas
+        });
+        textField.setTextFormatter(formatter);
+    }
+
+    private void configurarValidacaoCNPJ(TextField textField) {
+        TextFormatter<String> formatter = new TextFormatter<>(change -> {
+            String novoTexto = change.getControlNewText();
+
+            // Regex para validar o formato de CNPJ
+            if (novoTexto.matches("\\d{2}\\.\\d{3}\\.\\d{3}/\\d{4}-\\d{2}")) {
+                return change; // Aceita formato válido
+            }
+
+            return null; // Rejeita mudanças inválidas
+        });
+        textField.setTextFormatter(formatter);
+    }
+    private void configurarValidacaoTexto(TextField textField) {
+        textField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.matches("[\\p{L}\\s\\d.,-]*")) { // Permite letras, espaços, números, '.', ',' e '-'
+                textField.setText(oldValue);
+            }
+        });
+    }
+
 
     private void showSucessMessage() {
         successMessage.setVisible(true);

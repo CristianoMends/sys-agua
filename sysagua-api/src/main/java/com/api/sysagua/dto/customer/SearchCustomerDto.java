@@ -30,7 +30,7 @@ public class SearchCustomerDto {
     @Size(max = 50, message = "The city must be at most 50 characters.")
     private String city;
 
-    @Schema(description = "Nome do estado.", example = "Ceará", maxLength = 20)
+    @Schema(description = "Nome do estado.", example = "CE", maxLength = 20)
     @Size(max = 20, message = "The state must be at most 20 characters.")
     private String state;
 

@@ -24,7 +24,7 @@
                 </HBox>
             </top>
             <center>
-                <VBox fx:id="detailsFormCliente" managed="true" minHeight="205.0" minWidth="365.0" spacing="5.0">
+                <VBox fx:id="detailsFormCliente" managed="true" minHeight="400.0" minWidth="400.0" spacing="10.0">
                     <children>
                         <Label styleClass="label-field" text="Nome da Empresa" />
                         <TextField fx:id="nomeField" promptText="Nome da Empresa" styleClass="text-field" />
@@ -45,7 +45,7 @@
                                 <VBox maxHeight="50.0" prefHeight="200.0">
                                     <children>
                                         <Label styleClass="label-field" text="Telefone" />
-                                        <TextField fx:id="telefoneField" promptText="5585982127976" styleClass="text-field" />
+                                        <TextField fx:id="telefoneField" promptText="5585000000000" styleClass="text-field" />
                                     </children>
                                 </VBox>
                                 <Region maxWidth="120.0" prefHeight="200.0" prefWidth="120.0" />
