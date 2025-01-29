@@ -37,10 +37,10 @@
 
                                     <Button fx:id="btnAjustarEstoque" mnemonicParsing="false" onAction="#handleAjustarEstoque" styleClass="menu-button" text="Ajuste de estoque" />
                                     <Button fx:id="btnMovimentacoes" mnemonicParsing="false" onAction="#handleMovimentacoes" styleClass="menu-button" text="Movimentações" />
-                                    <Button fx:id="btnConfiguracoes" mnemonicParsing="false" onAction="#handleConfiguracoes" styleClass="menu-button">
+                                    <Button fx:id="btnConfiguracoes" mnemonicParsing="false" onAction="#handleConfiguracoes" styleClass="menuIcon-button">
                                         <graphic>
                                             <ImageView fitHeight="16" fitWidth="16" pickOnBounds="true" preserveRatio="true">
-                                                <Image url="@../icons/estoque/config.png" />
+                                                <Image url="@../../icons/estoque/config.png" />
                                             </ImageView>
                                         </graphic>
                                     </Button>

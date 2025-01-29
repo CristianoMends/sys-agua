@@ -1,3 +1,93 @@
+.menuIcon-button {
+    /*-fx-background-color: #404040;*/
+    -fx-background-color: transparent; /* Remove a cor de fundo */
+    -fx-border-color: transparent; /* Remove a borda */
+    -fx-focus-color: transparent; /* Remove o efeito de foco (se houver) */
+    -fx-text-fill: black;
+    -fx-font-size: 16px;
+    -fx-font-weight: normal;
+    -fx-background-radius: 5;
+    -fx-alignment: center-left; /* Alinha o texto à esquerda */
+}
+
+.menu-button:hover {
+    -fx-background-color: #707FDD10;
+    -fx-text-fill: #5A6ACF;
+    /*-fx-font-weight: bold;*/
+}
+
+.submenu-button {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-text-fill: black;
+    /*-fx-focus-color: transparent;*/
+    -fx-padding: 5;
+    -fx-font-size: 16px;
+    -fx-alignment: center-left;
+}
+
+.submenu-button:hover {
+    /*-fx-background-color: #707FDD;*/
+    /*-fx-font-weight: bold;*/
+    -fx-background-color: #707FDD10;
+    -fx-text-fill: #5A6ACF;
+}
+
+#topMenu {
+    -fx-background-color: #ffffff;
+    -fx-padding: 10px 20px;
+    -fx-border-color: transparent transparent #C8CBD9 transparent;
+    -fx-border-width: 0 0 1px 0;
+}
+
+#sideMenu {
+    -fx-background-color: #F1F2F7;
+    -fx-padding: 10px;
+    -fx-pref-width: 200px;
+}
+
+#submenu{
+    -fx-background-color: white;
+}
+
+#contentBody {
+    -fx-padding: 10px;
+    -fx-background-color: #f4f4f4;
+}
+
+#contentArea{
+    -fx-background-color: white;
+}
+
+.logo{
+    -fx-background-color: #F1F2F7;
+}
+
+.textField{
+    -fx-background-color: #F1F2F7;
+    -fx-text-fill: black;
+    -fx-font-size: 14px;
+    -fx-border-radius: 5px;
+}
+
+.textField:hover{
+    -fx-border-color: #9EB0EA;
+}
+
+.titled-pane > .title {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+.titled-pane > .content {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+
+/*estoque css*/
+
+
 .table-view {
     -fx-border-color: transparent; /* Remove a cor das bordas externas */
     -fx-background-color: transparent; /* Remove o fundo */
@@ -58,6 +148,27 @@
 .success-Message{
     -fx-border-color: green;
     -fx-border-radius: 5px;
+}
+
+.combo-box {
+    -fx-border-color: transparent;
+    -fx-background-color: #F1F2F7;
+    -fx-border-radius: 2px;
+}
+
+.combo-box:focused {
+    -fx-border-color: #8EB3FF;
+    -fx-border-radius: 2px;
+    -fx-background-color: white;
+}
+
+.combo-box .list-cell {
+    -fx-background-color: white;
+    -fx-text-fill: #737B8B;
+}
+
+.combo-box .list-cell:filled:selected, .combo-box .list-cell:filled:hover {
+    -fx-background-color: #f1f2f7;
 }
 
 /*---------- pagination ----------*/

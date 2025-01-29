@@ -73,3 +73,13 @@
 .textField:hover{
     -fx-border-color: #9EB0EA;
 }
+
+.titled-pane > .title {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+.titled-pane > .content {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
