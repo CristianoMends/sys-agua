@@ -1,10 +1,8 @@
 package edu.pies.sysaguaapp.models;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -17,11 +15,28 @@ public class Produto {
     private BigDecimal price;
     private BigDecimal cost;
     private String brand;
-    private String category;
-    private String line;
+    private Long categoryId;
+    private Long lineId;
     private String ncm;
     private String createdAt;
     private String updatedAt;
     private Boolean active;
+
+    private ProductCategory category;
+    private ProductLine line;
+
+    public void setCategory(ProductCategory category) {
+        this.category = category;
+        this.categoryId = category != null ? category.getId() : null;
+    }
+
+    public void setLine(ProductLine line) {
+        this.line = line;
+        this.lineId = line != null ? line.getId() : null;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
 }
 

@@ -1,9 +1,14 @@
 package edu.pies.sysaguaapp.controllers;
 
+import edu.pies.sysaguaapp.models.ProductCategory;
+import edu.pies.sysaguaapp.models.ProductLine;
 import edu.pies.sysaguaapp.models.Produto;
 import edu.pies.sysaguaapp.services.ProdutoService;
 import edu.pies.sysaguaapp.services.TokenManager;
+import edu.pies.sysaguaapp.services.ProductCategoryService;
+import edu.pies.sysaguaapp.services.ProductLineService;
 import javafx.animation.PauseTransition;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -18,10 +23,13 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.math.RoundingMode;
 
 public class ProdutosController{
 
     private final ProdutoService produtoService;
+    private final ProductCategoryService productCategoryService;
+    private final ProductLineService productLineService;
 
     @FXML
     private StackPane rootPane;
@@ -42,7 +50,7 @@ public class ProdutosController{
     private TextField nomeField;
 
     @FXML
-    private TextField categoriaField;
+    private ComboBox<String> categoriaComboBox;
 
     @FXML
     private TextField custoField;
@@ -60,7 +68,7 @@ public class ProdutosController{
     private TextField lineField;
 
     @FXML
-    private TextField ncmFiel;
+    private TextField ncmField;
 
     @FXML
     private TextField descricaoField;
@@ -101,15 +109,49 @@ public class ProdutosController{
     @FXML
     private Button btnCancelar;
 
+    @FXML
+    private ComboBox<String> linhaComboBox;
+
+    @FXML
+    private Label custoErrorLabel;
+
+    @FXML
+    private Label precoUnitarioErrorLabel;
+
+    @FXML
+    private Label marcaErrorLabel;
+
+    @FXML
+    private Label linhaErrorLabel;
+
+    @FXML
+    private Label unidadeErrorLabel;
+
+    @FXML
+    private Label ncmErrorLabel;
+
+    @FXML
+    private Label descricaoErrorLabel;
+
+    @FXML
+    private Label cestErrorLabel;
+
+    @FXML
+    private Label gtinErrorLabel;
+
     private ObservableList<Produto> produtosObservable;
     private int paginaAtual = 0;
     private final int itensPorPagina = 18;
     private int totalPaginas;
     private Produto produtoEditando = null;
+    private List<ProductCategory> categorias;
+    private List<ProductLine> linhas;
 
 
     public ProdutosController() {
         this.produtoService = new ProdutoService();
+        this.productCategoryService = new ProductCategoryService();
+        this.productLineService = new ProductLineService();
         this.produtosObservable = FXCollections.observableArrayList();
     }
 
@@ -117,7 +159,10 @@ public class ProdutosController{
     public void initialize() {
         configurarTabela();
         carregarProdutos();
+        carregarCategorias();
+        carregarLinhas();
         showMenuContext();
+        validarCampos();
     }
 
 
@@ -147,59 +192,134 @@ public class ProdutosController{
         }
     }
 
+    private Produto criarProduto() {
+        Produto novoProduto = new Produto();
+        novoProduto.setName(nomeField.getText());
+        ProductCategory categoriaSelecionada = categorias.stream()
+            .filter(c -> c.getName().equals(categoriaComboBox.getValue()))
+            .findFirst()
+            .orElse(null);
+        ProductLine linhaSelecionada = linhas.stream()
+            .filter(l -> l.getName().equals(linhaComboBox.getValue()))
+            .findFirst()
+            .orElse(null);
+        novoProduto.setCategoryId(categoriaSelecionada != null ? categoriaSelecionada.getId() : null);
+        novoProduto.setLineId(linhaSelecionada != null ? linhaSelecionada.getId() : null);
+        novoProduto.setCost(new BigDecimal(custoField.getText().replace(",", ".")));
+        novoProduto.setPrice(new BigDecimal(precoUnitarioField.getText().replace(",", ".")));
+        novoProduto.setUnit(unidadeField.getText());
+        novoProduto.setBrand(marcaField.getText());
+        novoProduto.setNcm(ncmField.getText()); // Corrected from ncmFiel to ncmField
+        return novoProduto;
+    }
+
     @FXML
     private void handleSalvar() {
-        String nome = nomeField.getText();
-        String categoria = categoriaField.getText();
-        BigDecimal custo = new BigDecimal(custoField.getText().replace(",", "."));
-        BigDecimal precoUnitario = new BigDecimal(precoUnitarioField.getText().replace(",", "."));
-        String marca = marcaField.getText();
-        String line = lineField.getText();
-        String unidade = unidadeField.getText();
+        if (validarFormulario()) {
+            Produto novoProduto = criarProduto();
 
-        //Fazer o tratamento correto de texto e numeros
-        validarCampos();
-
-        Produto novoProduto = new Produto();
-        novoProduto.setName(nome);
-        novoProduto.setCategory(categoria);
-        novoProduto.setCost(custo);
-        novoProduto.setPrice(precoUnitario);
-        novoProduto.setUnit(unidade);
-        novoProduto.setBrand(marca);
-        novoProduto.setLine(line);
-
-        try {
-            String token = TokenManager.getInstance().getToken();
-            if (produtoEditando != null) {
-                novoProduto.setId(produtoEditando.getId());
-                novoProduto.setActive(true);
-                produtoService.editarProduto(novoProduto, token);
-                produtosObservable.set(produtosObservable.indexOf(produtoEditando), novoProduto);
-            } else {
-                produtoService.criarProduto(novoProduto, token);
-                produtosObservable.add(novoProduto);
+            try {
+                String token = TokenManager.getInstance().getToken();
+                if (produtoEditando != null) {
+                    novoProduto.setId(produtoEditando.getId());
+                    novoProduto.setActive(true);
+                    produtoService.editarProduto(novoProduto, token);
+                    produtosObservable.set(produtosObservable.indexOf(produtoEditando), novoProduto);
+                } else {
+                    produtoService.criarProduto(novoProduto, token);
+                    produtosObservable.add(novoProduto);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Erro");
+                alert.setHeaderText("Falha ao criar produto");
+                System.out.println(e.getMessage());
+                alert.setContentText(e.getMessage());
+                hideForm();
+                hideOverlay();
+                alert.showAndWait();
             }
 
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Erro");
-            alert.setHeaderText("Falha ao criar produto");
-            System.out.println(e.getMessage());
-            alert.setContentText(e.getMessage());
             hideForm();
             hideOverlay();
-            alert.showAndWait();
+            clearFieldForm();
+            listProductView.setDisable(false);
+            showSucessMessage();
+            carregarProdutos();
+        }
+    }
+
+    private boolean validarFormulario() {
+        boolean isValid = true;
+
+        if (nomeField.getText().trim().isEmpty()) {
+            nomeErrorLabel.setVisible(true);
+            nomeErrorLabel.setManaged(true);
+            isValid = false;
         }
 
-        hideForm();
-        hideOverlay();
-        clearFieldForm();
-        listProductView.setDisable(false);
-        showSucessMessage();
-        carregarProdutos();
+        if (categoriaComboBox.getValue() == null || categoriaComboBox.getValue().trim().isEmpty()) {
+            categoriaErrorLabel.setVisible(true);
+            categoriaErrorLabel.setManaged(true);
+            isValid = false;
+        }
+
+        if (custoField.getText().trim().isEmpty()) {
+            custoErrorLabel.setVisible(true);
+            custoErrorLabel.setManaged(true);
+            isValid = false;
+        }
+
+        if (precoUnitarioField.getText().trim().isEmpty()) {
+            precoUnitarioErrorLabel.setVisible(true);
+            precoUnitarioErrorLabel.setManaged(true);
+            isValid = false;
+        }
+
+        if (marcaField.getText().trim().isEmpty()) {
+            marcaErrorLabel.setVisible(true);
+            marcaErrorLabel.setManaged(true);
+            isValid = false;
+        }
+
+        if (linhaComboBox.getValue() == null || linhaComboBox.getValue().trim().isEmpty()) {
+            linhaErrorLabel.setVisible(true);
+            linhaErrorLabel.setManaged(true);
+            isValid = false;
+        }
+
+        if (unidadeField.getText().trim().isEmpty()) {
+            unidadeErrorLabel.setVisible(true);
+            unidadeErrorLabel.setManaged(true);
+            isValid = false;
+        }
+
+        if (ncmField.getText().trim().isEmpty()) {
+            ncmErrorLabel.setVisible(true);
+            ncmErrorLabel.setManaged(true);
+            isValid = false;
+        }
+
+        if (descricaoField.getText().trim().isEmpty()) {
+            descricaoErrorLabel.setVisible(true);
+            descricaoErrorLabel.setManaged(true);
+            isValid = false;
+        }
+
+        if (cestField.getText().trim().isEmpty()) {
+            cestErrorLabel.setVisible(true);
+            cestErrorLabel.setManaged(true);
+            isValid = false;
+        }
+
+        if (gtinField.getText().trim().isEmpty()) {
+            gtinErrorLabel.setVisible(true);
+            gtinErrorLabel.setManaged(true);
+            isValid = false;
+        }
+
+        return isValid;
     }
 
     @FXML
@@ -207,6 +327,7 @@ public class ProdutosController{
        hideForm();
        hideOverlay();
         listProductView.setDisable(false);
+        clearFieldForm();
     }
 
     @FXML
@@ -294,8 +415,7 @@ public class ProdutosController{
         Produto produtoSelecionado = (Produto) tabelaProdutos.getSelectionModel().getSelectedItem();
 
         if (produtoSelecionado != null) {
-            try{
-                clearFieldForm();
+            try {
                 preencherCampos(produtoSelecionado);
                 produtoEditando = produtoSelecionado;
                 updateButtonText();
@@ -310,11 +430,11 @@ public class ProdutosController{
 
     private void preencherCampos(Produto produto) {
         nomeField.setText(produto.getName());
-        categoriaField.setText(produto.getCategory());
-        custoField.setText(String.valueOf(produto.getCost()));
-        precoUnitarioField.setText(String.valueOf(produto.getPrice()));
+        categoriaComboBox.setValue(produto.getCategory() != null ? produto.getCategory().getName() : null);
+        custoField.setText(produto.getCost() != null ? produto.getCost().setScale(2, RoundingMode.HALF_UP).toString().replace(".", ",") : "");
+        precoUnitarioField.setText(produto.getPrice() != null ? produto.getPrice().setScale(2, RoundingMode.HALF_UP).toString().replace(".", ",") : "");
         marcaField.setText(produto.getBrand());
-        lineField.setText(produto.getLine());
+        linhaComboBox.setValue(produto.getLine() != null ? produto.getLine().getName() : null);
         unidadeField.setText(produto.getUnit());
     }
 
@@ -322,7 +442,6 @@ public class ProdutosController{
         Produto produtoSelecionado = (Produto) tabelaProdutos.getSelectionModel().getSelectedItem();
         if (produtoSelecionado != null) {
             try {
-                clearFieldForm();
                 preencherCampos(produtoSelecionado);
                 produtoEditando = null;
                 updateButtonText();
@@ -350,7 +469,14 @@ public class ProdutosController{
         colunaNome.setCellValueFactory(new PropertyValueFactory<>("name"));
 
         TableColumn<Produto, String> colunaCategoria = new TableColumn<>("Categoria");
-        colunaCategoria.setCellValueFactory(new PropertyValueFactory<>("category"));
+        colunaCategoria.setCellValueFactory(cellData -> {
+            Produto produto = cellData.getValue();
+            ProductCategory categoria = categorias.stream()
+                .filter(c -> c.getId().equals(produto.getCategoryId()))
+                .findFirst()
+                .orElse(null);
+            return new SimpleStringProperty(categoria != null ? categoria.getName() : "N/A");
+        });
 
         TableColumn<Produto, String> colunaMarca = new TableColumn<>("Marca");
         colunaMarca.setCellValueFactory(new PropertyValueFactory<>("brand"));
@@ -392,6 +518,30 @@ public class ProdutosController{
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("Erro ao carregar produtos: " + e.getMessage());
+        }
+    }
+
+    private void carregarCategorias() {
+        try {
+            categorias = productCategoryService.buscarCategorias();
+            categoriaComboBox.setItems(FXCollections.observableArrayList(
+                categorias.stream().map(ProductCategory::getName).toList()
+            ));
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Erro ao carregar categorias: " + e.getMessage());
+        }
+    }
+
+    private void carregarLinhas() {
+        try {
+            linhas = productLineService.buscarLinhas();
+            linhaComboBox.setItems(FXCollections.observableArrayList(
+                linhas.stream().map(ProductLine::getName).toList()
+            ));
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Erro ao carregar linhas: " + e.getMessage());
         }
     }
 
@@ -437,11 +587,12 @@ public class ProdutosController{
 
     private void clearFieldForm() {
         nomeField.clear();
-        categoriaField.clear();
+        categoriaComboBox.setValue(null);
         unidadeField.clear();
         precoUnitarioField.clear();
         custoField.clear();
         marcaField.clear();
+        linhaComboBox.setValue(null);
     }
 
 
@@ -449,41 +600,53 @@ public class ProdutosController{
 
     private void validarCampos() {
         // Validar números
-        configurarValidacaoNumerica(custoField);
-        configurarValidacaoNumerica(precoUnitarioField);
-        configurarValidacaoNumerica(cestField);
-        configurarValidacaoNumerica(gtinField);
+        configurarValidacaoNumerica(custoField, custoErrorLabel);
+        configurarValidacaoNumerica(precoUnitarioField, precoUnitarioErrorLabel);
+        configurarValidacaoNumerica(cestField, cestErrorLabel);
+        configurarValidacaoNumerica(gtinField, gtinErrorLabel);
 
         // Validar texto
-        configurarValidacaoTexto(nomeField);
+        configurarValidacaoTexto(nomeField, nomeErrorLabel);
         nomeField.textProperty().addListener((obs, oldText, newText) -> {
             nomeErrorLabel.setVisible(newText.trim().isEmpty());
         });
 
-        configurarValidacaoTexto(categoriaField);
-        categoriaField.textProperty().addListener((obs, oldText, newText) -> {
+        configurarValidacaoTexto(categoriaComboBox.getEditor(), categoriaErrorLabel);
+        categoriaComboBox.getEditor().textProperty().addListener((obs, oldText, newText) -> {
             categoriaErrorLabel.setVisible(newText.trim().isEmpty());
         });
 
-        configurarValidacaoTexto(marcaField);
-        configurarValidacaoTexto(unidadeField);
-        configurarValidacaoTexto(descricaoField);
+        configurarValidacaoTexto(marcaField, marcaErrorLabel);
+        configurarValidacaoTexto(unidadeField, unidadeErrorLabel);
+        configurarValidacaoTexto(descricaoField, descricaoErrorLabel);
+        configurarValidacaoTexto(ncmField, ncmErrorLabel);
+        configurarValidacaoTexto(linhaComboBox.getEditor(), linhaErrorLabel);
     }
 
-    private void configurarValidacaoNumerica(TextField textField) {
+    private void configurarValidacaoNumerica(TextField textField, Label errorLabel) {
         TextFormatter<String> formatter = new TextFormatter<>(change -> {
-            if (change.getText().matches("\\d*([,]\\d*)?")) { // Permite números e ponto decimal
+            String newText = change.getControlNewText();
+            if (newText.matches("\\d*([,]\\d{0,4})?")) { // Permite números e até 4 casas decimais
+                errorLabel.setVisible(false);
+                errorLabel.setManaged(false);
                 return change;
             }
+            errorLabel.setVisible(true);
+            errorLabel.setManaged(true);
             return null; // Rejeita mudanças inválidas
         });
         textField.setTextFormatter(formatter);
     }
 
-    private void configurarValidacaoTexto(TextField textField) {
+    private void configurarValidacaoTexto(TextField textField, Label errorLabel) {
         textField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.matches("[\\p{L}\\s\\d.,-]*")) { // Permite letras, espaços, números, '.', ',' e '-'
                 textField.setText(oldValue);
+                errorLabel.setVisible(true);
+                errorLabel.setManaged(true);
+            } else {
+                errorLabel.setVisible(false);
+                errorLabel.setManaged(false);
             }
         });
     }
