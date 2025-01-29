@@ -28,9 +28,6 @@ public class HomeController implements Initializable {
 
     public Pane spacer; //espaçador do botão de sair
 
-    @FXML
-    private VBox submenu;
-
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         loadInitView();
@@ -66,99 +63,63 @@ public class HomeController implements Initializable {
     @FXML
     private void handleDashboard() {
         showMessage("Dashboard");
-        hideSubmenu();
     }
 
 
     @FXML
     private void handleEntregas() {
         showMessage("Entregas");
-        hideSubmenu();
     }
 
     @FXML
     private void handleCompras() {
         showMessage("Compras");
-        hideSubmenu();
     }
 
     @FXML
     private void handleEstoque() {
         loadView("/views/Estoque/Estoque.fxml");
-        hideSubmenu();
     }
 
     @FXML
     private void handleFinanceiro() {
         showMessage("Caixa");
-        hideSubmenu();
     }
 
     @FXML
     private void handleRelatorio() {
         showMessage("Relatório");
-        hideSubmenu();
     }
 
     @FXML
     private void handleAjuda() {
         showMessage("Usuário");
-        hideSubmenu();
     }
 
     @FXML
     private void handleCadastrosGerais() {
-        if (!submenu.isVisible()) {
-            submenu.setLayoutX(sideMenu.getWidth());  // Alinha ao lado do menu lateral
-            submenu.setManaged(true);
-            submenu.toFront();
-            submenu.setVisible(true);
-
-
-            // Adiciona evento para recolher o submenu ao clicar fora
-            rootPane.setOnMouseClicked(event -> {
-                    hideSubmenu();
-//                if (!submenu.contains(event.getX(), event.getY())) {
-//                }
-            });
-            //não fechar ao clicar dentro do submenu
-            submenu.setOnMouseClicked(event -> event.consume());
-        } else {
-            hideSubmenu();
-        }
+        // Removed submenu handling logic
     }
-
-    private void hideSubmenu() {
-        submenu.setVisible(false);
-        submenu.setManaged(false);
-        rootPane.setOnMouseClicked(null); // Remove o evento
-    }
-
 
     //------------------submenu cadastros gerais ---------------------//
     @FXML
     private void handleLoadClientesView() {
         loadView("/views/Clientes/Clientes.fxml");
-        hideSubmenu();
-
     }
 
     @FXML
     private void handleProdutos() {
         loadView("/views/Produtos/Produtos.fxml");
-        hideSubmenu();
     }
 
     @FXML
     private void handleEntregador() {
         loadView("/views/Entregador/Entregador.fxml");
-        hideSubmenu();
     }
 
     @FXML
     private void handleFornecedor() {
         showMessage("Todos os fornecedores");
-        hideSubmenu();
     }
 
     @FXML
@@ -214,9 +175,5 @@ public class HomeController implements Initializable {
             e.printStackTrace();
         }
     }
-
-
-
-
 
 }
