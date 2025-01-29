@@ -1,7 +1,5 @@
-package com.api.sysagua.dto.deliverer;
+package com.api.sysagua.dto.deliveryPerson;
 
-import com.api.sysagua.model.Customer;
-import com.api.sysagua.model.Deliverer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -17,7 +15,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Schema(description = "DTO para criação de um novo Entregador.")
-public class CreateDelivererDto {
+public class CreateDeliveryPersonDto {
 
     @Schema(description = "Nome do entregador", example = "Paulo", maxLength = 20)
     @NotBlank(message = "Name is mandatory")
@@ -28,7 +26,4 @@ public class CreateDelivererDto {
     @Pattern(regexp = "\\d{10,11}", message = "Phone must contain 10 or 11 digits")
     private String phone;
 
-    public Deliverer toModel() {
-        return new Deliverer(getName(), getPhone());
-    }
 }

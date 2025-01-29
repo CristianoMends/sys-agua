@@ -1,16 +1,18 @@
-package com.api.sysagua.dto.deliverer;
+package com.api.sysagua.dto.deliveryPerson;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
+import java.time.LocalDate;
+
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class SearchDelivererDto {
+public class SearchDeliveryPersonDto {
     @Schema(description = "Id do entregador.", example = "47")
     private Long id;
 
@@ -21,4 +23,9 @@ public class SearchDelivererDto {
     @Schema(description = "Número de telefone do entregador", example = "0521364789", pattern = "\\d{10,11}", nullable = true)
     @Pattern(regexp = "\\d{10,11}", message = "Phone must contain 10 or 11 digits")
     private String phone = "";
+
+    private Boolean active;
+
+    private LocalDate createdAtStart;
+    private LocalDate createdAtEnd;
 }
