@@ -5,6 +5,7 @@ import edu.pies.sysaguaapp.models.Produto;
 import edu.pies.sysaguaapp.services.EntregadorService;
 import edu.pies.sysaguaapp.services.TokenManager;
 import javafx.animation.PauseTransition;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -14,6 +15,7 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
+import javafx.beans.property.SimpleStringProperty;
 
 
 import java.util.List;
@@ -69,6 +71,9 @@ public class EntregadorController {
     @FXML
     private Button btnCancelar;
 
+    @FXML
+    private CheckBox exibirInativosCheckBox;
+
     private Entregador entregadorEditando = null;
 
     private ObservableList<Entregador> entregadorObservable;
@@ -86,6 +91,8 @@ public class EntregadorController {
         configurarTabela();
         carregarEntregadores();
         showMenuContext();
+
+        exibirInativosCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> carregarEntregadores());
 
         // Validar texto
         configurarValidacaoTexto(nomeField);
@@ -132,8 +139,8 @@ public class EntregadorController {
         //Fazer o tratamento correto de texto e numeros
 
         Entregador novoEntregador = new Entregador();
-        novoEntregador.setNome(nome);
-        novoEntregador.setTelefone(telefone);
+        novoEntregador.setName(nome);
+        novoEntregador.setPhone(telefone);
 
         try {
             String token = TokenManager.getInstance().getToken();
@@ -246,8 +253,8 @@ public class EntregadorController {
     }
 
     private void preencherCampos(Entregador entregador) {
-        nomeField.setText(entregador.getNome());
-        telefoneField.setText(entregador.getTelefone());
+        nomeField.setText(entregador.getName());
+        telefoneField.setText(entregador.getPhone());
 
     }
 
@@ -264,20 +271,57 @@ public class EntregadorController {
     private void configurarTabela() {
         // Configuração das colunas da tabela
         TableColumn<Entregador, String> colunaNome = new TableColumn<>("Nome");
-        colunaNome.setCellValueFactory(new PropertyValueFactory<>("nome"));
+        colunaNome.setCellValueFactory(new PropertyValueFactory<>("name"));
+
+        TableColumn<Entregador, Long> colunaCodigo = new TableColumn<>("Código");
+        colunaCodigo.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getId()));
+        colunaCodigo.setStyle("-fx-alignment: CENTER;");
+        colunaCodigo.setSortType(TableColumn.SortType.ASCENDING);
 
         TableColumn<Entregador, String> colunaTelefone = new TableColumn<>("Telefone");
-        colunaTelefone.setCellValueFactory(new PropertyValueFactory<>("telefone"));
+        colunaTelefone.setCellValueFactory(new PropertyValueFactory<>("phone"));
+        colunaTelefone.setStyle("-fx-alignment: CENTER;");
 
-        tabelaEntregador.getColumns().addAll(colunaNome, colunaTelefone);
+        TableColumn<Entregador, String> colunaData = new TableColumn<>("Data de cadastro");
+        colunaData.setCellValueFactory(new PropertyValueFactory<>("createdAt"));
+        colunaData.setStyle("-fx-alignment: CENTER;");
+
+        TableColumn<Entregador, String> colunaStatus = new TableColumn<>("Status");
+        colunaStatus.setCellValueFactory(cellData -> {
+            if (cellData.getValue().getActive()) {
+                return new SimpleStringProperty("Ativo");
+            }
+            return new SimpleStringProperty("Inativo");
+        });
+        colunaStatus.setStyle("-fx-alignment: CENTER;");
+
+        tabelaEntregador.getColumns().addAll(colunaCodigo,colunaNome, colunaTelefone, colunaData, colunaStatus);
 
         tabelaEntregador.setItems(entregadorObservable);
+
+        tabelaEntregador.setRowFactory(tv -> new TableRow<>() {
+            @Override
+            protected void updateItem(Entregador entregador, boolean empty) {
+                super.updateItem(entregador, empty);
+                if (entregador == null || empty) {
+                    setStyle("");
+                } else if (!entregador.isActive()) {
+                    setStyle("-fx-text-fill: red;");
+                } else {
+                    setStyle("");
+                }
+            }
+        });
     }
 
     private void carregarEntregadores() {
         try {
             String token = TokenManager.getInstance().getToken();
             List<Entregador> todosEntregadores = entregadorService.buscarEntregadores(token);
+
+            if (!exibirInativosCheckBox.isSelected()) {
+                todosEntregadores.removeIf(entregador -> !entregador.getActive());
+            }
 
             // Calcula o total de páginas
             totalPaginas = (int) Math.ceil((double) todosEntregadores.size() / itensPorPagina);
