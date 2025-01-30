@@ -2,11 +2,9 @@ package com.api.sysagua.controller;
 
 import com.api.sysagua.docs.StockDoc;
 import com.api.sysagua.dto.stock.AddProductDto;
-import com.api.sysagua.dto.stock.SearchStockDto;
 import com.api.sysagua.dto.stock.UpdateStockDto;
 import com.api.sysagua.model.Stock;
 import com.api.sysagua.service.StockService;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,7 +16,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("stock")
-@Tag(name = "Stock Controller", description = "Operações relacionadas ao gerenciamento de estoque.")
 public class StockController implements StockDoc {
 
     @Autowired
@@ -49,7 +46,7 @@ public class StockController implements StockDoc {
             @RequestParam(value = "productName", required = false) String productName
     ) {
 
-        var search = new SearchStockDto(
+        List<Stock> stockList = this.service.getStock(
                 id,
                 initialQuantityStart,
                 initialQuantityEnd,
@@ -62,10 +59,7 @@ public class StockController implements StockDoc {
                 updatedAtStart,
                 updatedAtEnd,
                 productId,
-                productName
-        );
-
-        List<Stock> stockList = this.service.getStock(search);
+                productName);
 
         return ResponseEntity.ok(stockList);
     }

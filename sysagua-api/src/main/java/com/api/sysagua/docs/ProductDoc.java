@@ -10,11 +10,15 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@SecurityRequirement(name = "BearerAuth")
+@Tag(name = "Product Controller", description = "Endpoints para gerenciamento de produtos")
 public interface ProductDoc {
 
     @Operation(
@@ -23,35 +27,11 @@ public interface ProductDoc {
             security = @SecurityRequirement(name = "Bearer")
     )
     @ApiResponses({
-            @ApiResponse(
-                    responseCode = "201",
-                    description = "Produto registrado com sucesso",
-                    content = @Content()
-            ),
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "Dados do produto fornecidos são inválidos",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ResponseError.class)
-                    )
-            ),
-            @ApiResponse(
-                    responseCode = "403",
-                    description = "Usuario não está autorizado",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ResponseError.class)
-                    )
-            ),
-            @ApiResponse(
-                    responseCode = "500",
-                    description = "Erro inesperado",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ResponseError.class)
-                    )
-            )
+            @ApiResponse(responseCode = "201", description = "sucesso.", content = @Content()),
+            @ApiResponse(responseCode = "400", description = "Parâmetros inválidos.", content = @Content()),
+            @ApiResponse(responseCode = "404", description = "Não encontrado", content = @Content()),
+            @ApiResponse(responseCode = "403", description = "Não autorizado.", content = @Content()),
+            @ApiResponse(responseCode = "500", description = "Erro interno no servidor.", content = @Content())
     })
     ResponseEntity<Void> create(CreateProductDto productDto);
 
@@ -61,38 +41,19 @@ public interface ProductDoc {
             security = @SecurityRequirement(name = "Bearer")
     )
     @ApiResponses({
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "Produtos encontrados com sucesso",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = Product.class)
-                    )
-            ),
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "Falha na requisição",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ResponseError.class)
-                    )
-            ),
-            @ApiResponse(
-                    responseCode = "403",
-                    description = "Usuario não está autorizado",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ResponseError.class)
-                    )
-            )
+            @ApiResponse(responseCode = "200", description = "sucesso."),
+            @ApiResponse(responseCode = "400", description = "Parâmetros inválidos.", content = @Content()),
+            @ApiResponse(responseCode = "404", description = "Não encontrado", content = @Content()),
+            @ApiResponse(responseCode = "403", description = "Não autorizado.", content = @Content()),
+            @ApiResponse(responseCode = "500", description = "Erro interno no servidor.", content = @Content())
     })
     ResponseEntity<List<Product>> list(
             Long id,
             String name,
-            Double priceStart,
-            Double priceEnd,
-            Double costStart,
-            Double costEnd,
+            BigDecimal priceStart,
+            BigDecimal priceEnd,
+            BigDecimal costStart,
+            BigDecimal costEnd,
             String category,
             String unit,
             String brand,
@@ -111,45 +72,11 @@ public interface ProductDoc {
             security = @SecurityRequirement(name = "Bearer")
     )
     @ApiResponses({
-            @ApiResponse(
-                    responseCode = "204",
-                    description = "Produto atualizado com sucesso",
-                    content = @Content(
-                            mediaType = "application/json"
-                    )
-            ),
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "Dados fornecidos são inválidos",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ResponseError.class)
-                    )
-            ),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "Produto não encontrado",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ResponseError.class)
-                    )
-            ),
-            @ApiResponse(
-                    responseCode = "403",
-                    description = "Usuario não autorizado",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ResponseError.class)
-                    )
-            ),
-            @ApiResponse(
-                    responseCode = "500",
-                    description = "Erro inesperado",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ResponseError.class)
-                    )
-            )
+            @ApiResponse(responseCode = "204", description = "sucesso.", content = @Content()),
+            @ApiResponse(responseCode = "400", description = "Parâmetros inválidos.", content = @Content()),
+            @ApiResponse(responseCode = "404", description = "Não encontrado", content = @Content()),
+            @ApiResponse(responseCode = "403", description = "Não autorizado.", content = @Content()),
+            @ApiResponse(responseCode = "500", description = "Erro interno no servidor.", content = @Content())
     })
     ResponseEntity<Void> update(
             Long id, UpdateProductDto productDto
@@ -161,43 +88,11 @@ public interface ProductDoc {
             security = @SecurityRequirement(name = "Bearer")
     )
     @ApiResponses({
-            @ApiResponse(
-                    responseCode = "204",
-                    description = "Produto deletado com sucesso",
-                    content = @Content()
-            ),
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "ID do produto fornecido é inválido",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ResponseError.class)
-                    )
-            ),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "Produto não encontrado",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ResponseError.class)
-                    )
-            ),
-            @ApiResponse(
-                    responseCode = "403",
-                    description = "Usuário não autorizado",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ResponseError.class)
-                    )
-            ),
-            @ApiResponse(
-                    responseCode = "500",
-                    description = "Erro inesperado",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ResponseError.class)
-                    )
-            )
+            @ApiResponse(responseCode = "204", description = "sucesso.", content = @Content()),
+            @ApiResponse(responseCode = "400", description = "Parâmetros inválidos.", content = @Content()),
+            @ApiResponse(responseCode = "404", description = "Não encontrado", content = @Content()),
+            @ApiResponse(responseCode = "403", description = "Não autorizado.", content = @Content()),
+            @ApiResponse(responseCode = "500", description = "Erro interno no servidor.", content = @Content())
     })
     ResponseEntity<Void> delete(Long id);
 

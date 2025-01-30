@@ -1,7 +1,6 @@
 package com.api.sysagua.service.impl;
 
 import com.api.sysagua.dto.supplier.CreateSupplierDto;
-import com.api.sysagua.dto.supplier.SearchSupplierDto;
 import com.api.sysagua.dto.supplier.UpdateSupplierDto;
 import com.api.sysagua.exception.BusinessException;
 import com.api.sysagua.model.Supplier;
@@ -38,12 +37,13 @@ public class SupplierServiceImpl implements SupplierService {
     }
 
     @Override
-    public List<Supplier> list(SearchSupplierDto dto) {
-        if (dto.getCnpj() == null) dto.setCnpj("");
-        if (dto.getPhone() == null) dto.setPhone("");
-        if (dto.getSocialReason() == null) dto.setSocialReason("");
+    public List<Supplier> list(Long id, String socialReason, String cnpj, String phone, Boolean active) {
 
-        return this.supplierRepository.findByFilters(dto.getId(),dto.getSocialReason(),dto.getCnpj(),dto.getPhone(), dto.getActive());
+        if (cnpj == null) cnpj = "";
+        if (phone == null) phone = "";
+        if (socialReason == null) socialReason = "";
+
+        return this.supplierRepository.findByFilters(id,socialReason,cnpj,phone,active);
     }
 
     @Override

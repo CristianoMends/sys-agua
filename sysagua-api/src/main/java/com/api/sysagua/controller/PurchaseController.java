@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -28,8 +29,8 @@ public class PurchaseController implements PurchaseDoc {
     @GetMapping
     public ResponseEntity<List<ViewPurchaseDto>> list(
             @RequestParam(value = "id", required = false) Long id,
-            @RequestParam(value = "totalValueStart", required = false) Double totalValueStart,
-            @RequestParam(value = "totalValueEnd", required = false) Double totalValueEnd,
+            @RequestParam(value = "totalValueStart", required = false) BigDecimal totalValueStart,
+            @RequestParam(value = "totalValueEnd", required = false) BigDecimal totalValueEnd,
             @RequestParam(value = "active", required = false) Boolean active,
             @RequestParam(value = "updatedAtStart", required = false) LocalDateTime updatedAtStart,
             @RequestParam(value = "updatedAtEnd", required = false) LocalDateTime updatedAtEnd,
@@ -38,7 +39,7 @@ public class PurchaseController implements PurchaseDoc {
             @RequestParam(value = "supplierId", required = false) Long supplierId,
             @RequestParam(value = "productId", required = false) Long productId
     ) {
-        var search = new SearchPurchaseDto(
+        return ResponseEntity.ok(this.purchaseService.list(
                 id,
                 totalValueStart,
                 totalValueEnd,
@@ -48,9 +49,7 @@ public class PurchaseController implements PurchaseDoc {
                 createdAtStart,
                 createdAtEnd,
                 supplierId,
-                productId
-        );
-        return ResponseEntity.ok(this.purchaseService.list(search));
+                productId));
     }
 
     @PutMapping("{id}")
@@ -63,7 +62,7 @@ public class PurchaseController implements PurchaseDoc {
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id){
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
         this.purchaseService.delete(id);
         return ResponseEntity.noContent().build();
     }

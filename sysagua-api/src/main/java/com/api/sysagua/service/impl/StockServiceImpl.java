@@ -1,7 +1,6 @@
 package com.api.sysagua.service.impl;
 
 import com.api.sysagua.dto.stock.AddProductDto;
-import com.api.sysagua.dto.stock.SearchStockDto;
 import com.api.sysagua.dto.stock.UpdateStockDto;
 import com.api.sysagua.exception.BusinessException;
 import com.api.sysagua.model.Stock;
@@ -56,22 +55,35 @@ public class StockServiceImpl implements StockService {
     }
 
     @Override
-    public List<Stock> getStock(SearchStockDto dto) {
-        if (dto.getProductName() == null) dto.setProductName("");
+    public List<Stock> getStock(Long id,
+                                Integer initialQuantityStart,
+                                Integer initialQuantityEnd,
+                                Integer totalEntriesStart,
+                                Integer totalEntriesEnd,
+                                Integer totalWithdrawalsStart,
+                                Integer totalWithdrawalsEnd,
+                                LocalDateTime createdAtStart,
+                                LocalDateTime createdAtEnd,
+                                LocalDateTime updatedAtStart,
+                                LocalDateTime updatedAtEnd,
+                                Long productId,
+                                String productName) {
+
+        if (productName == null) productName = "";
         return this.stockRepository.list(
-                dto.getId(),
-                dto.getInitialQuantityStart(),
-                dto.getInitialQuantityEnd(),
-                dto.getTotalEntriesStart(),
-                dto.getTotalEntriesEnd(),
-                dto.getTotalWithdrawalsStart(),
-                dto.getTotalWithdrawalsEnd(),
-                dto.getCreatedAtStart(),
-                dto.getCreatedAtEnd(),
-                dto.getUpdatedAtStart(),
-                dto.getUpdatedAtEnd(),
-                dto.getProductId(),
-                dto.getProductName()
+                id,
+                initialQuantityStart,
+                initialQuantityEnd,
+                totalEntriesStart,
+                totalEntriesEnd,
+                totalWithdrawalsStart,
+                totalWithdrawalsEnd,
+                createdAtStart,
+                createdAtEnd,
+                updatedAtStart,
+                updatedAtEnd,
+                productId,
+                productName
         );
     }
 
@@ -82,9 +94,9 @@ public class StockServiceImpl implements StockService {
                 () -> new BusinessException(String.format("Stock with id %d not found", id), HttpStatus.NOT_FOUND)
         );
 
-        if (dto.getProductId() != null){
+        if (dto.getProductId() != null) {
             var product = this.productRepository.findById(dto.getProductId()).orElseThrow(
-                    () -> new BusinessException("Product not found",HttpStatus.NOT_FOUND)
+                    () -> new BusinessException("Product not found", HttpStatus.NOT_FOUND)
             );
 
             if (!product.getActive()) {//se o produto não está ativo, não é possivel adicionar ao estoque
@@ -94,7 +106,7 @@ public class StockServiceImpl implements StockService {
             stock.setProduct(product);
         }
         if (dto.getQuantity() != null) {
-            if (stock.getTotalEntries() > 0){
+            if (stock.getTotalEntries() > 0) {
                 stock.setCurrentQuantity(dto.getQuantity());
             }
         }

@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -24,8 +26,8 @@ public class ViewProductPurchaseDto {
     private Integer quantity;
 
     @Schema(description = "Preço de compra do produto por unidade", example = "15.99")
-    private Double purchasePrice;
+    private BigDecimal purchasePrice;
 
     @Schema(description = "Preço total da compra do produto (quantidade * preço de compra)", example = "79.95")
-    private Double total;
+    private BigDecimal total;
 }

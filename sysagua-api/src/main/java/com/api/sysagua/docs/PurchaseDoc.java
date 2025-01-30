@@ -14,6 +14,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -23,8 +24,11 @@ public interface PurchaseDoc {
     @Operation(summary = "Cria uma nova compra",
             description = "Recebe os dados necessários para registrar uma nova compra.")
     @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "Compra criada com sucesso."),
-            @ApiResponse(responseCode = "403", description = "Acesso proibido."),
+            @ApiResponse(responseCode = "201", description = "sucesso.", content = @Content()),
+            @ApiResponse(responseCode = "400", description = "Parâmetros inválidos.", content = @Content()),
+            @ApiResponse(responseCode = "404", description = "Não encontrado", content = @Content()),
+            @ApiResponse(responseCode = "403", description = "Não autorizado.", content = @Content()),
+            @ApiResponse(responseCode = "500", description = "Erro interno no servidor.", content = @Content())
     })
     @PostMapping
     @CrossOrigin
@@ -34,17 +38,18 @@ public interface PurchaseDoc {
     @Operation(summary = "Lista compras",
             description = "Retorna uma lista de compras com base nos filtros fornecidos.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Lista de compras retornada com sucesso."),
+            @ApiResponse(responseCode = "200", description = "sucesso."),
             @ApiResponse(responseCode = "400", description = "Parâmetros inválidos.", content = @Content()),
-            @ApiResponse(responseCode = "403", description = "Acesso proibido.", content = @Content()),
+            @ApiResponse(responseCode = "404", description = "Não encontrado", content = @Content()),
+            @ApiResponse(responseCode = "403", description = "Não autorizado.", content = @Content()),
             @ApiResponse(responseCode = "500", description = "Erro interno no servidor.", content = @Content())
     })
     @GetMapping
     @CrossOrigin
     ResponseEntity<List<ViewPurchaseDto>> list(
             @Parameter(description = "Identificador da compra") @RequestParam(value = "id", required = false) Long id,
-            @Parameter(description = "Valor total mínimo") @RequestParam(value = "totalValueStart", required = false) Double totalValueStart,
-            @Parameter(description = "Valor total máximo") @RequestParam(value = "totalValueEnd", required = false) Double totalValueEnd,
+            @Parameter(description = "Valor total mínimo") @RequestParam(value = "totalValueStart", required = false) BigDecimal totalValueStart,
+            @Parameter(description = "Valor total máximo") @RequestParam(value = "totalValueEnd", required = false) BigDecimal totalValueEnd,
             @Parameter(description = "Status ativo da compra") @RequestParam(value = "active", required = false) Boolean active,
             @Parameter(description = "Data de atualização inicial") @RequestParam(value = "updatedAtStart", required = false) LocalDateTime updatedAtStart,
             @Parameter(description = "Data de atualização final") @RequestParam(value = "updatedAtEnd", required = false) LocalDateTime updatedAtEnd,
@@ -56,10 +61,11 @@ public interface PurchaseDoc {
     @Operation(summary = "Atualiza uma compra",
             description = "Atualiza os dados de uma compra existente com base no ID.")
     @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "Compra atualizada com sucesso.", content = @Content()),
-            @ApiResponse(responseCode = "403", description = "Acesso proibido.", content = @Content()),
-            @ApiResponse(responseCode = "404", description = "Compra não encontrada.", content = @Content()),
-            @ApiResponse(responseCode = "400", description = "Dados inválidos para atualização.", content = @Content())
+            @ApiResponse(responseCode = "204", description = "sucesso.", content = @Content()),
+            @ApiResponse(responseCode = "400", description = "Parâmetros inválidos.", content = @Content()),
+            @ApiResponse(responseCode = "404", description = "Não encontrado", content = @Content()),
+            @ApiResponse(responseCode = "403", description = "Não autorizado.", content = @Content()),
+            @ApiResponse(responseCode = "500", description = "Erro interno no servidor.", content = @Content())
     })
     @PutMapping("{id}")
     @CrossOrigin
@@ -70,9 +76,11 @@ public interface PurchaseDoc {
     @Operation(summary = "Deleta uma compra",
             description = "Remove uma compra do sistema com base no ID informado.")
     @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "Compra deletada com sucesso."),
-            @ApiResponse(responseCode = "403", description = "Acesso proibido."),
-            @ApiResponse(responseCode = "404", description = "Compra não encontrada.")
+            @ApiResponse(responseCode = "204", description = "sucesso.", content = @Content()),
+            @ApiResponse(responseCode = "400", description = "Parâmetros inválidos.", content = @Content()),
+            @ApiResponse(responseCode = "404", description = "Não encontrado", content = @Content()),
+            @ApiResponse(responseCode = "403", description = "Não autorizado.", content = @Content()),
+            @ApiResponse(responseCode = "500", description = "Erro interno no servidor.", content = @Content())
     })
     @DeleteMapping("{id}")
     @CrossOrigin

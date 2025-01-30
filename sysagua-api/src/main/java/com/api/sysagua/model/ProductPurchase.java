@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -28,15 +30,15 @@ public class ProductPurchase {
     private Product product;
 
     private Integer quantity;
-    private Double purchasePrice;
-    private Double total;
+    private BigDecimal purchasePrice;
+    private BigDecimal total;
 
-    public ProductPurchase(Purchase purchase,Product product, Integer quantity, Double purchasePrice){
+    public ProductPurchase(Purchase purchase,Product product, Integer quantity, BigDecimal purchasePrice){
         setPurchase(purchase);
         setProduct(product);
         setQuantity(quantity);
         setPurchasePrice(purchasePrice);
-        this.total = quantity * purchasePrice;
+        this.total = purchasePrice.multiply(BigDecimal.valueOf(quantity));
     }
 
     public ViewProductPurchaseDto toView(){

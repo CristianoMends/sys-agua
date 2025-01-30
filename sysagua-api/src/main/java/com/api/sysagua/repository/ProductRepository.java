@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -30,10 +31,10 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findByFilters(
             @Param("id") Long id,
             @Param("name") String name,
-            @Param("priceStart") Double priceStart,
-            @Param("priceEnd") Double priceEnd,
-            @Param("costStart") Double costStart,
-            @Param("costEnd") Double costEnd,
+            @Param("priceStart") BigDecimal priceStart,
+            @Param("priceEnd") BigDecimal priceEnd,
+            @Param("costStart") BigDecimal costStart,
+            @Param("costEnd") BigDecimal costEnd,
             @Param("category") String category,
             @Param("unit") String unit,
             @Param("brand") String brand,

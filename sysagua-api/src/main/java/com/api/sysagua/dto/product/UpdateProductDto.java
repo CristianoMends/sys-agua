@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -17,10 +19,10 @@ public class UpdateProductDto {
     private String name;
 
     @Schema(description = "Valor de custo do produto", example = "47.59")
-    private Double cost;
+    private BigDecimal cost;
 
     @Schema(description = "Preço de venda do produto ao ser adicionado ao estoque", example = "50.00")
-    private Double price;
+    private BigDecimal price;
 
     @Schema(description = "Unidade de medida do produto", example = "litro", maxLength = 20)
     @Size(max = 20, message = "Unit should not exceed 20 characters")
