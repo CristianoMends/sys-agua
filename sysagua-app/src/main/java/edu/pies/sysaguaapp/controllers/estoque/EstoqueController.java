@@ -73,6 +73,8 @@ public class EstoqueController {
     private void configurarTabela() {
         TableColumn<Estoque, Long> colunaCodigo = new TableColumn<>("Código");
         colunaCodigo.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getProduct().getId()));
+        colunaCodigo.setStyle("-fx-alignment: CENTER;");
+        colunaCodigo.setSortType(TableColumn.SortType.ASCENDING); // Adiciona a ordenação por ID
 
         TableColumn<Estoque, String> colunaProduto = new TableColumn<>("Produto");
         colunaProduto.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getProduct().getName()));
@@ -82,12 +84,15 @@ public class EstoqueController {
             BigDecimal cost = cellData.getValue().getProduct().getCost();
             return new SimpleStringProperty(cost != null ? "R$ " + cost.setScale(4, RoundingMode.HALF_UP).toString() : "");
         });
+        colunaCusto.setStyle("-fx-alignment: CENTER;");
 
         TableColumn<Estoque, Integer> colunaQuantidade = new TableColumn<>("Quantidade");
         colunaQuantidade.setCellValueFactory(new PropertyValueFactory<>("currentQuantity"));
+        colunaQuantidade.setStyle("-fx-alignment: CENTER;");
 
         tabelaEstoque.getColumns().addAll(colunaCodigo, colunaProduto, colunaCusto, colunaQuantidade);
         tabelaEstoque.setItems(estoqueObservable);
+        tabelaEstoque.getSortOrder().add(colunaCodigo); // Define a coluna de ID como a coluna de ordenação padrão
     }
 
     private void carregarProdutos() {
