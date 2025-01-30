@@ -1,6 +1,7 @@
 package com.api.sysagua.service.impl;
 
 import com.api.sysagua.dto.user.*;
+import com.api.sysagua.enumeration.UserAccess;
 import com.api.sysagua.enumeration.UserStatus;
 import com.api.sysagua.exception.BusinessException;
 import com.api.sysagua.model.User;
@@ -16,6 +17,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -109,32 +111,18 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> getUsers(SearchUserDto userDto) {
-        if (userDto.getEmail() == null){
-            userDto.setEmail("");
-        }
-        if (userDto.getPhone() == null){
-            userDto.setPhone("");
-        }
-        if (userDto.getName() == null){
-            userDto.setName("");
-        }
-        if (userDto.getSurname() == null){
-            userDto.setSurname("");
-        }
-        return userRepository.findByFilters(
-                userDto.getId(),
-                userDto.getName(),
-                userDto.getSurname(),
-                userDto.getPhone(),
-                userDto.getEmail(),
-                userDto.getStatus(),
-                userDto.getAccess()
-        );
+    public List<User> getUsers(UUID id, String name, String surname, String phone, String email, UserStatus status, UserAccess access) {
+
+        if (email == null) email = "";
+        if (phone == null) phone = "";
+        if (name == null) name = "";
+        if (surname == null) surname = "";
+
+        return userRepository.findByFilters(id, name, surname, phone, email, status, access);
     }
 
     @Override
-    public User updateUser(UpdateUserDto userDto) {
+    public void updateUser(UpdateUserDto userDto) {
         User user = userRepository.findById(userDto.getId())
                 .orElseThrow(() -> new BusinessException("User not found", HttpStatus.NOT_FOUND));
 
@@ -146,6 +134,5 @@ public class UserServiceImpl implements UserService {
         if (userDto.getStatus() != null) user.setStatus(userDto.getStatus());
 
         userRepository.save(user);
-        return user;
     }
 }

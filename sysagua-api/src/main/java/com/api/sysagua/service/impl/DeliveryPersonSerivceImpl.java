@@ -1,7 +1,6 @@
 package com.api.sysagua.service.impl;
 
 import com.api.sysagua.dto.deliveryPerson.CreateDeliveryPersonDto;
-import com.api.sysagua.dto.deliveryPerson.SearchDeliveryPersonDto;
 import com.api.sysagua.dto.deliveryPerson.UpdateDeliveryPersonDto;
 import com.api.sysagua.exception.BusinessException;
 import com.api.sysagua.model.DeliveryPerson;
@@ -37,19 +36,19 @@ public class DeliveryPersonSerivceImpl implements DeliveryPersonService {
     }
 
     @Override
-    public List<DeliveryPerson> findByFilters(SearchDeliveryPersonDto dto){
+    public List<DeliveryPerson> findByFilters(Long id,
+                                              String name,
+                                              String phone,
+                                              Boolean active,
+                                              LocalDate createdAtStart,
+                                              LocalDate createdAtEnd) {
         return this.repository.findByFilters(
-                dto.getId(),
-                dto.getName(),
-                dto.getPhone(),
-                dto.getActive(),
-                dto.getCreatedAtStart(),
-                dto.getCreatedAtEnd()
+                id, name, phone, active, createdAtStart, createdAtEnd
         );
     }
 
     @Override
-    public void deleteDeliveryPerson(Long id){
+    public void deleteDeliveryPerson(Long id) {
         var d = this.repository.findById(id).orElseThrow(() -> new BusinessException("No deliveryPerson with specified ID was found", HttpStatus.NOT_FOUND));
         if (!d.getActive()) {
             throw new BusinessException("DeliveryPerson is already inactive");
@@ -60,14 +59,14 @@ public class DeliveryPersonSerivceImpl implements DeliveryPersonService {
     }
 
     @Override
-    public void updateDeliveryPerson(Long id, UpdateDeliveryPersonDto dto){
+    public void updateDeliveryPerson(Long id, UpdateDeliveryPersonDto dto) {
         var deliveryPerson = this.repository.findById(id).orElseThrow(
-                ()-> new BusinessException("DeliveryPerson with id not found", HttpStatus.NOT_FOUND)
+                () -> new BusinessException("DeliveryPerson with id not found", HttpStatus.NOT_FOUND)
         );
 
 
         if (dto.getName() != null) deliveryPerson.setName(dto.getName());
-        if (dto.getPhone() != null ) deliveryPerson.setPhone(dto.getPhone());
+        if (dto.getPhone() != null) deliveryPerson.setPhone(dto.getPhone());
 
         this.repository.save(deliveryPerson);
     }

@@ -2,7 +2,6 @@ package com.api.sysagua.controller;
 
 import com.api.sysagua.docs.DeliveryPersonDoc;
 import com.api.sysagua.dto.deliveryPerson.CreateDeliveryPersonDto;
-import com.api.sysagua.dto.deliveryPerson.SearchDeliveryPersonDto;
 import com.api.sysagua.dto.deliveryPerson.UpdateDeliveryPersonDto;
 import com.api.sysagua.model.DeliveryPerson;
 import com.api.sysagua.service.DeliveryPersonService;
@@ -19,8 +18,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("deliveryPersons")
-@SecurityRequirement(name = "BearerAuth")
-@Tag(name = "DeliveryPerson Controller", description = "Endpoints para gerenciamento de entregadores")
 public class DeliveryPersonController implements DeliveryPersonDoc{
 
     @Autowired
@@ -44,10 +41,7 @@ public class DeliveryPersonController implements DeliveryPersonDoc{
             @RequestParam(required = false) LocalDate createdAtStart,
             @RequestParam(required = false) LocalDate createdAtEnd
             ){
-
-        var search = new SearchDeliveryPersonDto(id, name, phone, active, createdAtStart, createdAtEnd);
-
-        List<DeliveryPerson> deliverers = service.findByFilters(search);
+        List<DeliveryPerson> deliverers = service.findByFilters(id, name, phone, active, createdAtStart, createdAtEnd);
         return ResponseEntity.ok(deliverers);
     }
 

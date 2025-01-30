@@ -2,11 +2,9 @@ package com.api.sysagua.controller;
 
 import com.api.sysagua.docs.SupplierDoc;
 import com.api.sysagua.dto.supplier.CreateSupplierDto;
-import com.api.sysagua.dto.supplier.SearchSupplierDto;
 import com.api.sysagua.dto.supplier.UpdateSupplierDto;
 import com.api.sysagua.model.Supplier;
 import com.api.sysagua.service.SupplierService;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +16,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("suppliers")
-@Tag(name = "Supplier Controller", description = "Controlador responsável pela gestão dos fornecedores.")
 public class SupplierController implements SupplierDoc {
     @Autowired
     private SupplierService service;
@@ -39,7 +36,7 @@ public class SupplierController implements SupplierDoc {
             @RequestParam(value = "phone",required = false) String phone,
             @RequestParam(value = "active", required = false) Boolean active
     ){
-        return ResponseEntity.ok(this.service.list(new SearchSupplierDto(id,socialReason,cnpj,phone, active)));
+        return ResponseEntity.ok(this.service.list(id,socialReason,cnpj,phone, active));
     }
 
     @DeleteMapping("{id}")

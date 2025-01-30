@@ -7,8 +7,6 @@ import com.api.sysagua.enumeration.UserStatus;
 import com.api.sysagua.model.User;
 import com.api.sysagua.service.UserService;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,8 +19,6 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/users")
-@SecurityRequirement(name = "BearerAuth")
-@Tag(name = "User Controller", description = "Endpoints para gerenciamento de usuários")
 public class UserController implements UserDoc {
 
     @Autowired
@@ -63,8 +59,7 @@ public class UserController implements UserDoc {
             @RequestParam(required = false) UserStatus status,
             @RequestParam(required = false) UserAccess access
     ) {
-        var searchUserDto = new SearchUserDto(id, name, surname, phone, email, status, access);
-        List<ViewUserDto> users = userService.getUsers(searchUserDto)
+        List<ViewUserDto> users = userService.getUsers(id, name, surname, phone, email, status, access)
                 .stream()
                 .map(User::toView)
                 .toList();
