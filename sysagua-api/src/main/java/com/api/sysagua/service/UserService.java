@@ -1,10 +1,13 @@
 package com.api.sysagua.service;
 
 import com.api.sysagua.dto.user.*;
+import com.api.sysagua.enumeration.UserAccess;
+import com.api.sysagua.enumeration.UserStatus;
 import com.api.sysagua.model.User;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface UserService {
 
@@ -16,7 +19,13 @@ public interface UserService {
 
     Token authenticateUser(LoginDto loginDto);
 
-    List<User> getUsers(SearchUserDto userDto);
+    List<User> getUsers(UUID id,
+                        String name,
+                        String surname,
+                        String phone,
+                        String email,
+                        UserStatus status,
+                        UserAccess access);
 
-    User updateUser(UpdateUserDto userDto);
+    void updateUser(UpdateUserDto userDto);
 }
