@@ -1,7 +1,6 @@
 package com.api.sysagua.service.impl;
 
 import com.api.sysagua.dto.product.CreateProductDto;
-import com.api.sysagua.dto.product.SearchProductDto;
 import com.api.sysagua.dto.product.UpdateProductDto;
 import com.api.sysagua.exception.BusinessException;
 import com.api.sysagua.model.Product;
@@ -14,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
@@ -37,11 +37,11 @@ public class ProductServiceImpl implements ProductService {
     public void registerProduct(CreateProductDto dto) {
 
         var line = this.productLineRepository.findById(dto.getLineId()).orElseThrow(
-                () -> new BusinessException("Product Line not found",HttpStatus.NOT_FOUND)
+                () -> new BusinessException("Product Line not found", HttpStatus.NOT_FOUND)
         );
 
         var cat = this.productCategoryRepository.findById(dto.getCategoryId()).orElseThrow(
-                () -> new BusinessException("Product category not found",HttpStatus.NOT_FOUND)
+                () -> new BusinessException("Product category not found", HttpStatus.NOT_FOUND)
         );
 
         if (cat.getActive().equals(false)) throw new BusinessException("Category is inactive");
@@ -62,73 +62,87 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<Product> getProducts(SearchProductDto p) {
-        if (p.getName()     == null ) p.setName("");
-        if (p.getCategory() == null ) p.setCategory("");
-        if (p.getUnit()     == null ) p.setUnit("");
-        if (p.getBrand()    == null ) p.setBrand("");
-        if (p.getLine()    == null  ) p.setLine("");
-        if (p.getNcm()      == null) p.setNcm("");
+    public List<Product> getProducts(Long id,
+                                     String name,
+                                     BigDecimal priceStart,
+                                     BigDecimal priceEnd,
+                                     BigDecimal costStart,
+                                     BigDecimal costEnd,
+                                     String category,
+                                     String unit,
+                                     String brand,
+                                     LocalDateTime startUpdateDate,
+                                     LocalDateTime endUpdateDate,
+                                     LocalDateTime startRegisterDate,
+                                     LocalDateTime endRegisterDate,
+                                     Boolean active,
+                                     String line,
+                                     String ncm) {
+        if (name == null) name = "";
+        if (category == null) category = "";
+        if (unit == null) unit = "";
+        if (brand == null) brand = "";
+        if (line == null) line = "";
+        if (ncm == null) ncm = "";
 
 
-        if (p.getStartUpdateDate() != null && p.getEndRegisterDate() != null
-                && p.getStartUpdateDate().isAfter(p.getEndRegisterDate())) {
+        if (startUpdateDate != null && endUpdateDate != null
+                && startUpdateDate.isAfter(endUpdateDate)) {
             throw new BusinessException("Start date cannot be after end date in update date.", HttpStatus.BAD_REQUEST);
         }
 
-        if (p.getStartRegisterDate() != null && p.getEndRegisterDate() != null
-                && p.getStartRegisterDate().isAfter(p.getEndRegisterDate())) {
+        if (startRegisterDate != null && endRegisterDate != null
+                && startRegisterDate.isAfter(endRegisterDate)) {
             throw new BusinessException("Start date cannot be after end date in creation date.", HttpStatus.BAD_REQUEST);
         }
 
-        System.out.println(p);
         return this.productRepository.findByFilters(
-                p.getId(),
-                p.getName(),
-                p.getPriceStart(),
-                p.getPriceEnd(),
-                p.getCostStart(),
-                p.getCostEnd(),
-                p.getCategory(),
-                p.getUnit(),
-                p.getBrand(),
-                p.getStartUpdateDate(),
-                p.getEndUpdateDate(),
-                p.getStartRegisterDate(),
-                p.getEndRegisterDate(),
-                p.getActive(),
-                p.getNcm(),
-                p.getLine()
+                id,
+                name,
+                priceStart,
+                priceEnd,
+                costStart,
+                costEnd,
+                unit,
+                brand,
+                category,
+                startRegisterDate,
+                endRegisterDate,
+                startUpdateDate,
+                endUpdateDate,
+                active,
+                ncm,
+                line
         );
     }
 
     @Override
     public void updateProduct(Long id, UpdateProductDto dto) {
-        Product p = this.productRepository.findById(id).orElseThrow(()->
-                new BusinessException("Product not found",HttpStatus.NOT_FOUND));
+        Product p = this.productRepository.findById(id).orElseThrow(() ->
+                new BusinessException("Product not found", HttpStatus.NOT_FOUND));
 
-        if (dto.getCategoryId() != null){
+        if (dto.getCategoryId() != null) {
             var cat = this.productCategoryRepository.findById(dto.getCategoryId()).orElseThrow(
-                    () -> new BusinessException("Product category not found",HttpStatus.NOT_FOUND)
+                    () -> new BusinessException("Product category not found", HttpStatus.NOT_FOUND)
             );
 
             p.setCategory(cat);
         }
 
-        if (dto.getLineId() != null){
+        if (dto.getLineId() != null) {
             var line = this.productLineRepository.findById(dto.getLineId()).orElseThrow(
-                    () -> new BusinessException("Product line not found",HttpStatus.NOT_FOUND)
+                    () -> new BusinessException("Product line not found", HttpStatus.NOT_FOUND)
             );
 
             p.setLine(line);
         }
 
-        if (dto.getNcm()        != null) p.setNcm(dto.getNcm());
-        if (dto.getBrand()      != null) p.setBrand(    dto.getBrand());
-        if (dto.getUnit()       != null) p.setUnit(     dto.getUnit());
-        if (dto.getName()       != null) p.setName(     dto.getName());
-        if (dto.getPrice()      != null) p.setPrice(dto.getPrice());
-        if (dto.getCost()       != null) p.setCost(dto.getCost());
+        if (dto.getNcm() != null) p.setNcm(dto.getNcm());
+        if (dto.getBrand() != null) p.setBrand(dto.getBrand());
+        if (dto.getUnit() != null) p.setUnit(dto.getUnit());
+        if (dto.getName() != null) p.setName(dto.getName());
+        if (dto.getPrice() != null) p.setPrice(dto.getPrice());
+        if (dto.getCost() != null) p.setCost(dto.getCost());
 
         p.setUpdatedAt(LocalDateTime.now(ZoneOffset.of("-03:00")));
         p.setActive(true);
@@ -143,7 +157,7 @@ public class ProductServiceImpl implements ProductService {
 
         var stockByProduct = this.stockRepository.findProduct(p.getId());
 
-        if (stockByProduct.isPresent() && stockByProduct.get().getCurrentQuantity() > 0){
+        if (stockByProduct.isPresent() && stockByProduct.get().getCurrentQuantity() > 0) {
             throw new BusinessException("The product cannot be deleted because it is still in stock.");
         }
 

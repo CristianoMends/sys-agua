@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Getter
@@ -22,12 +23,12 @@ public class ViewProductDto {
     private String name;
 
     @Schema(description = "Preço de venda do produto", example = "50.00")
-    private Double price;
+    private BigDecimal price;
 
     @Schema(description = "Preço de custo do produto", example = "20.00")
-    private Double cost;
+    private BigDecimal cost;
 
-    @Schema(description = "Unidade de medida do produto", example = "litro", maxLength = 20)
+    @Schema(description = "Unidade de medida do produto", example = "ml", maxLength = 20)
     private String unit;
 
     @Schema(description = "Marca do produto", example = "Crystal", maxLength = 30)

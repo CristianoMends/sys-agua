@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -30,9 +32,9 @@ public class PurchaseServiceImpl implements PurchaseService {
     public void create(CreatePurchaseDto dto) {
 
         var purchase = new Purchase();
-        var productPurchases =  createProductPurchase(dto.getItems(), purchase);
+        var productPurchases = createProductPurchase(dto.getItems(), purchase);
         var supplier = this.findSupplierById(dto.getSupplierId());
-        if (supplier.getActive().equals(false)){
+        if (supplier.getActive().equals(false)) {
             throw new BusinessException("Supplier is inactive");
         }
 
@@ -48,12 +50,12 @@ public class PurchaseServiceImpl implements PurchaseService {
     public void update(Long id, UpdatePurchaseDto dto) {
         Purchase purchase = findPurchaseById(id);
 
-        if (dto.getSupplierId() != null){
+        if (dto.getSupplierId() != null) {
             var supplier = findSupplierById(dto.getSupplierId());
             purchase.setSupplier(supplier);
         }
 
-        if (dto.getProductPurchases() != null){
+        if (dto.getProductPurchases() != null) {
             var productPurchases = updateProductPurchase(dto.getProductPurchases(), purchase);
             purchase.setProductPurchases(productPurchases);
         }
@@ -63,23 +65,24 @@ public class PurchaseServiceImpl implements PurchaseService {
         this.purchaseRepository.save(purchase);
     }
 
-    private List<ProductPurchase> updateProductPurchase(List<CreateProductPurchaseDto> dto, Purchase purchase){
+    private List<ProductPurchase> updateProductPurchase(List<CreateProductPurchaseDto> dto, Purchase purchase) {
         List<ProductPurchase> productPurchases = purchase.getProductPurchases();
         productPurchases.clear();
-        for (var item : dto){
+        for (var item : dto) {
             var product = this.findProductById(item.getProductId());
-            if (product.getActive().equals(false)){
+            if (product.getActive().equals(false)) {
                 throw new BusinessException(String.format("Product with id %d is inactive", product.getId()));
             }
-            productPurchases.add(new ProductPurchase(purchase,product,item.getQuantity(),item.getPurchasePrice()));
+            productPurchases.add(new ProductPurchase(purchase, product, item.getQuantity(), item.getPurchasePrice()));
         }
         return productPurchases;
     }
-    private List<ProductPurchase> createProductPurchase(List<CreateProductPurchaseDto> dto, Purchase purchase){
+
+    private List<ProductPurchase> createProductPurchase(List<CreateProductPurchaseDto> dto, Purchase purchase) {
         List<ProductPurchase> productPurchases = new ArrayList<>();
-        for (var item : dto){
+        for (var item : dto) {
             var product = this.findProductById(item.getProductId());
-            productPurchases.add(new ProductPurchase(purchase,product,item.getQuantity(),item.getPurchasePrice()));
+            productPurchases.add(new ProductPurchase(purchase, product, item.getQuantity(), item.getPurchasePrice()));
         }
         return productPurchases;
     }
@@ -93,18 +96,29 @@ public class PurchaseServiceImpl implements PurchaseService {
     }
 
     @Override
-    public List<ViewPurchaseDto> list(SearchPurchaseDto searchDto) {
+    public List<ViewPurchaseDto> list(
+            Long id,
+            BigDecimal totalValueStart,
+            BigDecimal totalValueEnd,
+            Boolean active,
+            LocalDateTime updatedAtStart,
+            LocalDateTime updatedAtEnd,
+            LocalDateTime createdAtStart,
+            LocalDateTime createdAtEnd,
+            Long supplierId,
+            Long productId
+    ) {
         return purchaseRepository.list(
-                searchDto.getId(),
-                searchDto.getTotalValueStart(),
-                searchDto.getTotalValueEnd(),
-                searchDto.getActive(),
-                searchDto.getUpdatedAtStart(),
-                searchDto.getUpdatedAtEnd(),
-                searchDto.getCreatedAtStart(),
-                searchDto.getCreatedAtEnd(),
-                searchDto.getSupplierId(),
-                searchDto.getProductId()
+                id,
+                totalValueStart,
+                totalValueEnd,
+                active,
+                updatedAtStart,
+                updatedAtEnd,
+                createdAtStart,
+                createdAtEnd,
+                supplierId,
+                productId
         ).stream().map(Purchase::toView).toList();
     }
 

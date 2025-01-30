@@ -4,6 +4,7 @@ import com.api.sysagua.dto.product.ViewProductDto;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Getter
@@ -23,9 +24,9 @@ public class Product {
     @Column(nullable = false)
     private String name;
 
-    private Double price;
+    private BigDecimal price;
 
-    private Double cost;
+    private BigDecimal cost;
 
     @Column(nullable = false)
     private String unit;

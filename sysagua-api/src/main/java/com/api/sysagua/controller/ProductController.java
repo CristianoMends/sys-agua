@@ -2,7 +2,6 @@ package com.api.sysagua.controller;
 
 import com.api.sysagua.docs.ProductDoc;
 import com.api.sysagua.dto.product.CreateProductDto;
-import com.api.sysagua.dto.product.SearchProductDto;
 import com.api.sysagua.dto.product.UpdateProductDto;
 import com.api.sysagua.model.Product;
 import com.api.sysagua.service.ProductService;
@@ -14,13 +13,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
 @RequestMapping("/products")
-@SecurityRequirement(name = "BearerAuth")
-@Tag(name = "Product Controller", description = "Endpoints para gerenciamento de produtos")
 public class ProductController implements ProductDoc {
 
     @Autowired
@@ -38,10 +36,10 @@ public class ProductController implements ProductDoc {
     public ResponseEntity<List<Product>> list(
             @RequestParam(required = false) Long id,
             @RequestParam(required = false) String name,
-            @RequestParam(required = false) Double priceStart,
-            @RequestParam(required = false) Double priceEnd,
-            @RequestParam(required = false) Double costStart,
-            @RequestParam(required = false) Double costEnd,
+            @RequestParam(required = false) BigDecimal priceStart,
+            @RequestParam(required = false) BigDecimal priceEnd,
+            @RequestParam(required = false) BigDecimal costStart,
+            @RequestParam(required = false) BigDecimal costEnd,
             @RequestParam(required = false) String category,
             @RequestParam(required = false) String unit,
             @RequestParam(required = false) String brand,
@@ -53,28 +51,23 @@ public class ProductController implements ProductDoc {
             @RequestParam(required = false) String line,
             @RequestParam(required = false) String ncm
     ) {
-
-        var searchProductDto = new SearchProductDto(
-                id,
-                name,
-                priceStart,
-                priceEnd,
-                costStart,
-                costEnd,
-                unit,
-                brand,
-                category,
-                startRegisterDate,
-                endRegisterDate,
-                startUpdateDate,
-                endUpdateDate,
-                active,
-                ncm,
-                line
-
-        );
-
-        List<Product> products = productService.getProducts(searchProductDto)
+        List<Product> products = productService.getProducts(
+                        id,
+                        name,
+                        priceStart,
+                        priceEnd,
+                        costStart,
+                        costEnd,
+                        unit,
+                        brand,
+                        category,
+                        startRegisterDate,
+                        endRegisterDate,
+                        startUpdateDate,
+                        endUpdateDate,
+                        active,
+                        ncm,
+                        line)
                 .stream()
                 .toList();
 
@@ -95,9 +88,9 @@ public class ProductController implements ProductDoc {
     @Override
     public ResponseEntity<Void> delete(
             @PathVariable Long id
-    ){
-      this.productService.delete(id);
-      return ResponseEntity.noContent().build();
+    ) {
+        this.productService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 
 }

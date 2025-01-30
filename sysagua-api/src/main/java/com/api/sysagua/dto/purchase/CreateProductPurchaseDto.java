@@ -9,6 +9,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -28,6 +30,6 @@ public class CreateProductPurchaseDto {
     @NotNull(message = "Purchase price cannot be null.")
     @DecimalMin(value = "0.01", message = "Purchase price must be at least 0.01.")
     @Schema(description = "Preço do produto por unidade na compra", example = "29.99", minimum = "0.01")
-    private Double purchasePrice;
+    private BigDecimal purchasePrice;
 
 }
