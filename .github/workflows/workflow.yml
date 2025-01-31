@@ -14,13 +14,13 @@ jobs:
   ci-pipeline:
     runs-on: ubuntu-latest
     env:
-      SPRING_PROFILES_ACTIVE: ${{ secrets.SPRING_PROFILES_ACTIVE }}
+      SPRING_PROFILES_ACTIVE: test
       DB_URL: jdbc:postgresql://postgres-db:5432/sysagua_db
-      DB_USERNAME: ${{ secrets.DB_USERNAME }}
-      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-      DEFAULT_EMAIL: ${{ secrets.DEFAULT_EMAIL }}
-      DEFAULT_PASSWORD: ${{ secrets.DEFAULT_PASSWORD }}
-      JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
+      DB_USERNAME: postgres
+      DB_PASSWORD: test2024
+      DEFAULT_EMAIL: teste@gmail.com 
+      DEFAULT_PASSWORD: admin123
+      JWT_SECRET_KEY: secret1234
 
     steps:
       # Checkout do código-fonte
