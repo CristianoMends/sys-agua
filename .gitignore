@@ -2,6 +2,7 @@
 .env
 *.class
 .idea
+.secrets
 
 # Log file
 *.log
