@@ -4,6 +4,7 @@ import com.api.sysagua.enumeration.OrderStatus;
 import com.api.sysagua.enumeration.PaymentMethod;
 import lombok.*;
 import jakarta.persistence.*;
+import org.springframework.data.annotation.CreatedDate;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -20,10 +21,12 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(optional = false)
+    @OneToOne(orphanRemoval = true)
+    @JoinColumn(name = "customer_id")
     private Customer customer;
 
-    @ManyToOne(optional = false)
+    @ManyToOne
+    @JoinColumn(name = "delivery_person_id")
     private DeliveryPerson deliveryPerson;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -38,12 +41,14 @@ public class Order {
     @Enumerated(EnumType.STRING)
     private PaymentMethod paymentMethod;
 
+    @CreatedDate
     private LocalDateTime createdAt;
 
     private LocalDateTime finishedAt;
 
-    public BigDecimal calculateTotalAmount() {
-        return productOrders.stream()
+    @PostLoad
+    private void calculateTotalAmount() {
+        this.totalAmount = productOrders.stream()
                 .map(p -> p.getUnitPrice()
                         .multiply(BigDecimal.valueOf(p.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
