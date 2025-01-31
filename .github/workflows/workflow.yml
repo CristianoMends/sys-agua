@@ -1,4 +1,4 @@
-name: Continuous Integration
+name: continuous-integration
 
 
 on:
@@ -11,16 +11,16 @@ on:
       - main
 
 jobs:
-  CI-Pipeline:
+  ci-pipeline:
     runs-on: ubuntu-latest
     env:
-      SPRING_PROFILES_ACTIVE: test
-      DB_URL: jdbc:postgresql://localhost:5433/sysagua_db
-      DB_USERNAME: postgres
-      DB_PASSWORD: testpassword
-      DEFAULT_EMAIL: admin@sysagua.com
-      DEFAULT_PASSWORD: admin123
-      JWT_SECRET_KEY: your-secret-key
+      SPRING_PROFILES_ACTIVE: ${{ secrets.SPRING_PROFILES_ACTIVE }}
+      DB_URL: jdbc:postgresql://postgres-db:5432/sysagua_db
+      DB_USERNAME: ${{ secrets.DB_USERNAME }}
+      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      DEFAULT_EMAIL: ${{ secrets.DEFAULT_EMAIL }}
+      DEFAULT_PASSWORD: ${{ secrets.DEFAULT_PASSWORD }}
+      JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
 
     steps:
       # Checkout do código-fonte
@@ -55,21 +55,21 @@ jobs:
       - name: Start Docker Compose
         run: docker-compose up --build -d
         env:
-          DB_PASSWORD: testpassword
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
 
       # Aguarda que os serviços estejam prontos
       - name: Wait for services to be ready
         run: |
-          timeout 120 bash -c '
+          timeout 300 bash -c '
           until echo > /dev/tcp/localhost/8080; do
             echo "Waiting for API service..."
             sleep 2
           done
           echo "API service is ready!"'
 
-      # permissões gradlew
+      # Concede permissão de execução ao script Gradle Wrapper
       - name: Grant execute permission for gradlew
-        run: chmod +x ./gradlew
+        run: chmod +x ./sysagua-api/gradlew
 
       # Execução de testes da API usando Gradle
       - name: Run API Tests
