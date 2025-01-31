@@ -5,6 +5,7 @@ import com.api.sysagua.dto.purchase.*;
 import com.api.sysagua.service.PurchaseService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,9 +23,8 @@ public class PurchaseController implements PurchaseDoc {
     @PostMapping()
     public ResponseEntity<Object> create(@RequestBody CreatePurchaseDto dto) {
         this.purchaseService.create(dto);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
-
 
     @GetMapping
     public ResponseEntity<List<ViewPurchaseDto>> list(
