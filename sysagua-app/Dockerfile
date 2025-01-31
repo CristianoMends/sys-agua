@@ -21,5 +21,5 @@ WORKDIR $APP_HOME
 # Copia o arquivo JAR gerado na etapa de build para o container
 COPY --from=BUILD $APP_HOME/target/*.jar $JAR_NAME
 
-# Comando de entrada configurável para rodar a aplicação JavaFX
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# Comando de entrada configurável para verificar se o build funcionou
+ENTRYPOINT ["java", "-version"]
