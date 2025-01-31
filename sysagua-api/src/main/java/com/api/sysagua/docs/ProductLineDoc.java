@@ -4,6 +4,7 @@ import com.api.sysagua.dto.product.CreateLineDto;
 import com.api.sysagua.model.ProductLine;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -41,9 +42,11 @@ public interface ProductLineDoc {
     @Operation(summary = "Deleta uma linha de produto",
             description = "Remove uma linha de produto do sistema com base no ID fornecido.")
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Linha de produto deletada com sucesso."),
-            @ApiResponse(responseCode = "403", description = "Acesso proibido."),
-            @ApiResponse(responseCode = "404", description = "Linha de produto não encontrada."),
+            @ApiResponse(responseCode = "204", description = "sucesso.", content = @Content()),
+            @ApiResponse(responseCode = "400", description = "Parâmetros inválidos.", content = @Content()),
+            @ApiResponse(responseCode = "404", description = "Não encontrado", content = @Content()),
+            @ApiResponse(responseCode = "403", description = "Não autorizado.", content = @Content()),
+            @ApiResponse(responseCode = "500", description = "Erro interno no servidor.", content = @Content())
     })
     ResponseEntity<Void> delete(
             @Parameter(description = "Identificador único da linha de produto") Long id);

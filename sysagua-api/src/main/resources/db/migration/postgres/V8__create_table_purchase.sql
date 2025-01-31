@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS purchases (
     purchase_id BIGINT NOT NULL,
     supplier_id BIGINT,
-    total_value NUMERIC(10, 2),
+    total_value NUMERIC(10,2),
     active BOOLEAN DEFAULT TRUE,
     updated_at TIMESTAMP,
     created_at TIMESTAMP,

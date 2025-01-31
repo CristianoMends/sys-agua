@@ -8,6 +8,8 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
+import java.math.BigDecimal;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -23,13 +25,13 @@ public class CreateProductDto {
 
     @Schema(description = "Valor de custo do produto", example = "47.59")
     @NotNull
-    private Double cost;
+    private BigDecimal cost;
 
     @Schema(description = "Preço de venda do produto ao ser adicionado ao estoque", example = "50.49")
     @NotNull
-    private Double price;
+    private BigDecimal price;
 
-    @Schema(description = "Unidade de medida do produto", example = "UNIDADE", maxLength = 20)
+    @Schema(description = "Unidade de medida do produto", example = "ml", maxLength = 20)
     @NotBlank(message = "Unit is mandatory")
     @Size(max = 20, message = "Unit should not exceed 20 characters")
     private String unit;

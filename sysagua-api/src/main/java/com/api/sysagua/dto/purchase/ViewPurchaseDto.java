@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -21,7 +22,7 @@ public class ViewPurchaseDto {
     private Long id;
 
     @Schema(description = "Valor total da compra", example = "1500.00")
-    private Double totalValue;
+    private BigDecimal totalValue;
 
     @Schema(description = "Data e hora da criação da compra", example = "2025-01-14T10:00:00Z")
     private LocalDateTime createdAt;

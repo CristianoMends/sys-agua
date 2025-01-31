@@ -36,14 +36,6 @@ services:
     networks:
       - sysagua-network # Adicionado à rede personalizada
 
-  # Serviço do frontend SysAgua
-  sysagua-app:
-    build:
-      context: ./sysagua-app  # Define o diretório do código-fonte do frontend para o build do Docker
-    container_name: sysagua-app  # Nome do container do frontend
-    depends_on:
-      - sysagua-api  # Garante que a API esteja disponível antes do frontend iniciar
-    network_mode: host  # Usa o mesmo modo de rede do host
 
 networks:
   sysagua-network: # Definição da rede personalizada

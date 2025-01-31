@@ -10,12 +10,14 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Tag(name = "Stock Controller", description = "Operações relacionadas ao gerenciamento de estoque.")
 public interface StockDoc {
 
     @Operation(
@@ -28,54 +30,31 @@ public interface StockDoc {
                             mediaType = "application/json",
                             schema = @Schema(implementation = AddProductDto.class)
                     )
-            ),
-            responses = {
-                    @ApiResponse(
-                            responseCode = "201",
-                            description = "Produto adicionado ao estoque com sucesso."
-                    ),
-                    @ApiResponse(
-                            responseCode = "400",
-                            description = "Erro de validação nos dados fornecidos.",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = ResponseError.class)
-                            )
-                    ),
-                    @ApiResponse(
-                            responseCode = "500",
-                            description = "Erro interno no servidor.",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = ResponseError.class)
-                            )
-                    )
-            }
+            )
+
     )
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "sucesso.", content = @Content()),
+            @ApiResponse(responseCode = "400", description = "Parâmetros inválidos.", content = @Content()),
+            @ApiResponse(responseCode = "403", description = "Não autorizado.", content = @Content()),
+            @ApiResponse(responseCode = "500", description = "Erro interno no servidor.", content = @Content())
+    })
     ResponseEntity<Void> addProduct(AddProductDto dto);
 
     @Operation(
             summary = "Obtém produtos do estoque com filtros",
-            description = "Este endpoint retorna uma lista de produtos no estoque com base nos filtros fornecidos.",
-            responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description = "Lista de produtos no estoque retornada com sucesso.",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = Stock.class)
-                            )
-                    ),
-                    @ApiResponse(
-                            responseCode = "500",
-                            description = "Erro interno no servidor.",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = ResponseError.class)
-                            )
-                    )
-            }
+            description = "Este endpoint retorna uma lista de produtos no estoque com base nos filtros fornecidos."
     )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "sucesso.",
+                    content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = Stock.class)
+            )),
+            @ApiResponse(responseCode = "400", description = "Parâmetros inválidos.", content = @Content()),
+            @ApiResponse(responseCode = "403", description = "Não autorizado.", content = @Content()),
+            @ApiResponse(responseCode = "500", description = "Erro interno no servidor.", content = @Content())
+    })
     @GetMapping
     ResponseEntity<List<Stock>> list(
             Long id,
@@ -99,43 +78,11 @@ public interface StockDoc {
             security = @SecurityRequirement(name = "Bearer")
     )
     @ApiResponses({
-            @ApiResponse(
-                    responseCode = "204",
-                    description = "Estoque do produto atualizado com sucesso",
-                    content = @Content()
-            ),
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "Dados fornecidos são inválidos",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ResponseError.class)
-                    )
-            ),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "Produto não encontrado",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ResponseError.class)
-                    )
-            ),
-            @ApiResponse(
-                    responseCode = "403",
-                    description = "Usuário não autorizado",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ResponseError.class)
-                    )
-            ),
-            @ApiResponse(
-                    responseCode = "500",
-                    description = "Erro inesperado",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ResponseError.class)
-                    )
-            )
+            @ApiResponse(responseCode = "204", description = "sucesso.", content = @Content()),
+            @ApiResponse(responseCode = "400", description = "Parâmetros inválidos.", content = @Content()),
+            @ApiResponse(responseCode = "404", description = "Não encontrado", content = @Content()),
+            @ApiResponse(responseCode = "403", description = "Não autorizado.", content = @Content()),
+            @ApiResponse(responseCode = "500", description = "Erro interno no servidor.", content = @Content())
     })
     ResponseEntity<Void> update(
             Long id,

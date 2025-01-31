@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +20,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 import java.util.UUID;
-
+@SecurityRequirement(name = "BearerAuth")
+@Tag(name = "User Controller", description = "Endpoints para gerenciamento de usuários")
 public interface UserDoc {
 
     @Operation(
@@ -31,32 +33,27 @@ public interface UserDoc {
             @ApiResponse(
                     responseCode = "201",
                     description = "Usuário registrado com sucesso",
-                    content = @Content(
-                    )
+                    content = @Content()
             ),
             @ApiResponse(
                     responseCode = "400",
                     description = "Dados do usuário fornecidos são inválidos",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ResponseError.class)
-                    )
+                    content = @Content()
             ),
             @ApiResponse(
                     responseCode = "409",
                     description = "Usuário com e-mail ou telefone já registrado",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ResponseError.class)
-                    )
+                    content = @Content()
             ),
             @ApiResponse(
                     responseCode = "500",
                     description = "Erro inesperado",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ResponseError.class)
-                    )
+                    content = @Content()
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Não autorizado",
+                    content = @Content()
             )
     })
     ResponseEntity<Void> create(@RequestBody @Valid CreateUserDto userDto);
@@ -77,26 +74,20 @@ public interface UserDoc {
             @ApiResponse(
                     responseCode = "400",
                     description = "Dados de login inválidos",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ResponseError.class)
-                    )
+                    content = @Content()
             ),
             @ApiResponse(
                     responseCode = "401",
                     description = "Credenciais incorretas ou conta inativa",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ResponseError.class)
-                    )
+                    content = @Content()
             ),
             @ApiResponse(
                     responseCode = "500",
                     description = "Erro inesperado",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ResponseError.class)
-                    )
+                    content = @Content()
+            ),
+            @ApiResponse(
+                    responseCode = "403",description = "Não autorizado", content = @Content()
             )
     })
     ResponseEntity<Token> authenticate(@RequestBody @Valid LoginDto loginDto);
@@ -114,26 +105,20 @@ public interface UserDoc {
             @ApiResponse(
                     responseCode = "400",
                     description = "Dados fornecidos são inválidos",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ResponseError.class)
-                    )
+                    content = @Content()
             ),
             @ApiResponse(
                     responseCode = "404",
                     description = "Usuário não encontrado",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ResponseError.class)
-                    )
+                    content = @Content()
             ),
             @ApiResponse(
                     responseCode = "500",
                     description = "Erro inesperado",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ResponseError.class)
-                    )
+                    content = @Content()
+            ),
+            @ApiResponse(
+                    responseCode = "403",description = "Não autorizado", content = @Content()
             )
     })
     ResponseEntity<Void> delete(
@@ -153,10 +138,14 @@ public interface UserDoc {
                             schema = @Schema(implementation = ViewUserDto.class)
                     )),
             @ApiResponse(responseCode = "400", description = "Parâmetros de filtro inválidos",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ResponseError.class)
-                    ))
+                    content = @Content()
+            ),
+            @ApiResponse(
+                    responseCode = "403",description = "Não autorizado", content = @Content()
+            ),
+            @ApiResponse(
+                    responseCode = "500",description = "Erro inesperado", content = @Content()
+            )
     })
     ResponseEntity<List<ViewUserDto>> list(
             @RequestParam(required = false) UUID id,
@@ -186,18 +175,18 @@ public interface UserDoc {
             @ApiResponse(
                     responseCode = "400",
                     description = "Dados fornecidos são inválidos",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ResponseError.class)
-                    )
+                    content = @Content()
             ),
             @ApiResponse(
                     responseCode = "404",
                     description = "Usuário não encontrado",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ResponseError.class)
-                    )
+                    content = @Content()
+            ),
+            @ApiResponse(
+                    responseCode = "403",description = "Não autorizado", content = @Content()
+            ),
+            @ApiResponse(
+                    responseCode = "500",description = "Erro inesperado", content = @Content()
             )
     })
     public ResponseEntity<Void> update(
