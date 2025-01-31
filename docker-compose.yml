@@ -11,6 +11,7 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}  # Senha do banco de dados (definida como variável de ambiente)
     ports:
       - "5434:5432"  # Mapeia a porta 5432 do container para a porta 5434 do host
+    command: ["postgres", "-c", "fsync=off", "-c", "full_page_writes=off"]
     volumes:
       - db-data:/var/lib/postgresql/data  # Armazena os dados do banco de forma persistente em um volume
     networks:
