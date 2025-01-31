@@ -51,12 +51,6 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y docker-compose
 
-      - name: Reset Database
-        run: |
-          docker exec postgres-db psql -U postgres -c "DROP DATABASE IF EXISTS sysagua_db;"
-          docker exec postgres-db psql -U postgres -c "CREATE DATABASE sysagua_db;"
-
-
       # Início dos serviços com Docker Compose
       - name: Start Docker Compose
         run: docker-compose up --build -d
