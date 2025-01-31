@@ -11,6 +11,7 @@ public enum PaymentMethod {
     DEBIT("Débito"),
     CREDIT("Crédito"),
     MONEY("Dinheiro"),
+    UNDEFINED("Indefinido"),
     TICKET("Boleto");
 
     private final String description;
