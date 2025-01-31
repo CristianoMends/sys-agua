@@ -11,7 +11,7 @@ import java.net.http.HttpResponse;
 import java.util.List;
 
 public class EntregadorService {
-    private static final String BASE_URL = "http://localhost:8080/entregador";
+    private static final String BASE_URL = "http://localhost:8080/deliveryPersons";
     private final HttpClient httpClient;
     private final ObjectMapper objectMapper;
 

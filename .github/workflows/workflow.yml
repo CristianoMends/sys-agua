@@ -14,7 +14,7 @@ jobs:
   CI-Pipeline:
     runs-on: ubuntu-latest
     env:
-      SPRING_PROFILES_ACTIVE: test
+      SPRING_PROFILES_ACTIVE: prod
       DB_URL: jdbc:postgresql://localhost:5433/sysagua_db
       DB_USERNAME: postgres
       DB_PASSWORD: testpassword
@@ -66,6 +66,10 @@ jobs:
             sleep 2
           done
           echo "API service is ready!"'
+
+      # permissões gradlew
+      - name: Grant execute permission for gradlew
+        run: chmod +x ./gradlew
 
       # Execução de testes da API usando Gradle
       - name: Run API Tests
