@@ -67,6 +67,10 @@ jobs:
           done
           echo "API service is ready!"'
 
+      # permissões gradlew
+      - name: Grant execute permission for gradlew
+        run: chmod +x ./gradlew
+
       # Execução de testes da API usando Gradle
       - name: Run API Tests
         working-directory: ./sysagua-api
