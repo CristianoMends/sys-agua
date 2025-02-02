@@ -2,12 +2,20 @@ package com.api.sysagua.controller;
 
 import com.api.sysagua.docs.OrderDoc;
 import com.api.sysagua.dto.order.CreateOrderDto;
+import com.api.sysagua.dto.order.UpdateOrderDto;
+import com.api.sysagua.enumeration.OrderStatus;
+import com.api.sysagua.enumeration.PaymentMethod;
+import com.api.sysagua.model.Customer;
+import com.api.sysagua.model.DeliveryPerson;
+import com.api.sysagua.model.Order;
+import com.api.sysagua.model.ProductOrder;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
