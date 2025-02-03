@@ -1,5 +1,6 @@
 package com.api.sysagua.model;
 
+import com.api.sysagua.dto.order.ViewOrderDto;
 import com.api.sysagua.enumeration.OrderStatus;
 import com.api.sysagua.enumeration.PaymentMethod;
 import lombok.*;
@@ -46,11 +47,33 @@ public class Order {
 
     private LocalDateTime finishedAt;
 
-    @PostLoad
-    private void calculateTotalAmount() {
+    public Order(Customer customer, DeliveryPerson deliveryPerson, List<ProductOrder> productOrders, OrderStatus status) {
+        setCustomer(customer);
+        setDeliveryPerson(deliveryPerson);
+        setProductOrders(productOrders);
+        setStatus(status);
+    }
+    @PrePersist
+    private void calculateTotalAmount(){
+        if (getTotalAmount() != null) return;
+
         this.totalAmount = productOrders.stream()
                 .map(p -> p.getUnitPrice()
                         .multiply(BigDecimal.valueOf(p.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+    public ViewOrderDto toView() {
+        return new ViewOrderDto(
+                getId(),
+                getStatus(),
+                getReceivedAmount(),
+                getTotalAmount(),
+                getPaymentMethod(),
+                getCreatedAt(),
+                getFinishedAt(),
+                getCustomer(),
+                getDeliveryPerson(),
+                getProductOrders().stream().map(ProductOrder::toView).toList()
+        );
     }
 }
