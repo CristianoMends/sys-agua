@@ -4,7 +4,6 @@ import com.api.sysagua.enumeration.OrderStatus;
 import com.api.sysagua.model.Customer;
 import com.api.sysagua.model.DeliveryPerson;
 import com.api.sysagua.model.ProductOrder;
-import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
