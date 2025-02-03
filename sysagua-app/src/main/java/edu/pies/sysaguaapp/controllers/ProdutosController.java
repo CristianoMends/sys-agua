@@ -8,6 +8,7 @@ import edu.pies.sysaguaapp.services.TokenManager;
 import edu.pies.sysaguaapp.services.ProductCategoryService;
 import edu.pies.sysaguaapp.services.ProductLineService;
 import javafx.animation.PauseTransition;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -41,67 +42,31 @@ public class ProdutosController{
     private HBox paginationContainer;
 
     @FXML
-    private Button btnAnterior;
+    private Button btnAnterior, btnProximo;
 
     @FXML
-    private Button btnProximo;
-
-    @FXML
-    private TextField nomeField;
+    private TextField nomeField, custoField, precoUnitarioField, marcaField, unidadeField;
 
     @FXML
     private ComboBox<String> categoriaComboBox;
 
     @FXML
-    private TextField custoField;
-
-    @FXML
-    private TextField precoUnitarioField;
-
-    @FXML
-    private TextField marcaField;
-
-    @FXML
-    private TextField unidadeField;
-
-    @FXML
-    private TextField lineField;
-
-    @FXML
-    private TextField ncmField;
-
-    @FXML
-    private TextField descricaoField;
-
-    @FXML
-    private TextField cestField;
-
-    @FXML
-    private TextField gtinField;
+    private TextField ncmField, descricaoField, cestField, gtinField;
 
     @FXML
     private BorderPane formCadastroProduto;
 
     @FXML
-    private VBox detailsFormProduto;
-
-    @FXML
-    private VBox detailsFormFiscal;
+    private VBox detailsFormProduto, detailsFormFiscal,listProductView;
 
     @FXML
     private Rectangle overlay;
 
     @FXML
-    private VBox listProductView;
-
-    @FXML
     private Label successMessage;
 
     @FXML
-    private Label nomeErrorLabel;
-
-    @FXML
-    private Label categoriaErrorLabel;
+    private Label nomeErrorLabel, categoriaErrorLabel, custoErrorLabel, precoUnitarioErrorLabel, marcaErrorLabel, linhaErrorLabel, unidadeErrorLabel;
 
     @FXML
     private Button btnSalvar;
@@ -113,31 +78,10 @@ public class ProdutosController{
     private ComboBox<String> linhaComboBox;
 
     @FXML
-    private Label custoErrorLabel;
+    private Label ncmErrorLabel, descricaoErrorLabel, cestErrorLabel, gtinErrorLabel;
 
     @FXML
-    private Label precoUnitarioErrorLabel;
-
-    @FXML
-    private Label marcaErrorLabel;
-
-    @FXML
-    private Label linhaErrorLabel;
-
-    @FXML
-    private Label unidadeErrorLabel;
-
-    @FXML
-    private Label ncmErrorLabel;
-
-    @FXML
-    private Label descricaoErrorLabel;
-
-    @FXML
-    private Label cestErrorLabel;
-
-    @FXML
-    private Label gtinErrorLabel;
+    private CheckBox exibirInativosCheckBox;
 
     private ObservableList<Produto> produtosObservable;
     private int paginaAtual = 0;
@@ -163,6 +107,7 @@ public class ProdutosController{
         carregarLinhas();
         showMenuContext();
         validarCampos();
+        configurarFiltroInativos();
     }
 
 
@@ -326,8 +271,9 @@ public class ProdutosController{
     private void handleCancelar() {
        hideForm();
        hideOverlay();
-        listProductView.setDisable(false);
-        clearFieldForm();
+       clearFieldForm();
+       this.produtoEditando = null;
+       listProductView.setDisable(false);
     }
 
     @FXML
@@ -364,6 +310,8 @@ public class ProdutosController{
 
     @FXML
     private void handleAddProduto() {
+        updateButtonText();
+        clearFieldForm();
         if (!formCadastroProduto.isVisible()) {
             showOverlay();
             showForm();
@@ -468,6 +416,11 @@ public class ProdutosController{
         TableColumn<Produto, String> colunaNome = new TableColumn<>("Nome");
         colunaNome.setCellValueFactory(new PropertyValueFactory<>("name"));
 
+        TableColumn<Produto, Long> colunaCodigo = new TableColumn<>("Código");
+        colunaCodigo.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getId()));
+        colunaCodigo.setStyle("-fx-alignment: CENTER;");
+        colunaCodigo.setSortType(TableColumn.SortType.ASCENDING);
+
         TableColumn<Produto, String> colunaCategoria = new TableColumn<>("Categoria");
         colunaCategoria.setCellValueFactory(cellData -> {
             Produto produto = cellData.getValue();
@@ -483,15 +436,39 @@ public class ProdutosController{
 
         TableColumn<Produto, String> colunaUnidade = new TableColumn<>("Unidade");
         colunaUnidade.setCellValueFactory(new PropertyValueFactory<>("unit"));
+        colunaUnidade.setStyle("-fx-alignment: CENTER;");
 
-        TableColumn<Produto, Double> colunaPreco = new TableColumn<>("Preço");
-        colunaPreco.setCellValueFactory(new PropertyValueFactory<>("price"));
+        TableColumn<Produto, String> colunaPreco = new TableColumn<>("Preço");
+        colunaPreco.setCellValueFactory(cellData ->{
+            BigDecimal preco = cellData.getValue().getPrice();
+            return new SimpleStringProperty(preco != null ? "R$ " + preco.setScale(4, RoundingMode.HALF_UP).toString() : "");
+        });
+        colunaPreco.setStyle("-fx-alignment: CENTER;");
 
-        TableColumn<Produto, Double> colunaCusto = new TableColumn<>("Custo");
-        colunaCusto.setCellValueFactory(new PropertyValueFactory<>("cost"));
+        TableColumn<Produto, String> colunaCusto = new TableColumn<>("Custo");
+        colunaCusto.setCellValueFactory(cellData -> {
+            BigDecimal custo = cellData.getValue().getPrice();
+            return new SimpleStringProperty(custo != null ? "R$ " + custo.setScale(4, RoundingMode.HALF_UP).toString() : "");
+        });
+        colunaCusto.setStyle("-fx-alignment: CENTER;");
 
-        tabelaProdutos.getColumns().addAll(colunaNome, colunaCategoria, colunaMarca ,colunaUnidade,colunaPreco, colunaCusto);
+        tabelaProdutos.getColumns().addAll(colunaCodigo, colunaNome, colunaCategoria, colunaMarca ,colunaUnidade,colunaPreco, colunaCusto);
 
+        tabelaProdutos.getSortOrder().add(colunaCodigo);
+
+        tabelaProdutos.setRowFactory(tv -> new TableRow<>() {
+            @Override
+            protected void updateItem(Produto produto, boolean empty) {
+                super.updateItem(produto, empty);
+                if (produto == null || empty) {
+                    setStyle("");
+                } else if (!produto.isActive()) {
+                    setStyle("-fx-text-fill: red;");
+                } else {
+                    setStyle("");
+                }
+            }
+        });
 
         tabelaProdutos.setItems(produtosObservable);
     }
@@ -500,6 +477,13 @@ public class ProdutosController{
         try {
             String token = TokenManager.getInstance().getToken();
             List<Produto> todosProdutos = produtoService.buscarProdutos(token);
+
+            // Filtra os produtos ativos se o checkbox não estiver marcado
+            if (!exibirInativosCheckBox.isSelected()) {
+                todosProdutos = todosProdutos.stream()
+                    .filter(Produto::isActive)
+                    .toList();
+            }
 
             // Calcula o total de páginas
             totalPaginas = (int) Math.ceil((double) todosProdutos.size() / itensPorPagina);
@@ -649,6 +633,10 @@ public class ProdutosController{
                 errorLabel.setManaged(false);
             }
         });
+    }
+
+    private void configurarFiltroInativos() {
+        exibirInativosCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> carregarProdutos());
     }
 
     /*------------------------ mensagens ---------------*/
