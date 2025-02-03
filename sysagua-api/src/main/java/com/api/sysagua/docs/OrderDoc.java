@@ -2,24 +2,18 @@ package com.api.sysagua.docs;
 
 import com.api.sysagua.dto.order.CreateOrderDto;
 import com.api.sysagua.dto.order.UpdateOrderDto;
+import com.api.sysagua.dto.order.ViewOrderDto;
 import com.api.sysagua.enumeration.OrderStatus;
 import com.api.sysagua.enumeration.PaymentMethod;
-import com.api.sysagua.model.Customer;
-import com.api.sysagua.model.DeliveryPerson;
 import com.api.sysagua.model.Order;
-import com.api.sysagua.model.ProductOrder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -49,31 +43,22 @@ public interface OrderDoc {
             @ApiResponse(responseCode = "403", description = "Não autorizado.", content = @Content()),
             @ApiResponse(responseCode = "500", description = "Erro interno no servidor.", content = @Content())
     })
-    ResponseEntity<List<Order>> list(
+    ResponseEntity<List<ViewOrderDto>> list(
             Long id,
-            Customer customer,
-            DeliveryPerson deliveryPerson,
-            List<ProductOrder> productOrders,
+            Long customerId,
+            Long deliveryPersonId,
+            Long productOrderId,
             OrderStatus status,
-            BigDecimal receivedAmount,
-            BigDecimal totalAmount,
+            BigDecimal receivedAmountStart,
+            BigDecimal receivedAmountEnd,
+            BigDecimal totalAmountStart,
+            BigDecimal totalAmountEnd,
             PaymentMethod paymentMethod,
-            LocalDateTime createdAt,
-            LocalDateTime finishedAt
+            LocalDateTime createdAtStart,
+            LocalDateTime createdAtEnd,
+            LocalDateTime finishedAtStart,
+            LocalDateTime finishedAtEnd
     );
-
-    @Operation(
-            summary = "Deletar um pedido",
-            description = "Marca um pedido como inativo com base no ID."
-    )
-    @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "sucesso.", content = @Content()),
-            @ApiResponse(responseCode = "400", description = "Parâmetros inválidos.", content = @Content()),
-            @ApiResponse(responseCode = "404", description = "Não encontrado", content = @Content()),
-            @ApiResponse(responseCode = "403", description = "Não autorizado.", content = @Content()),
-            @ApiResponse(responseCode = "500", description = "Erro interno no servidor.", content = @Content())
-    })
-    ResponseEntity<Void> delete(Long id);
 
     @Operation(
             summary = "Atualizar os dados de um pedido",
