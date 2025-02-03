@@ -1,5 +1,8 @@
 package com.api.sysagua.service;
 
+import com.api.sysagua.dto.order.CreateOrderDto;
+import com.api.sysagua.dto.order.UpdateOrderDto;
+import com.api.sysagua.dto.order.ViewOrderDto;
 import com.api.sysagua.enumeration.OrderStatus;
 import com.api.sysagua.enumeration.PaymentMethod;
 import com.api.sysagua.model.Order;
@@ -9,9 +12,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface OrderService {
-    void create(Order order);
+    void create(CreateOrderDto order);
 
-    List<Order> list(
+    List<ViewOrderDto> list(
             Long id,
             Long customerId,
             Long deliveryPersonId,
@@ -28,7 +31,5 @@ public interface OrderService {
             LocalDateTime finishedAtEnd
     );
 
-    void update(Long id, Order dto);
-
-    void delete(Long id);
+    void update(Long id, UpdateOrderDto dto);
 }
