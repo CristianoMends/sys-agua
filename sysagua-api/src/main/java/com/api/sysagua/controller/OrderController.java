@@ -3,12 +3,10 @@ package com.api.sysagua.controller;
 import com.api.sysagua.docs.OrderDoc;
 import com.api.sysagua.dto.order.CreateOrderDto;
 import com.api.sysagua.dto.order.UpdateOrderDto;
+import com.api.sysagua.dto.order.ViewOrderDto;
 import com.api.sysagua.enumeration.OrderStatus;
 import com.api.sysagua.enumeration.PaymentMethod;
-import com.api.sysagua.model.Customer;
-import com.api.sysagua.model.DeliveryPerson;
 import com.api.sysagua.model.Order;
-import com.api.sysagua.model.ProductOrder;
 import com.api.sysagua.service.OrderService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,39 +31,50 @@ public class OrderController implements OrderDoc{
     @PostMapping
     public ResponseEntity<Void> create(
             @RequestBody @Valid CreateOrderDto dto){
-                this.service.createOrder(dto);
+                this.service.create(dto);
             return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
 @GetMapping
 @CrossOrigin
-public ResponseEntity<List<Order>> list(
+public ResponseEntity<List<ViewOrderDto>> list(
         @RequestParam(required = false) Long id,
-        @RequestParam(required = false) Customer customer,
-        @RequestParam(required = false) DeliveryPerson deliveryPerson,
-        @RequestParam(required = false) List<ProductOrder> productOrders,
+        @RequestParam(required = false) Long customerId,
+        @RequestParam(required = false) Long deliveryPersonId,
+        @RequestParam(required = false) Long productOrderId,
         @RequestParam(required = false) OrderStatus status,
-        @RequestParam(required = false) BigDecimal receivedAmount,
-        @RequestParam(required = false) BigDecimal totalAmount,
+        @RequestParam(required = false) BigDecimal receivedAmountStart,
+        @RequestParam(required = false) BigDecimal receivedAmountEnd,
+        @RequestParam(required = false) BigDecimal totalAmountStart,
+        @RequestParam(required = false) BigDecimal totalAmountEnd,
         @RequestParam(required = false) PaymentMethod paymentMethod,
-        @RequestParam(required = false) LocalDateTime createdAt,
-        @RequestParam(required = false) LocalDateTime finishedAt
+        @RequestParam(required = false) LocalDateTime createdAtStart,
+        @RequestParam(required = false) LocalDateTime createdAtEnd,
+        @RequestParam(required = false) LocalDateTime finishedAtStart,
+        @RequestParam(required = false) LocalDateTime finishedAtEnd
 ){
-    List<Order> orders = service.findByFilters(id, customer, deliveryPerson, productOrders, status,
-            receivedAmount, totalAmount, paymentMethod, createdAt, finishedAt);
+    List<ViewOrderDto> orders = service.list(
+            id,
+            customerId,
+            deliveryPersonId,
+            productOrderId,
+            status,
+            receivedAmountStart,
+            receivedAmountEnd,
+            totalAmountStart,
+            totalAmountEnd,
+            paymentMethod,
+            createdAtStart,
+            createdAtEnd,
+            finishedAtStart,
+            finishedAtEnd
+    );
     return ResponseEntity.ok(orders);
-}
-
-@CrossOrigin
-@DeleteMapping("{id")
-public ResponseEntity<Void> delete(@PathVariable Long id){
-    this.service.deleteOrder(id);
-    return ResponseEntity.noContent().build();
 }
 
     @PutMapping("{id}")
     public ResponseEntity<Void> update(@PathVariable Long id, @RequestBody @Valid UpdateOrderDto dto){
-        this.service.updateOrder(id, dto);
+        this.service.update(id, dto);
         return ResponseEntity.noContent().build();
     }
 }
