@@ -15,6 +15,11 @@ services:
       - db-data:/var/lib/postgresql/data  # Armazena os dados do banco de forma persistente em um volume
     networks:
       - sysagua-network # Adicionado à rede personalizada
+    healthcheck: #health check
+      test: [ "CMD", "pg_isready", "-U", "postgres" ]
+      interval: 10s
+      retries: 5
+      timeout: 5s
 
   # Serviço da API SysAgua
   sysagua-api:
