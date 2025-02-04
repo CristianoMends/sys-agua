@@ -43,7 +43,6 @@ public class FornecedorService {
     public Fornecedor cadastrarFornecedor(Fornecedor fornecedor, String token) throws Exception {
         // Converter o objeto Fornecedor para JSON
         String fornecedorJson = objectMapper.writeValueAsString(fornecedor);
-        System.out.println(fornecedorJson);
 
         // Criar a requisição POST
         HttpRequest request = HttpRequest.newBuilder()
@@ -53,7 +52,6 @@ public class FornecedorService {
                 .header("Authorization", "Bearer " + token)
                 .build();
 
-        System.out.println(request);
         // Enviar a requisição
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
@@ -110,4 +108,25 @@ public class FornecedorService {
             throw new Exception("Erro ao buscar fornecedor: " + response.body());
         }
     }
+
+    public Fornecedor inativarFornecedor(Fornecedor fornecedor, String token) throws Exception {
+        String urlFornecedor = BASE_URL + "/" + fornecedor.getId();
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(urlFornecedor))
+                .DELETE()
+                .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer " + token)
+                .build();
+
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() == 204) {
+            return null;
+        } else {
+            throw new Exception("Erro ao deletar: " + response.body());
+        }
+    }
+
+
 }

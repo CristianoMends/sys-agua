@@ -121,9 +121,16 @@ public class FornecedorController {
     }
 
     private void handleInativarFornecedor() {
-        Object fornecedorSelecionado = tabelaFornecedor.getSelectionModel().getSelectedItem();
+        Fornecedor fornecedorSelecionado = tabelaFornecedor.getSelectionModel().getSelectedItem();
         if (fornecedorSelecionado != null) {
-            System.out.println("Inativar: " + fornecedorSelecionado);
+            try {
+                String token = TokenManager.getInstance().getToken();
+                fornecedorService.inativarFornecedor(fornecedorSelecionado, token);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.out.println("Erro ao inativar fornecedor: " + e.getMessage());
+            }
         }
     }
 
@@ -148,6 +155,17 @@ public class FornecedorController {
         colunaCnpj.setCellValueFactory(new PropertyValueFactory<>("cnpj"));
         colunaCnpj.setStyle("-fx-alignment: CENTER;");
 
+        TableColumn<Fornecedor, String> colunaEndereco = new TableColumn<>("Endereço");
+        colunaEndereco.setCellValueFactory(celldata -> {
+            String rua = celldata.getValue().getAddress().getStreet();
+            String numero = celldata.getValue().getAddress().getNumber();
+            String bairro = celldata.getValue().getAddress().getNeighborhood();
+            return new SimpleStringProperty(rua + ", " + numero + ", " + bairro);
+        });
+
+        TableColumn<Fornecedor, String> columnCidade = new TableColumn<>("Cidade");
+        columnCidade.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getAddress().getCity()));
+
         TableColumn<Fornecedor, String> colunaStatus = new TableColumn<>("Status");
         colunaStatus.setCellValueFactory(cellData -> {
             if (cellData.getValue().getActive()) {
@@ -157,7 +175,7 @@ public class FornecedorController {
         });
         colunaStatus.setStyle("-fx-alignment: CENTER;");
 
-        tabelaFornecedor.getColumns().addAll(colunaCodigo,colunaRazaosocial, colunaTelefone, colunaCnpj, colunaStatus);
+        tabelaFornecedor.getColumns().addAll(colunaCodigo,colunaRazaosocial, colunaTelefone, colunaCnpj, colunaEndereco, columnCidade, colunaStatus);
 
         tabelaFornecedor.setItems(fornecedorObservable);
 
@@ -243,27 +261,6 @@ public class FornecedorController {
             paginaAtual++;
             carregarFornecedores();
         }
-    }
-
-
-    /*--------- validações ----------*/
-
-    private void configurarValidacaoNumerica(TextField textField) {
-        TextFormatter<String> formatter = new TextFormatter<>(change -> {
-            if (change.getText().matches("\\d*([.]\\d*)?")) { // Permite números e ponto decimal
-                return change;
-            }
-            return null; // Rejeita mudanças inválidas
-        });
-        textField.setTextFormatter(formatter);
-    }
-
-    private void configurarValidacaoTexto(TextField textField) {
-        textField.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (!newValue.matches("[\\p{L}\\s\\d.,-]*")) { // Permite letras, espaços, números, '.', ',' e '-'
-                textField.setText(oldValue);
-            }
-        });
     }
 
     /*------------------------ mensagens ---------------*/
