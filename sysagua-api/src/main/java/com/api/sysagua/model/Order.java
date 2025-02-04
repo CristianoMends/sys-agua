@@ -44,8 +44,10 @@ public class Order {
 
     @CreatedDate
     private LocalDateTime createdAt;
-
     private LocalDateTime finishedAt;
+    private LocalDateTime canceledAt;
+    private String description;
+
 
     public Order(Customer customer, DeliveryPerson deliveryPerson, List<ProductOrder> productOrders, OrderStatus status) {
         setCustomer(customer);
@@ -53,7 +55,12 @@ public class Order {
         setProductOrders(productOrders);
         setStatus(status);
     }
+
     @PrePersist
+    private void prePersist(){
+        calculateTotalAmount();
+        setCreatedAt(LocalDateTime.now());
+    }
     private void calculateTotalAmount(){
         if (getTotalAmount() != null) return;
 
@@ -62,6 +69,7 @@ public class Order {
                         .multiply(BigDecimal.valueOf(p.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
+
     public ViewOrderDto toView() {
         return new ViewOrderDto(
                 getId(),
@@ -71,6 +79,8 @@ public class Order {
                 getPaymentMethod(),
                 getCreatedAt(),
                 getFinishedAt(),
+                getCanceledAt(),
+                getDescription(),
                 getCustomer(),
                 getDeliveryPerson(),
                 getProductOrders().stream().map(ProductOrder::toView).toList()
