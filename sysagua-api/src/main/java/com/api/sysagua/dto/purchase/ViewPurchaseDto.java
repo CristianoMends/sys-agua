@@ -30,6 +30,15 @@ public class ViewPurchaseDto {
     @Schema(description = "Data e hora da criação da compra", example = "2025-01-14T10:00:00Z")
     private LocalDateTime updatedAt;
 
+    @Schema(description = "Data e hora da cancelamento da compra", example = "2025-01-14T10:00:00Z")
+    private LocalDateTime canceledAt;
+
+    @Schema(description = "Data e hora da finalização da compra", example = "2025-01-14T10:00:00Z")
+    private LocalDateTime finishedAt;
+
+    @Schema(description = "Descrição da compra", example = "Sem descrição")
+    private String description;
+
     @Schema(description = "Se a compra está ativa no sistema", example = "2025-01-14T10:00:00Z")
     private Boolean active;
 
