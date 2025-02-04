@@ -6,6 +6,7 @@ import edu.pies.sysaguaapp.models.Clientes;
 import edu.pies.sysaguaapp.services.ClientesService;
 import edu.pies.sysaguaapp.services.TokenManager;
 import javafx.animation.PauseTransition;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -32,55 +33,36 @@ public class ClientesController {
     @FXML
     private TextField nomeField;
 
-    @FXML
-    private Label nomeErrorLabel;
 
     @FXML
     private VBox addressBox;
     @FXML
-    private TextField numberField;
-
-    @FXML
-    private Label numberErrorLabel;
+    private TextField numberField, fullAddressField, idField;
 
     @FXML
     private TextField streetField;
-
-    @FXML
-    private Label streetErrorLabel;
 
 
     @FXML
     private TextField neighborhoodField;
 
-    @FXML
-    private Label neighborhoodErrorLabel;
 
     @FXML
     private TextField cityField;
 
-    @FXML
-    private Label cityErrorLabel;
 
     @FXML
     private TextField stateField;
-
-    @FXML
-    private Label stateErrorLabel;
 
     private Address address;
 
     @FXML
     private TextField telefoneField;
 
-    @FXML
-    private Label telefoneErrorLabel;
 
     @FXML
     private TextField CNPJField;
 
-    @FXML
-    private Label cnpjErrorLabel;
 
     @FXML
     private BorderPane formCadastroClientes;
@@ -175,7 +157,8 @@ public class ClientesController {
             String cidade = cityField.getText();
             String estado = stateField.getText();
 
-            validarCampos();
+
+        validarCampos();
 
             // Cria o objeto Address
             Address clienteAddress = new Address();
@@ -450,23 +433,25 @@ public class ClientesController {
 
     private void configurarTabela() {
         // Configuração das colunas da tabela
+        TableColumn<Clientes, Long> colunaId = new TableColumn<>("Código");
+        colunaId.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getId()));
+
+
         TableColumn<Clientes, String> colunaNome = new TableColumn<>("Nome");
         colunaNome.setCellValueFactory(new PropertyValueFactory<>("name"));
 
-        TableColumn<Clientes, String> colunaNumero = new TableColumn<>("Número");
-        colunaNumero.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getAddress().getNumber()));
+        TableColumn<Clientes, String> colunaEnderecoCompleto = new TableColumn<>("Endereço");
+        colunaEnderecoCompleto.setCellValueFactory(cellData -> {
+            String numero = cellData.getValue().getAddress().getNumber();
+            String rua = cellData.getValue().getAddress().getStreet();
+            String bairro = cellData.getValue().getAddress().getNeighborhood();
+            String cidade = cellData.getValue().getAddress().getCity();
+            String estado = cellData.getValue().getAddress().getState();
 
-        TableColumn<Clientes, String> colunaRua = new TableColumn<>("Rua");
-        colunaRua.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getAddress().getStreet()));
+            String enderecoFormatado = String.format("%s, %s - %s, %s - %s", rua, numero, bairro, cidade, estado);
+            return new SimpleStringProperty(enderecoFormatado);
+        });
 
-        TableColumn<Clientes, String> colunaBairro = new TableColumn<>("Bairro");
-        colunaBairro.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getAddress().getNeighborhood()));
-
-        TableColumn<Clientes, String> colunaCidade = new TableColumn<>("Cidade");
-        colunaCidade.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getAddress().getCity()));
-
-        TableColumn<Clientes, String> colunaEstado = new TableColumn<>("Estado");
-        colunaEstado.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getAddress().getState()));
 
         TableColumn<Clientes, String> colunaTelefone = new TableColumn<>("Telefone");
         colunaTelefone.setCellValueFactory(new PropertyValueFactory<>("phone"));
@@ -474,7 +459,7 @@ public class ClientesController {
         TableColumn<Clientes, String> colunaCnpj = new TableColumn<>("CNPJ");
         colunaCnpj.setCellValueFactory(new PropertyValueFactory<>("cnpj"));
 
-        tabelaClientes.getColumns().addAll(colunaNome, colunaNumero, colunaRua, colunaBairro, colunaCidade,colunaEstado, colunaTelefone, colunaCnpj);
+        tabelaClientes.getColumns().addAll(colunaId, colunaNome, colunaEnderecoCompleto, colunaTelefone, colunaCnpj);
         tabelaClientes.setItems(clientesObservable);
     }
 
