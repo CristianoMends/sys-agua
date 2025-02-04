@@ -1,8 +1,8 @@
 package com.api.sysagua.dto.customer;
 
+import com.api.sysagua.dto.address.UpdateAddressDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -30,32 +30,21 @@ public class UpdateCustomerDto {
     )
     private String phone;
 
+    @Pattern(
+            regexp = "\\d{2}\\.\\d{3}\\.\\d{3}/\\d{4}-\\d{2}",
+            message = "The CNPJ must follow the format 00.000.000/0000-00."
+    )
+    @Schema(
+            description = "Número do CNPJ do fornecedor",
+            example = "04.693.497/0001-21",
+            pattern = "\\d{2}\\.\\d{3}\\.\\d{3}/\\d{4}-\\d{2}"
+    )
+    private String cnpj;
+
     @Schema(description = "Se o cliente esta ativo", example = "true")
     private Boolean active;
 
-    @Schema(description = "Numero de residencia do cliente.", example = "123", maxLength = 10)
-    @Size(max = 10, message = "The number must be at most 10 characters.")
-
-    @Pattern(
-            regexp = "^\\d+(?: [a-zA-Z]+(?: [a-zA-Z]+)*)?$",
-            message = "The number format must be '204 B' or '204 B High', where the text after the number is optional."
-    )
-    private String number;
-
-    @Schema(description = "Nome da rua.", example = "Rua torres tortas", maxLength = 50)
-    @Size(max = 50, message = "The street must be at most 50 characters.")
-    private String street;
-
-    @Schema(description = "Nome do Bairro.", example = "Centro", maxLength = 50)
-    @Size(max = 50, message = "The neighborhood must be at most 50 characters.")
-    private String neighborhood;
-
-    @Schema(description = "Nome da cidade.", example = "Springfield", maxLength = 50)
-    @Size(max = 50, message = "The city must be at most 50 characters.")
-    private String city;
-
-    @Schema(description = "Nome do estado.", example = "CE", maxLength = 20)
-    @Size(max = 20, message = "The state must be at most 20 characters.")
-    private String state;
+    @Valid
+    private UpdateAddressDto address;
 
 }
