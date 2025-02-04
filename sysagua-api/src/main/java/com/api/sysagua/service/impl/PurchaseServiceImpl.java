@@ -1,8 +1,7 @@
 package com.api.sysagua.service.impl;
 
 import com.api.sysagua.dto.purchase.*;
-import com.api.sysagua.enumeration.PaymentMethod;
-import com.api.sysagua.enumeration.StatusTransaction;
+import com.api.sysagua.enumeration.TransactionStatus;
 import com.api.sysagua.enumeration.TransactionType;
 import com.api.sysagua.exception.BusinessException;
 import com.api.sysagua.model.*;
@@ -25,13 +24,10 @@ public class PurchaseServiceImpl implements PurchaseService {
 
     @Autowired
     private PurchaseRepository purchaseRepository;
-
     @Autowired
     private ProductRepository productRepository;
-
     @Autowired
     private SupplierRepository supplierRepository;
-
     @Autowired
     private TransactionService transactionService;
 
@@ -47,17 +43,25 @@ public class PurchaseServiceImpl implements PurchaseService {
 
         purchase.setProductPurchases(productPurchases);
         purchase.setSupplier(supplier);
-        purchase.updateTotalValue();
         purchase.setActive(true);
-        purchase.setCreatedAt(ZonedDateTime.now(ZoneId.of("America/Sao_Paulo")).toLocalDateTime());
+        purchase.setDescription(dto.getDescription());
+        purchase.setPaymentMethod(dto.getPaymentMethod());
         var saved = this.purchaseRepository.save(purchase);
 
-        this.transactionService.save(
+        saveOnTransactionHistory(saved);
+    }
+
+    private void saveOnTransactionHistory(Purchase purchase){
+        Transaction transaction = new Transaction(
+                TransactionStatus.PENDING,
                 purchase.getTotalValue(),
                 TransactionType.EXPENSE,
-                PaymentMethod.UNDEFINED,
-                "Compra ID: " + saved.getId()
+                purchase.getPaymentMethod(),
+                purchase.getDescription(),
+                null,
+                purchase
         );
+        this.transactionService.save(transaction);
     }
 
     @Override
@@ -73,6 +77,9 @@ public class PurchaseServiceImpl implements PurchaseService {
             var productPurchases = updateProductPurchase(dto.getProductPurchases(), purchase);
             purchase.setProductPurchases(productPurchases);
         }
+
+        if (dto.getDescription() != null) purchase.setDescription(dto.getDescription());
+        if (dto.getPaymentMethod() != null) purchase.setPaymentMethod(dto.getPaymentMethod());
 
         purchase.setActive(true);
         purchase.setUpdatedAt(ZonedDateTime.now(ZoneId.of("America/Sao_Paulo")).toLocalDateTime());
@@ -120,7 +127,12 @@ public class PurchaseServiceImpl implements PurchaseService {
             LocalDateTime createdAtStart,
             LocalDateTime createdAtEnd,
             Long supplierId,
-            Long productId
+            Long productId,
+            LocalDateTime finishedAtStart,
+            LocalDateTime finishedAtEnd,
+            LocalDateTime canceledAtStart,
+            LocalDateTime canceledAtEnd,
+            String description
     ) {
         return purchaseRepository.list(
                 id,
@@ -131,6 +143,11 @@ public class PurchaseServiceImpl implements PurchaseService {
                 updatedAtEnd,
                 createdAtStart,
                 createdAtEnd,
+                finishedAtStart,
+                finishedAtEnd,
+                canceledAtStart,
+                canceledAtEnd,
+                description,
                 supplierId,
                 productId
         ).stream().map(Purchase::toView).toList();
