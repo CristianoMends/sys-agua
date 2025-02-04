@@ -1,7 +1,8 @@
 package com.api.sysagua.model;
 
+import com.api.sysagua.dto.transaction.ViewTransactionDto;
 import com.api.sysagua.enumeration.PaymentMethod;
-import com.api.sysagua.enumeration.StatusTransaction;
+import com.api.sysagua.enumeration.TransactionStatus;
 import com.api.sysagua.enumeration.TransactionType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -9,8 +10,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -29,7 +28,7 @@ public class Transaction {
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    private StatusTransaction status;
+    private TransactionStatus status;
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
@@ -53,4 +52,42 @@ public class Transaction {
     @Column(nullable = false)
     private String description;
 
+    @ManyToOne
+    @JoinColumn(name = "order_id")
+    private Order order;
+
+    @ManyToOne
+    @JoinColumn(name = "purchase_id")
+    private Purchase purchase;
+
+    public Transaction(TransactionStatus status, BigDecimal amount, TransactionType type, PaymentMethod paymentMethod, String description, Order order, Purchase purchase) {
+        this.status = status;
+        this.amount = amount;
+        this.type = type;
+        this.paymentMethod = paymentMethod;
+        this.description = description;
+        this.order = order;
+        this.purchase = purchase;
+    }
+
+    @PrePersist
+    private void prePersist() {
+        setCreatedAt(LocalDateTime.now());
+    }
+
+    public ViewTransactionDto toView() {
+        return new ViewTransactionDto(
+                getId(),
+                getStatus(),
+                getCreatedAt(),
+                getFinishedAt(),
+                getCanceledAt(),
+                getAmount(),
+                getType(),
+                getPaymentMethod(),
+                getDescription(),
+                getOrder() != null ? getOrder().getId() : null,
+                getPurchase() != null ? getPurchase().getId() : null
+        );
+    }
 }
