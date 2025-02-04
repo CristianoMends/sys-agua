@@ -33,7 +33,7 @@ public class UpdateOrderDto {
     @Schema(description = "Produtos pedidos", example = "Garrafao 20l")
     private List<ProductOrder> productOrders;
 
-    @Schema(description = "Status do pedido", example = "realizado")
+    @Schema(description = "Status do pedido", example = "FINISHED")
     private OrderStatus status;
 
     @Schema(description = "Valor recebido do pedido", example = "50.00")
