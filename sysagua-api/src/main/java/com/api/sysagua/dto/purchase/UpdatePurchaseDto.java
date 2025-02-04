@@ -1,5 +1,6 @@
 package com.api.sysagua.dto.purchase;
 
+import com.api.sysagua.enumeration.PaymentMethod;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,5 +23,8 @@ public class UpdatePurchaseDto {
 
     @Schema(description = "Descrição da compra", example = "Sem descrição")
     private String description;
+
+    @Schema(description = "metodo de pagamento", example = "PIX")
+    private PaymentMethod paymentMethod;
 
 }

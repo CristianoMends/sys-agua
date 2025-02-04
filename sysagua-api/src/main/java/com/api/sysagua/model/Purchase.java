@@ -2,6 +2,7 @@ package com.api.sysagua.model;
 
 
 import com.api.sysagua.dto.purchase.ViewPurchaseDto;
+import com.api.sysagua.enumeration.PaymentMethod;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -27,6 +28,7 @@ public class Purchase {
     private LocalDateTime finishedAt;
     private LocalDateTime canceledAt;
     private String description;
+    private PaymentMethod paymentMethod;
 
     @OneToMany(mappedBy = "purchase", cascade = CascadeType.ALL,orphanRemoval = true)
     private List<ProductPurchase> productPurchases;
@@ -54,6 +56,7 @@ public class Purchase {
                 getUpdatedAt(),
                 getCanceledAt(),
                 getFinishedAt(),
+                getPaymentMethod(),
                 getDescription(),
                 getActive(),
                 getProductPurchases().stream().map(ProductPurchase::toView).toList(),

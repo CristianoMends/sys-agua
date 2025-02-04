@@ -8,6 +8,7 @@ CREATE TABLE purchases (
     finished_At TIMESTAMP,
     canceled_at TIMESTAMP,
     description VARCHAR(255),
+    payment_method VARCHAR(50),
     FOREIGN KEY (supplier_id) REFERENCES suppliers(id)
 );
 

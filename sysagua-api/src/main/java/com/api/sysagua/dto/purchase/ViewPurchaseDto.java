@@ -1,5 +1,6 @@
 package com.api.sysagua.dto.purchase;
 
+import com.api.sysagua.enumeration.PaymentMethod;
 import com.api.sysagua.model.Supplier;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -35,6 +36,9 @@ public class ViewPurchaseDto {
 
     @Schema(description = "Data e hora da finalização da compra", example = "2025-01-14T10:00:00Z")
     private LocalDateTime finishedAt;
+
+    @Schema(description = "metodo de pagamento", example = "PIX")
+    private PaymentMethod paymentMethod;
 
     @Schema(description = "Descrição da compra", example = "Sem descrição")
     private String description;
