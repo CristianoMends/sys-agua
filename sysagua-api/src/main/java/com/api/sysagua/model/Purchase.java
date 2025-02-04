@@ -24,6 +24,9 @@ public class Purchase {
     private Boolean active;
     private LocalDateTime updatedAt;
     private LocalDateTime createdAt;
+    private LocalDateTime finishedAt;
+    private LocalDateTime canceledAt;
+    private String description;
 
     @OneToMany(mappedBy = "purchase", cascade = CascadeType.ALL,orphanRemoval = true)
     private List<ProductPurchase> productPurchases;
@@ -32,9 +35,12 @@ public class Purchase {
     @JoinColumn(name = "supplier_id")
     private Supplier supplier;
 
+    @PrePersist
+    private void prePersist(){
+        updateTotalValue();
+    }
 
-
-    public void updateTotalValue() {
+    private void updateTotalValue() {
         this.totalValue = productPurchases.stream()
                 .map(p -> p.getPurchasePrice().multiply(BigDecimal.valueOf(p.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -46,6 +52,9 @@ public class Purchase {
                 getTotalValue(),
                 getCreatedAt(),
                 getUpdatedAt(),
+                getCanceledAt(),
+                getFinishedAt(),
+                getDescription(),
                 getActive(),
                 getProductPurchases().stream().map(ProductPurchase::toView).toList(),
                 getSupplier()

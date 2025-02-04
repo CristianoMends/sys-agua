@@ -23,7 +23,12 @@ public interface PurchaseService {
             LocalDateTime createdAtStart,
             LocalDateTime createdAtEnd,
             Long supplierId,
-            Long productId
+            Long productId,
+            LocalDateTime finishedAtStart,
+            LocalDateTime finishedAtEnd,
+            LocalDateTime canceledAtStart,
+            LocalDateTime canceledAtEnd,
+            String description
     );
 
     void update(Long id, UpdatePurchaseDto dto);

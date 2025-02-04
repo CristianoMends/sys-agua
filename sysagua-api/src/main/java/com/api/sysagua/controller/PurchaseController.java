@@ -37,7 +37,12 @@ public class PurchaseController implements PurchaseDoc {
             @RequestParam(value = "createdAtStart", required = false) LocalDateTime createdAtStart,
             @RequestParam(value = "createdAtEnd", required = false) LocalDateTime createdAtEnd,
             @RequestParam(value = "supplierId", required = false) Long supplierId,
-            @RequestParam(value = "productId", required = false) Long productId
+            @RequestParam(value = "productId", required = false) Long productId,
+            @RequestParam(required = false) LocalDateTime finishedAtStart,
+            @RequestParam(required = false) LocalDateTime finishedAtEnd,
+            @RequestParam(required = false) LocalDateTime canceledAtStart,
+            @RequestParam(required = false) LocalDateTime canceledAtEnd,
+            @RequestParam(required = false) String description
     ) {
         return ResponseEntity.ok(this.purchaseService.list(
                 id,
@@ -49,7 +54,13 @@ public class PurchaseController implements PurchaseDoc {
                 createdAtStart,
                 createdAtEnd,
                 supplierId,
-                productId));
+                productId,
+                finishedAtStart,
+                finishedAtEnd,
+                canceledAtStart,
+                canceledAtEnd,
+                description
+        ));
     }
 
     @PutMapping("{id}")

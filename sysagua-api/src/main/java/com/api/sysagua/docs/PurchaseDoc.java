@@ -56,7 +56,13 @@ public interface PurchaseDoc {
             @Parameter(description = "Data de criação inicial") @RequestParam(value = "createdAtStart", required = false) LocalDateTime createdAtStart,
             @Parameter(description = "Data de criação final") @RequestParam(value = "createdAtEnd", required = false) LocalDateTime createdAtEnd,
             @Parameter(description = "ID do fornecedor") @RequestParam(value = "supplierId", required = false) Long supplierId,
-            @Parameter(description = "ID do produto") @RequestParam(value = "productId", required = false) Long productId);
+            @Parameter(description = "ID do produto") @RequestParam(value = "productId", required = false) Long productId,
+            @Parameter(description = "Data de finalização inicial") LocalDateTime finishedAtStart,
+            @Parameter(description = "Data de finalização final") LocalDateTime finishedAtEnd,
+            @Parameter(description = "Data de cancelamento inicial") LocalDateTime canceledAtStart,
+            @Parameter(description = "Data de cancelamento final") LocalDateTime canceledAtEnd,
+            @Parameter(description = "Descrição") String description
+    );
 
     @Operation(summary = "Atualiza uma compra",
             description = "Atualiza os dados de uma compra existente com base no ID.")
