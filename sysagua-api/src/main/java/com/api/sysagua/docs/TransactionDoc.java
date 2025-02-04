@@ -1,12 +1,12 @@
 package com.api.sysagua.docs;
 
+import com.api.sysagua.dto.transaction.ViewTransactionDto;
 import com.api.sysagua.model.Transaction;
 import com.api.sysagua.enumeration.PaymentMethod;
-import com.api.sysagua.enumeration.StatusTransaction;
+import com.api.sysagua.enumeration.TransactionStatus;
 import com.api.sysagua.enumeration.TransactionType;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -57,9 +57,9 @@ public interface TransactionDoc {
             @ApiResponse(responseCode = "403", description = "Acesso não autorizado.", content = @Content()),
             @ApiResponse(responseCode = "500", description = "Erro interno no servidor.", content = @Content())
     })
-    ResponseEntity<List<Transaction>> listTransactions(
+    ResponseEntity<List<ViewTransactionDto>> listTransactions(
             Long id,
-            StatusTransaction status,
+            TransactionStatus status,
             BigDecimal amountStart,
             BigDecimal amountEnd,
             TransactionType type,
