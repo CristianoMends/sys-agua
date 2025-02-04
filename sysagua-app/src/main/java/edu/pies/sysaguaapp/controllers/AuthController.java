@@ -63,6 +63,7 @@ public class AuthController implements Initializable {
 
             stage.setScene(scene);
             stage.setTitle("SysAgua - Início");
+            stage.setMaximized(true);
             stage.show();
 
         } catch (Exception e) {
