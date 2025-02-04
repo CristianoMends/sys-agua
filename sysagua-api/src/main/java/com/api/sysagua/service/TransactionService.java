@@ -1,11 +1,11 @@
 package com.api.sysagua.service;
 
 
+import com.api.sysagua.dto.transaction.ViewTransactionDto;
 import com.api.sysagua.enumeration.PaymentMethod;
-import com.api.sysagua.enumeration.StatusTransaction;
+import com.api.sysagua.enumeration.TransactionStatus;
 import com.api.sysagua.enumeration.TransactionType;
 import com.api.sysagua.model.Transaction;
-import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -14,15 +14,15 @@ import java.math.BigDecimal;
 
 public interface TransactionService {
 
-    void save(BigDecimal amount, TransactionType type, PaymentMethod paymentMethod, String description);
+    void save(Transaction transaction);
 
     void cancel(Long id);
 
     void finish(Long id);
 
-    List<Transaction> list(
+    List<ViewTransactionDto> list(
             Long id,
-            StatusTransaction status,
+            TransactionStatus status,
             BigDecimal amountStart,
             BigDecimal amountEnd,
             TransactionType type,

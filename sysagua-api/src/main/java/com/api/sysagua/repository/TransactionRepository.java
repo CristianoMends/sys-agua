@@ -1,7 +1,7 @@
 package com.api.sysagua.repository;
 
 import com.api.sysagua.enumeration.PaymentMethod;
-import com.api.sysagua.enumeration.StatusTransaction;
+import com.api.sysagua.enumeration.TransactionStatus;
 import com.api.sysagua.enumeration.TransactionType;
 import com.api.sysagua.model.Transaction;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -27,7 +27,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
             order by t.createdAt""")
     List<Transaction> list(
             @Param("id") Long id,
-            @Param("status") StatusTransaction status,
+            @Param("status") TransactionStatus status,
             @Param("amountStart") BigDecimal amountStart,
             @Param("amountEnd") BigDecimal amountEnd,
             @Param("type") TransactionType type,

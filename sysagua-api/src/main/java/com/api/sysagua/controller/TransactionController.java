@@ -1,10 +1,10 @@
 package com.api.sysagua.controller;
 
 import com.api.sysagua.docs.TransactionDoc;
+import com.api.sysagua.dto.transaction.ViewTransactionDto;
 import com.api.sysagua.enumeration.PaymentMethod;
-import com.api.sysagua.enumeration.StatusTransaction;
+import com.api.sysagua.enumeration.TransactionStatus;
 import com.api.sysagua.enumeration.TransactionType;
-import com.api.sysagua.model.Transaction;
 import com.api.sysagua.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -39,9 +39,9 @@ public class TransactionController implements TransactionDoc {
 
     @GetMapping
     @CrossOrigin
-    public ResponseEntity<List<Transaction>> listTransactions(
+    public ResponseEntity<List<ViewTransactionDto>> listTransactions(
             @RequestParam(required = false) Long id,
-            @RequestParam(required = false) StatusTransaction status,
+            @RequestParam(required = false) TransactionStatus status,
             @RequestParam(required = false) BigDecimal amountStart,
             @RequestParam(required = false) BigDecimal amountEnd,
             @RequestParam(required = false) TransactionType type,
@@ -55,7 +55,7 @@ public class TransactionController implements TransactionDoc {
             @RequestParam(required = false) LocalDateTime canceledAtEnd
     ) {
 
-        List<Transaction> transactions = service.list(
+        List<ViewTransactionDto> transactions = service.list(
                 id,
                 status,
                 amountStart,

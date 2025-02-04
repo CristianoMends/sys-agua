@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
-public enum StatusTransaction {
+public enum TransactionStatus {
 
     PAID("Paga"),
     PENDING("Pendente"),
