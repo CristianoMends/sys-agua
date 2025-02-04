@@ -76,7 +76,6 @@ public class AddFornecedorController {
                 if (fornecedorEditando != null) {
                     novoFornecedor.setId(fornecedorEditando.getId());
                     fornecedorService.atualizarFornecedor(novoFornecedor, token);
-                    System.out.println("atualizei o fornecedor");
                 } else {
                     fornecedorService.cadastrarFornecedor(novoFornecedor, token);
                 }
