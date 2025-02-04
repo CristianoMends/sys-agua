@@ -1,10 +1,14 @@
 package com.api.sysagua.service.impl;
 
 import com.api.sysagua.dto.purchase.*;
+import com.api.sysagua.enumeration.PaymentMethod;
+import com.api.sysagua.enumeration.StatusTransaction;
+import com.api.sysagua.enumeration.TransactionType;
 import com.api.sysagua.exception.BusinessException;
 import com.api.sysagua.model.*;
 import com.api.sysagua.repository.*;
 import com.api.sysagua.service.PurchaseService;
+import com.api.sysagua.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -28,6 +32,9 @@ public class PurchaseServiceImpl implements PurchaseService {
     @Autowired
     private SupplierRepository supplierRepository;
 
+    @Autowired
+    private TransactionService transactionService;
+
     @Override
     public void create(CreatePurchaseDto dto) {
 
@@ -43,7 +50,14 @@ public class PurchaseServiceImpl implements PurchaseService {
         purchase.updateTotalValue();
         purchase.setActive(true);
         purchase.setCreatedAt(ZonedDateTime.now(ZoneId.of("America/Sao_Paulo")).toLocalDateTime());
-        this.purchaseRepository.save(purchase);
+        var saved = this.purchaseRepository.save(purchase);
+
+        this.transactionService.save(
+                purchase.getTotalValue(),
+                TransactionType.EXPENSE,
+                PaymentMethod.UNDEFINED,
+                "Compra ID: " + saved.getId()
+        );
     }
 
     @Override

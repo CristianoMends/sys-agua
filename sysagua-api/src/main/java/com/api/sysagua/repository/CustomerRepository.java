@@ -6,12 +6,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface CustomerRepository extends JpaRepository<Customer, Long> {
+
 
     @Query(value = """
                 select c from Customer c
@@ -37,5 +37,13 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
             @Param("active") Boolean active,
             @Param("cnpj") String cnpj
     );
+
+    @Override
+    Optional<Customer> findById(Long id);
+
+    Optional<Customer> findByCnpj(String cnpj);
+
+    Optional<Customer> findByPhone(String phone);
+
 
 }

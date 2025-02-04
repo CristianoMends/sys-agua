@@ -1,4 +1,4 @@
-package com.api.sysagua.dto.customer;
+package com.api.sysagua.dto.address;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;

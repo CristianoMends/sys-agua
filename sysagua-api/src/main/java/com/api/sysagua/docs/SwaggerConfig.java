@@ -85,4 +85,12 @@ public class SwaggerConfig {
                 .build();
     }
 
+    @Bean
+    public GroupedOpenApi transactionsApi() {
+        return GroupedOpenApi.builder()
+                .group("Transações")
+                .pathsToMatch("/transactions/**")
+                .build();
+    }
+
 }
