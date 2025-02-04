@@ -66,9 +66,7 @@ public class FornecedorService {
     }
 
     public Fornecedor atualizarFornecedor(Fornecedor fornecedor, String token) throws Exception {
-
-        UpdateFornecedorDto fornecedorDto = new UpdateFornecedorDto(fornecedor);
-        String fornecedorJson = objectMapper.writeValueAsString(fornecedorDto);
+        String fornecedorJson = objectMapper.writeValueAsString(fornecedor);
         String urlFornecedor = BASE_URL + "/" + fornecedor.getId();
 
         HttpRequest request = HttpRequest.newBuilder()
