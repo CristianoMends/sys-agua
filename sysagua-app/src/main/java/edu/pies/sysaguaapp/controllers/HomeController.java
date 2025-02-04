@@ -28,6 +28,7 @@ public class HomeController implements Initializable {
 
     public Pane spacer; //espaçador do botão de sair
 
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         loadInitView();
@@ -68,7 +69,7 @@ public class HomeController implements Initializable {
 
     @FXML
     private void handleEntregas() {
-        showMessage("Entregas");
+        loadView("/views/Pedidos/Pedido.fxml");
     }
 
     @FXML
