@@ -6,6 +6,7 @@ import com.api.sysagua.dto.order.UpdateOrderDto;
 import com.api.sysagua.dto.order.ViewOrderDto;
 import com.api.sysagua.enumeration.OrderStatus;
 import com.api.sysagua.enumeration.PaymentMethod;
+import com.api.sysagua.enumeration.TransactionStatus;
 import com.api.sysagua.enumeration.TransactionType;
 import com.api.sysagua.exception.BusinessException;
 import com.api.sysagua.model.*;
@@ -45,6 +46,7 @@ public class OrderServiceImpl implements OrderService {
         order.setReceivedAmount(dto.getReceivedAmount());
         order.setTotalAmount(dto.getTotalAmount());
         order.setPaymentMethod(dto.getPaymentMethod());
+        order.setDescription(dto.getDescription());
         var saved = this.orderRepository.save(order);
 
         this.saveOnTransactionHistory(saved);
@@ -86,12 +88,16 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private void saveOnTransactionHistory(Order order) {
-        this.transactionService.save(
+        Transaction transaction = new Transaction(
+                TransactionStatus.PENDING,
                 order.getTotalAmount(),
                 TransactionType.INCOME,
                 order.getPaymentMethod(),
-                "Pedido ID: " + order.getId()
+                order.getDescription(),
+                order,
+                null
         );
+        this.transactionService.save(transaction);
     }
 
     @Override
