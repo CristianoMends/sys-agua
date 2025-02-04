@@ -26,6 +26,8 @@ public class ViewOrderDto {
     private PaymentMethod paymentMethod;
     private LocalDateTime createdAt;
     private LocalDateTime finishedAt;
+    private LocalDateTime canceledAt;
+    private String description;
     private Customer customer;
     private DeliveryPerson deliveryPerson;
     private List<ViewProductOrderDto> productOrders;
