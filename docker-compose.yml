@@ -30,7 +30,13 @@ services:
       DEFAULT_PASSWORD: ${DEFAULT_PASSWORD}  # Senha padrão para autenticação
       JWT_SECRET_KEY: ${JWT_SECRET_KEY}  # Chave secreta para geração de tokens JWT
     depends_on:
-      - db  # Garante que o serviço do banco de dados esteja disponível antes da API iniciar
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-h", "db", "-U", "postgres" ]
+      interval: 10s
+      retries: 5
+      timeout: 5s
     ports:
       - "8080:8080"  # Mapeia a porta 8080 do container para a porta 8080 do host
     networks:
