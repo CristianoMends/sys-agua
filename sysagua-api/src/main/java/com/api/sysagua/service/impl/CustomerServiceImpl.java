@@ -21,20 +21,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public void createCustomer(CreateCustomerDto dto) {
-        var c = this.repository.findByFilters(
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                dto.getCnpj());
-
-        if (!c.isEmpty()) {
-            throw new BusinessException("There is already a customer with this CNPJ");
-        }
+        this.validatePhoneAndCnpj(dto.getPhone(),dto.getCnpj());
 
         var toSave = dto.toModel();
         toSave.setCreatedAt(LocalDate.now());
@@ -60,44 +47,52 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public void deleteCustomer(Long id) {
-        var c = this.repository.findById(id).orElseThrow(() -> new BusinessException("No customer with specified ID was found", HttpStatus.NOT_FOUND));
-        if (!c.getActive()) {
+        var customer = this.repository.findById(id).orElseThrow(
+                () -> new BusinessException("Customer with id not found", HttpStatus.NOT_FOUND)
+        );
+
+        if (!customer.getActive()) {
             throw new BusinessException("Customer is already inactive");
         }
 
-        c.setActive(false);
-        this.repository.save(c);
+        customer.setActive(false);
+        this.repository.save(customer);
     }
 
 
     @Override
     public void updateCustomer(Long id, UpdateCustomerDto dto) {
-        var c = this.repository.findByFilters(
-                id,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null);
+        var customer = this.repository.findById(id).orElseThrow(
+                () -> new BusinessException("Customer with id not found", HttpStatus.NOT_FOUND)
+        );
 
-        if (c.isEmpty()) {
-            throw new BusinessException("Customer with id not found", HttpStatus.NOT_FOUND);
-        }
+        this.validatePhoneAndCnpj(dto.getPhone(),dto.getCnpj());
 
-        var customer = c.getFirst();
 
         if (dto.getName() != null) customer.setName(dto.getName());
         if (dto.getPhone() != null) customer.setPhone(dto.getPhone());
-        if (dto.getNumber() != null) customer.getAddress().setNumber(dto.getNumber());
-        if (dto.getStreet() != null) customer.getAddress().setStreet(dto.getStreet());
-        if (dto.getCity() != null) customer.getAddress().setCity(dto.getCity());
-        if (dto.getNeighborhood() != null) customer.getAddress().setNeighborhood(dto.getNeighborhood());
-        if (dto.getState() != null) customer.getAddress().setState(dto.getState());
+        if (dto.getAddress().getNumber() != null) customer.getAddress().setNumber(dto.getAddress().getNumber());
+        if (dto.getAddress().getStreet() != null) customer.getAddress().setStreet(dto.getAddress().getStreet());
+        if (dto.getAddress().getCity() != null) customer.getAddress().setCity(dto.getAddress().getCity());
+        if (dto.getAddress().getNeighborhood() != null)
+            customer.getAddress().setNeighborhood(dto.getAddress().getNeighborhood());
+        if (dto.getAddress().getState() != null) customer.getAddress().setState(dto.getAddress().getState());
         if (dto.getActive() != null) customer.setActive(dto.getActive());
 
         this.repository.save(customer);
+    }
+
+    private void validatePhoneAndCnpj(String phone, String cnpj){
+        this.repository.findByCnpj(cnpj).ifPresent(
+                c -> {
+                    throw new BusinessException("There is already a customer with this CNPJ");
+                }
+        );
+
+        this.repository.findByPhone(phone).ifPresent(
+                c -> {
+                    throw new BusinessException("There is already a customer with this PHONE");
+                }
+        );
     }
 }
