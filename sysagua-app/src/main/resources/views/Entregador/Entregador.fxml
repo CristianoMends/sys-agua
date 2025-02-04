@@ -89,9 +89,9 @@
                   <CheckBox fx:id="exibirInativosCheckBox" mnemonicParsing="false" />
                </children>
             </HBox>
-                <StackPane prefHeight="472.0" prefWidth="917.0">
+                <StackPane VBox.vgrow="SOMETIMES">
                     <children>
-                        <TableView fx:id="tabelaEntregador" prefHeight="484.0">
+                        <TableView fx:id="tabelaEntregador">
                             <columnResizePolicy>
                                 <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                             </columnResizePolicy></TableView>
