@@ -65,9 +65,16 @@ public class CustomerServiceImpl implements CustomerService {
         var customer = this.repository.findById(id).orElseThrow(
                 () -> new BusinessException("Customer with id not found", HttpStatus.NOT_FOUND)
         );
-
-        this.validatePhoneAndCnpj(dto.getPhone(),dto.getCnpj());
-
+        if (!customer.getCnpj().equals(dto.getCnpj())){
+            this.repository.findByCnpj(dto.getCnpj()).ifPresent(c ->{
+                throw new BusinessException("There is already a customer with this CNPJ");
+            });
+        }
+        if (!customer.getPhone().equals(dto.getPhone())){
+            this.repository.findByPhone(dto.getPhone()).ifPresent(c ->{
+                throw new BusinessException("There is already a customer with this Phone");
+            });
+        }
 
         if (dto.getName() != null) customer.setName(dto.getName());
         if (dto.getPhone() != null) customer.setPhone(dto.getPhone());

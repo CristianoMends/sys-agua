@@ -49,8 +49,16 @@ public class SupplierServiceImpl implements SupplierService {
     public void update(Long id, UpdateSupplierDto dto) {
         var supplier = this.supplierRepository.findById(id).orElseThrow(() -> new BusinessException("Supplier not found",HttpStatus.NOT_FOUND));
 
-        this.validatePhoneAndCnpj(dto.getPhone(), dto.getCnpj());
-
+        if (!supplier.getCnpj().equals(dto.getCnpj())){
+            this.supplierRepository.findByCnpj(dto.getCnpj()).ifPresent(c ->{
+                throw new BusinessException("There is already a supplier with this CNPJ");
+            });
+        }
+        if (!supplier.getPhone().equals(dto.getPhone())){
+            this.supplierRepository.findByPhone(dto.getPhone()).ifPresent(c ->{
+                throw new BusinessException("There is already a supplier with this Phone");
+            });
+        }
         if (dto.getCnpj() != null) supplier.setCnpj(dto.getCnpj());
         if (dto.getSocialReason() != null) supplier.setSocialReason(dto.getSocialReason());
         if (dto.getPhone() != null) supplier.setPhone(dto.getPhone());
