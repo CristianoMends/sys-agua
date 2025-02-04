@@ -91,19 +91,9 @@ public class EntregadorController {
         configurarTabela();
         carregarEntregadores();
         showMenuContext();
-
+        validarCampos();
         exibirInativosCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> carregarEntregadores());
 
-        // Validar texto
-        configurarValidacaoTexto(nomeField);
-        nomeField.textProperty().addListener((obs, oldText, newText) -> {
-            nomeErrorLabel.setVisible(newText.trim().isEmpty());
-        });
-
-        configurarValidacaoTexto(telefoneField);
-        telefoneField.textProperty().addListener((obs, oldText, newText) -> {
-            telefoneErrorLabel.setVisible(newText.trim().isEmpty());
-        });
     }
 
     private void showOverlay() {
@@ -259,9 +249,15 @@ public class EntregadorController {
     }
 
     private void handleInativarEntregador() {
-        Object entregadorSelecionado = tabelaEntregador.getSelectionModel().getSelectedItem();
+        Entregador entregadorSelecionado = tabelaEntregador.getSelectionModel().getSelectedItem();
         if (entregadorSelecionado != null) {
-            System.out.println("Inativar: " + entregadorSelecionado);
+            try {
+                String token = TokenManager.getInstance().getToken();
+                entregadorService.inativarEntregador(entregadorSelecionado, token);
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.out.println("Erro ao inativar entregador "+e.getMessage());
+            }
         }
     }
 
@@ -390,21 +386,46 @@ public class EntregadorController {
 
 
     /*--------- validações ----------*/
+    private void validarCampos() {
+        // Validar números
+        configurarValidacaoTelefone(telefoneField, telefoneErrorLabel);
 
-    private void configurarValidacaoNumerica(TextField textField) {
-        TextFormatter<String> formatter = new TextFormatter<>(change -> {
-            if (change.getText().matches("\\d*([.]\\d*)?")) { // Permite números e ponto decimal
-                return change;
-            }
-            return null; // Rejeita mudanças inválidas
-        });
-        textField.setTextFormatter(formatter);
+        // Validar texto
+        configurarValidacaoTexto(nomeField, nomeErrorLabel);
     }
 
-    private void configurarValidacaoTexto(TextField textField) {
+    private void configurarValidacaoTexto(TextField textField, Label errorLabel) {
         textField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.matches("[\\p{L}\\s\\d.,-]*")) { // Permite letras, espaços, números, '.', ',' e '-'
                 textField.setText(oldValue);
+                errorLabel.setVisible(true);
+                errorLabel.setManaged(true);
+            } else {
+                errorLabel.setVisible(false);
+                errorLabel.setManaged(false);
+            }
+        });
+    }
+
+    private void configurarValidacaoTelefone(TextField textField, Label errorLabel) {
+        textField.textProperty().addListener((observable, oldValue, newValue) -> {
+            // Remove qualquer caractere não numérico
+            String digits = newValue.replaceAll("[^\\d]", "");
+
+            // Limita o comprimento do telefone a 11 caracteres
+            if (digits.length() > 11) {
+                digits = digits.substring(0, 11);
+            }
+
+            textField.setText(digits);
+
+            if (digits.length() == 11) {
+                errorLabel.setVisible(false);
+                errorLabel.setManaged(false);
+            } else {
+                errorLabel.setText("Telefone inválido.");
+                errorLabel.setVisible(true);
+                errorLabel.setManaged(true);
             }
         });
     }

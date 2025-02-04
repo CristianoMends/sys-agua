@@ -114,4 +114,23 @@ public class ProdutoService {
             throw new Exception("Erro ao buscar produto: " + response.body());
         }
     }
+
+    public Produto inativarProduto(Produto produto, String token) throws Exception {
+        String urlComId = BASE_URL + "/" + produto.getId();
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(urlComId))
+                .DELETE()
+                .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer " + token)
+                .build();
+
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() == 204) {
+            return null;
+        } else {
+            throw new Exception("Erro ao inativar produto: " + response.body());
+        }
+    }
 }
