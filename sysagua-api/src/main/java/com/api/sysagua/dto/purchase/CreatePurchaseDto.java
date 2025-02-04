@@ -23,4 +23,7 @@ public class CreatePurchaseDto {
     @NotNull(message = "Supplier ID cannot be null.")
     @Schema(description = "Identificador único do fornecedor", example = "1")
     private Long supplierId;
+
+    @Schema(description = "Descrição da compra", example = "Sem descrição")
+    private String description;
 }

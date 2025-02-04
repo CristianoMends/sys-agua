@@ -2,7 +2,6 @@ package com.api.sysagua.dto.order;
 
 import com.api.sysagua.enumeration.PaymentMethod;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -40,5 +39,8 @@ public class CreateOrderDto {
     @Schema(description = "Metodo de pagamento", example = "PIX")
     @NotNull(message = "PaymentMethod is mandatory")
     private PaymentMethod paymentMethod;
+
+    @Schema(description = "Descrição do pedido", example = "Sem descrição")
+    private String description;
 
 }
