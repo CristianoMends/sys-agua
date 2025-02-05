@@ -1,6 +1,6 @@
-package edu.pies.sysaguaapp.models.Pedido;
+package edu.pies.sysaguaapp.models;
 
-public enum TipoPagamento {
+public enum MetodoPagamento {
     PIX("Pix"),
     DEBIT("Débito"),
     CREDIT("Crédito"),
@@ -8,7 +8,7 @@ public enum TipoPagamento {
     TICKET("Boleto");
     private final String descricao;
 
-    TipoPagamento(String descricao){
+    MetodoPagamento(String descricao){
         this.descricao = descricao;
     }
     public String getDescricao() {
