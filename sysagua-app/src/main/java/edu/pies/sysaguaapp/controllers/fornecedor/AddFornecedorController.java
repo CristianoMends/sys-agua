@@ -255,7 +255,7 @@ public class AddFornecedorController {
         configurarValidacaoTexto(logradouroField, logradErrorLabel);
         configurarValidacaoTexto(bairroField, bairroErrorLabel);
         configurarValidacaoTexto(cidadeField, cidadeErrorLabel);
-        configurarValidacaoTexto(estadoField, estadoErrorLabel);
+        configurarValidacaoEstado(estadoField, estadoErrorLabel);
     }
 
     private void configurarFormatacaoCNPJ(TextField textField, Label errorLabel) {
@@ -344,6 +344,26 @@ public class AddFornecedorController {
     private void configurarValidacaoTexto(TextField textField, Label errorLabel) {
         textField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.matches("[\\p{L}\\s\\d.,-]*")) { // Permite letras, espaços, números, '.', ',' e '-'
+                textField.setText(oldValue);
+                errorLabel.setVisible(true);
+                errorLabel.setManaged(true);
+            } else {
+                errorLabel.setVisible(false);
+                errorLabel.setManaged(false);
+            }
+        });
+    }
+
+    private void configurarValidacaoEstado(TextField textField, Label errorLabel) {
+        textField.textProperty().addListener((observable, oldValue, newValue) -> {
+
+            if (newValue.length() > 2){
+                newValue = newValue.substring(0, 2);
+            }
+
+            textField.setText(newValue);
+
+            if (!newValue.matches("\\p{L}*")) { // Permite letras, espaços, números, '.', ',' e '-'
                 textField.setText(oldValue);
                 errorLabel.setVisible(true);
                 errorLabel.setManaged(true);
