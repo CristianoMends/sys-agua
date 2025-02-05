@@ -60,6 +60,9 @@ jobs:
           docker-compose up --build -d
         env:
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DEFAULT_EMAIL: ${{ secrets.DEFAULT_EMAIL }}
+          DEFAULT_PASSWORD: ${{ secrets.DEFAULT_PASSWORD }}
+          JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
 
       # Aguarda que os serviços estejam prontos
       - name: Wait for API service to be ready
