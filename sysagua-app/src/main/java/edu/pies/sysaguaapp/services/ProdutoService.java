@@ -2,6 +2,7 @@ package edu.pies.sysaguaapp.services;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.pies.sysaguaapp.models.Fornecedor;
 import edu.pies.sysaguaapp.models.Produto;
 
 import java.net.URI;
@@ -10,6 +11,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ProdutoService {
@@ -45,7 +47,6 @@ public class ProdutoService {
     public Produto criarProduto(Produto produto, String token) throws Exception {
         // Converter o objeto Produto para JSON
         String produtoJson = objectMapper.writeValueAsString(produto);
-        System.out.println(produtoJson);
 
         // Criar a requisição POST
         HttpRequest request = HttpRequest.newBuilder()
@@ -56,10 +57,7 @@ public class ProdutoService {
                 .build();
 
         // Enviar a requisição
-        System.out.println(request);
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-        System.out.println(response.statusCode());
-        System.out.println(response.body());
 
         // Verificar a resposta
         if (response.statusCode() == 201) {
@@ -109,7 +107,11 @@ public class ProdutoService {
             if (response.body().isEmpty()) {
                 return null;
             }
-            return objectMapper.readValue(response.body(), Produto.class);
+            List<Produto> produtos = objectMapper.readValue(response.body(), new TypeReference<List<Produto>>() {});
+            if (!produtos.isEmpty()) {
+                return produtos.get(0);
+            }
+            return null;
         } else {
             throw new Exception("Erro ao buscar produto: " + response.body());
         }

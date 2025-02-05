@@ -19,4 +19,6 @@ module edu.pies.sysaguaapp {
     opens edu.pies.sysaguaapp.controllers.estoque to javafx.fxml;
     exports edu.pies.sysaguaapp.controllers.fornecedor;
     opens edu.pies.sysaguaapp.controllers.fornecedor to javafx.fxml;
+    exports edu.pies.sysaguaapp.controllers.produto;
+    opens edu.pies.sysaguaapp.controllers.produto to javafx.fxml;
 }
