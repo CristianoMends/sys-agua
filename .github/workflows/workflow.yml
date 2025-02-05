@@ -53,11 +53,11 @@ jobs:
       # Início dos serviços com Docker Compose
       - name: Start Docker Compose
         run: |
-          DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
-          DEFAULT_EMAIL=${{ secrets.DEFAULT_EMAIL }} \
-          DEFAULT_PASSWORD=${{ secrets.DEFAULT_PASSWORD }} \
-          JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }} \
-          docker-compose up --build -d
+          export DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+          export DEFAULT_EMAIL=${{ secrets.DEFAULT_EMAIL }}
+          export DEFAULT_PASSWORD=${{ secrets.DEFAULT_PASSWORD }}
+          export JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}
+          export docker-compose up --build -d
         env:
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
 
