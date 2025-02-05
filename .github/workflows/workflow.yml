@@ -1,6 +1,5 @@
 name: continuous-integration
 
-
 on:
   push:
     branches:
@@ -63,14 +62,18 @@ jobs:
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
 
       # Aguarda que os serviços estejam prontos
-      - name: Wait for services to be ready
+      - name: Wait for API service to be ready
         run: |
-          timeout 300 bash -c '
-          until echo > /dev/tcp/localhost/8080; do
-            echo "Waiting for API service..."
+          echo "Waiting for API service on port 8080..."
+          for i in {1..60}; do
+            if nc -zv localhost 8080; then
+              echo "API is up!"
+              exit 0
+            fi
             sleep 2
           done
-          echo "API service is ready!"'
+          echo "API service failed to start"
+          exit 1
 
       # Concede permissão de execução ao script Gradle Wrapper
       - name: Grant execute permission for gradlew
