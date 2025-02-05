@@ -403,9 +403,15 @@ public class ProdutosController{
     }
 
     private void handleInativarProduto() {
-        Object produtoSelecionado = tabelaProdutos.getSelectionModel().getSelectedItem();
+        Produto produtoSelecionado = tabelaProdutos.getSelectionModel().getSelectedItem();
         if (produtoSelecionado != null) {
-            System.out.println("Inativar Produto: " + produtoSelecionado);
+            try {
+                String token = TokenManager.getInstance().getToken();
+                produtoService.inativarProduto(produtoSelecionado, token);
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.out.println("Erro ao inativar produto: " + e.getMessage());
+            }
         }
     }
 

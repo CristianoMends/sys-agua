@@ -2,7 +2,9 @@ package edu.pies.sysaguaapp.services;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.pies.sysaguaapp.models.Entregador;
+import edu.pies.sysaguaapp.dtos.UpdateFornecedorDto;
+import edu.pies.sysaguaapp.models.Fornecedor;
+import edu.pies.sysaguaapp.models.Produto;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -10,17 +12,17 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.List;
 
-public class EntregadorService {
-    private static final String BASE_URL = "http://localhost:8080/deliveryPersons";
+public class FornecedorService {
+    private static final String BASE_URL = "http://localhost:8080/suppliers";
     private final HttpClient httpClient;
     private final ObjectMapper objectMapper;
 
-    public EntregadorService() {
+    public FornecedorService() {
         this.httpClient = HttpClient.newHttpClient();
         this.objectMapper = new ObjectMapper();
     }
 
-    public List<Entregador> buscarEntregadores(String token) throws Exception {
+    public List<Fornecedor> buscarFornecedores(String token) throws Exception {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(BASE_URL))
                 .GET()
@@ -31,21 +33,21 @@ public class EntregadorService {
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
         if (response.statusCode() == 200) {
-            return objectMapper.readValue(response.body(), new TypeReference<List<Entregador>>() {
+            return objectMapper.readValue(response.body(), new TypeReference<List<Fornecedor>>() {
             });
         } else {
             throw new Exception("Erro ao buscar: " + response.body());
         }
     }
 
-    public Entregador cadastrarEntregador(Entregador entregador, String token) throws Exception {
-        // Converter o objeto Entregador para JSON
-        String entregadorJson = objectMapper.writeValueAsString(entregador);
+    public Fornecedor cadastrarFornecedor(Fornecedor fornecedor, String token) throws Exception {
+        // Converter o objeto Fornecedor para JSON
+        String fornecedorJson = objectMapper.writeValueAsString(fornecedor);
 
         // Criar a requisição POST
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(BASE_URL))
-                .POST(HttpRequest.BodyPublishers.ofString(entregadorJson))
+                .POST(HttpRequest.BodyPublishers.ofString(fornecedorJson))
                 .header("Content-Type", "application/json")
                 .header("Authorization", "Bearer " + token)
                 .build();
@@ -61,18 +63,19 @@ public class EntregadorService {
         }
     }
 
-    public Entregador atualizarEntregador(Entregador entregador, String token) throws Exception {
-        String entregadorJson = objectMapper.writeValueAsString(entregador);
+    public Fornecedor atualizarFornecedor(Fornecedor fornecedor, String token) throws Exception {
+        String fornecedorJson = objectMapper.writeValueAsString(fornecedor);
+        String urlFornecedor = BASE_URL + "/" + fornecedor.getId();
 
-        String urlEntregador = BASE_URL + "/" + entregador.getId();
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(urlEntregador))
-                .PUT(HttpRequest.BodyPublishers.ofString(entregadorJson))
+                .uri(URI.create(urlFornecedor))
+                .PUT(HttpRequest.BodyPublishers.ofString(fornecedorJson))
                 .header("Content-Type", "application/json")
                 .header("Authorization", "Bearer " + token)
                 .build();
 
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
         if (response.statusCode() == 204) {
             return null;
         } else {
@@ -80,20 +83,50 @@ public class EntregadorService {
         }
     }
 
-    public Entregador inativarEntregador(Entregador entregador, String token) throws Exception {
-        String urlEntregador = BASE_URL + "/" + entregador.getId();
+    public Fornecedor buscarFornecedorId(String id, String token) throws Exception {
+        String urlComId = BASE_URL + "?id=" + id;
+
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(urlEntregador))
+                .uri(URI.create(urlComId))
+                .GET()
+                .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer " + token)
+                .build();
+
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() == 200) {
+            if (response.body().isEmpty()) {
+                return null;
+            }
+            List<Fornecedor> fornecedores = objectMapper.readValue(response.body(), new TypeReference<List<Fornecedor>>() {});
+            if (!fornecedores.isEmpty()) {
+                return fornecedores.get(0);
+            }
+            return null;
+        } else {
+            throw new Exception("Erro ao buscar fornecedor: " + response.body());
+        }
+    }
+
+    public Fornecedor inativarFornecedor(Fornecedor fornecedor, String token) throws Exception {
+        String urlFornecedor = BASE_URL + "/" + fornecedor.getId();
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(urlFornecedor))
                 .DELETE()
                 .header("Content-Type", "application/json")
                 .header("Authorization", "Bearer " + token)
                 .build();
 
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
         if (response.statusCode() == 204) {
             return null;
         } else {
-            throw new Exception("Erro ao inativar: " + response.body());
+            throw new Exception("Erro ao deletar: " + response.body());
         }
     }
+
+
 }

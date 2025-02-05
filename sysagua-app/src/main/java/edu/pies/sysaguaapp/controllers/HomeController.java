@@ -119,7 +119,7 @@ public class HomeController implements Initializable {
 
     @FXML
     private void handleFornecedor() {
-        showMessage("Todos os fornecedores");
+        loadView("/views/Fornecedor/Fornecedor.fxml");
     }
 
     @FXML
