@@ -13,9 +13,11 @@
 <?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.text.Font?>
 
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ComboBox?>
 <StackPane fx:id="rootPane" prefHeight="600.0" prefWidth="900.0" style="-fx-background-color: white;" stylesheets="@../../styles/pedidos.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.pies.sysaguaapp.controllers.PedidoController">
     <Rectangle fx:id="overlay" fill="#D9D9D9" managed="false" visible="false" />
-    <VBox fx:id="listClienteView" prefHeight="200.0" prefWidth="100.0">
+    <VBox fx:id="listPedidoView" prefHeight="200.0" prefWidth="100.0">
         <children>
             <StackPane prefHeight="90.0">
                 <children>
@@ -28,7 +30,6 @@
                         <children>
                             <Label text="Todos os Pedidos" />
                             <Region HBox.hgrow="ALWAYS" />
-                            <Button mnemonicParsing="false" onAction="#handleAddPedido" styleClass="menu-button" text="Adicionar" />
                         </children>
                     </HBox>
                 </children>
@@ -37,20 +38,31 @@
                 </padding>
             </StackPane>
 
-            <!-- Novo campo para seleção de data com ícone de calendário e label clicável -->
-            <VBox spacing="5" style="-fx-padding: 10;">
+            <VBox spacing="15" style="-fx-padding: 20;">
                 <children>
-                    <Label text="A partir de:" onMouseClicked="#handleAbrirCalendario" />
                     <HBox spacing="10" alignment="CENTER_LEFT">
                         <children>
-                            <DatePicker fx:id="datePicker" onMouseClicked="#handleAbrirCalendario" />
+                            <Label text="Data" onMouseClicked="#handleAbrirCalendario" />
+                            <DatePicker fx:id="datePicker" onMouseClicked="#handleAbrirCalendario"/>
                             <ImageView fx:id="calendarIcon" fitWidth="20" fitHeight="20" onMouseClicked="#handleAbrirCalendario" />
+
+                            <Label text="Status" />
+                            <ComboBox fx:id="comboBoxStatus" promptText="Selecione o status" prefWidth="150" />
+
+                            <Label text="Cliente" />
+                            <TextField fx:id="campoNomeCliente" promptText="Nome do cliente" prefWidth="150" />
+
+                            <Label text="Entregador" />
+                            <TextField fx:id="campoNomeEntregador" promptText="Nome do entregador" prefWidth="150" />
+
+                            <Button mnemonicParsing="false" text="Filtrar" styleClass="menu-button" onAction="#handleFiltrarPedidos" />
+                            <Button mnemonicParsing="false" styleClass="menu-button" text="Adicionar" />
                         </children>
                     </HBox>
                 </children>
             </VBox>
 
-            <TableView fx:id="tabelaPedido" prefHeight="484.0" styleClass="table-view">
+            <TableView fx:id="tabelaPedidos" prefHeight="484.0" styleClass="table-view">
                 <columnResizePolicy>
                     <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                 </columnResizePolicy>
