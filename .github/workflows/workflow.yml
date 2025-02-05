@@ -57,7 +57,7 @@ jobs:
           export DEFAULT_EMAIL=${{ secrets.DEFAULT_EMAIL }}
           export DEFAULT_PASSWORD=${{ secrets.DEFAULT_PASSWORD }}
           export JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}
-          export docker-compose up --build -d
+          docker-compose up --build -d
         env:
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
 
