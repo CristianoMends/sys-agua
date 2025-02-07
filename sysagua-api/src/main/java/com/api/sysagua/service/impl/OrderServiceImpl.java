@@ -4,15 +4,12 @@ import com.api.sysagua.dto.order.CreateOrderDto;
 import com.api.sysagua.dto.order.CreateProductOrderDto;
 import com.api.sysagua.dto.order.UpdateOrderDto;
 import com.api.sysagua.dto.order.ViewOrderDto;
-import com.api.sysagua.enumeration.OrderStatus;
-import com.api.sysagua.enumeration.PaymentMethod;
-import com.api.sysagua.enumeration.TransactionStatus;
-import com.api.sysagua.enumeration.TransactionType;
+import com.api.sysagua.enumeration.*;
 import com.api.sysagua.exception.BusinessException;
 import com.api.sysagua.model.*;
 import com.api.sysagua.repository.*;
+import com.api.sysagua.service.CashierService;
 import com.api.sysagua.service.OrderService;
-import com.api.sysagua.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -34,7 +31,11 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private OrderRepository orderRepository;
     @Autowired
-    private TransactionService transactionService;
+    private StockRepository stockRepository;
+    @Autowired
+    private CashierService cashierService;
+    @Autowired
+    private TransactionRepository transactionRepository;
 
     @Override
     public void create(CreateOrderDto dto) {
@@ -42,14 +43,50 @@ public class OrderServiceImpl implements OrderService {
         order.setCustomer(getCustomerById(dto.getCustomerId()));
         order.setDeliveryPerson(getDeliveryPersonById(dto.getDeliveryPersonId()));
         order.setProductOrders(createListProductOrder(order, dto.getProductOrders()));
-        order.setStatus(OrderStatus.PENDING);
+        order.setDeliveryStatus(DeliveryStatus.PENDING);
         order.setReceivedAmount(dto.getReceivedAmount());
         order.setTotalAmount(dto.getTotalAmount());
         order.setPaymentMethod(dto.getPaymentMethod());
         order.setDescription(dto.getDescription());
         var saved = this.orderRepository.save(order);
 
-        this.saveOnTransactionHistory(saved);
+        createPendingTransaction(saved);
+    }
+
+    @Override
+    public List<ViewOrderDto> list(Long id, Long customerId, Long deliveryPersonId, Long productOrderId, DeliveryStatus status, BigDecimal receivedAmountStart, BigDecimal receivedAmountEnd, BigDecimal totalAmountStart, BigDecimal totalAmountEnd, PaymentMethod paymentMethod, LocalDateTime createdAtStart, LocalDateTime createdAtEnd, LocalDateTime finishedAtStart, LocalDateTime finishedAtEnd) {
+        return this.orderRepository.list(
+                id,
+                customerId,
+                deliveryPersonId,
+                productOrderId,
+                status,
+                receivedAmountStart,
+                receivedAmountEnd,
+                totalAmountStart,
+                totalAmountEnd,
+                paymentMethod,
+                createdAtStart,
+                createdAtEnd,
+                finishedAtStart,
+                finishedAtEnd
+        ).stream().map(Order::toView).toList();
+    }
+
+    @Override
+    public void update(Long id, UpdateOrderDto dto) {
+        var order = this.orderRepository.findById(id).orElseThrow(
+                () -> new BusinessException("Order not found", HttpStatus.NOT_FOUND)
+        );
+
+        if (order.getDeliveryStatus().equals(DeliveryStatus.FINISHED)) processOrderProducts(order);
+
+        switch (order.getPaymentStatus()) {
+            case PAID -> createPaidTransaction(order);
+            case CANCELED -> createCanceledTransaction(order);
+            case PENDING -> createPendingTransaction(order);
+        }
+        this.orderRepository.save(order);
     }
 
     private DeliveryPerson getDeliveryPersonById(Long id) {
@@ -87,46 +124,58 @@ public class OrderServiceImpl implements OrderService {
         return list;
     }
 
-    private void saveOnTransactionHistory(Order order) {
-        Transaction transaction = new Transaction(
+    private void addWithdrawsProductFromStock(int quantity, Product product) {
+        var stock = this.stockRepository.findProduct(product.getId()).orElseThrow(
+                () -> new BusinessException("Stock by product not found", HttpStatus.NOT_FOUND)
+        );
+        stock.setTotalWithdrawals(stock.getTotalWithdrawals() + quantity);
+        this.stockRepository.save(stock);
+    }
+
+    private void processOrderProducts(Order order) {
+        order.getProductOrders()
+                .forEach(p -> addWithdrawsProductFromStock(p.getQuantity(), p.getProduct()));
+
+    }
+
+    private void createPendingTransaction(Order order) {
+        var t = new Transaction(
                 TransactionStatus.PENDING,
                 order.getTotalAmount(),
                 TransactionType.INCOME,
                 order.getPaymentMethod(),
-                order.getDescription(),
+                "Pedido aguardando pagamento",
                 order,
                 null
         );
-        this.transactionService.save(transaction);
+        this.transactionRepository.save(t);
     }
 
-    @Override
-    public List<ViewOrderDto> list(Long id, Long customerId, Long deliveryPersonId, Long productOrderId, OrderStatus status, BigDecimal receivedAmountStart, BigDecimal receivedAmountEnd, BigDecimal totalAmountStart, BigDecimal totalAmountEnd, PaymentMethod paymentMethod, LocalDateTime createdAtStart, LocalDateTime createdAtEnd, LocalDateTime finishedAtStart, LocalDateTime finishedAtEnd) {
-        return this.orderRepository.list(
-                id,
-                customerId,
-                deliveryPersonId,
-                productOrderId,
-                status,
-                receivedAmountStart,
-                receivedAmountEnd,
-                totalAmountStart,
-                totalAmountEnd,
-                paymentMethod,
-                createdAtStart,
-                createdAtEnd,
-                finishedAtStart,
-                finishedAtEnd
-        ).stream().map(Order::toView).toList();
-    }
-
-    @Override
-    public void update(Long id, UpdateOrderDto dto) {
-        var order = this.orderRepository.findById(id).orElseThrow(
-                () -> new BusinessException("Order not found", HttpStatus.NOT_FOUND)
+    private void createPaidTransaction(Order order) {
+        var t = new Transaction(
+                TransactionStatus.PAID,
+                order.getTotalAmount(),
+                TransactionType.INCOME,
+                order.getPaymentMethod(),
+                "Pedido pago",
+                order,
+                null
         );
 
+        this.transactionRepository.save(t);
+    }
 
-        this.orderRepository.save(order);
+    private void createCanceledTransaction(Order order) {
+        var t = new Transaction(
+                TransactionStatus.CANCELED,
+                order.getTotalAmount(),
+                TransactionType.INCOME,
+                order.getPaymentMethod(),
+                "Pedido cancelado",
+                order,
+                null
+        );
+        this.transactionRepository.save(t);
+
     }
 }
