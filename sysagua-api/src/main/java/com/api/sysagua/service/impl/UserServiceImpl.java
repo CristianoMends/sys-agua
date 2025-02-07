@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -38,7 +39,6 @@ public class UserServiceImpl implements UserService {
 
         return userRepository.save(userToSave);
     }
-
     private void checkIfEmailExists(String email) {
         userRepository.findByEmail(email).ifPresent(user -> {
             if (user.getStatus().equals(UserStatus.INACTIVE)) {
@@ -53,7 +53,6 @@ public class UserServiceImpl implements UserService {
             );
         });
     }
-
     private void checkIfPhoneExists(String phone) {
         if (phone == null || phone.isEmpty()) {
             return;
@@ -72,14 +71,12 @@ public class UserServiceImpl implements UserService {
             );
         });
     }
-
     @Override
     public UserDetails getUserByEmail(String email) {
         return this.userRepository.findByEmail(email).orElseThrow(() ->
                 new BusinessException("No user was found with the email provided", HttpStatus.NOT_FOUND)
         );
     }
-
     @Override
     public void deactivateUser(String email) {
         var user = (User) this.getUserByEmail(email);
@@ -93,7 +90,6 @@ public class UserServiceImpl implements UserService {
         user.setStatus(UserStatus.INACTIVE);
         this.userRepository.save(user);
     }
-
     @Override
     public Token authenticateUser(LoginDto loginDto) {
         var usernamePassword = new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword());
@@ -109,7 +105,6 @@ public class UserServiceImpl implements UserService {
         var token = this.tokenService.generateToken(user);
         return new Token(token);
     }
-
     @Override
     public List<User> getUsers(UUID id, String name, String surname, String phone, String email, UserStatus status, UserAccess access) {
 
@@ -120,7 +115,6 @@ public class UserServiceImpl implements UserService {
 
         return userRepository.findByFilters(id, name, surname, phone, email, status, access);
     }
-
     @Override
     public void updateUser(UpdateUserDto userDto) {
         User user = userRepository.findById(userDto.getId())
@@ -134,5 +128,15 @@ public class UserServiceImpl implements UserService {
         if (userDto.getStatus() != null) user.setStatus(userDto.getStatus());
 
         userRepository.save(user);
+    }
+    @Override
+    public String getLoggedUser() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        if (principal instanceof UserDetails) {
+            return ((UserDetails) principal).getUsername();
+        } else {
+            return principal.toString();
+        }
     }
 }
