@@ -21,22 +21,6 @@ public class TransactionController implements TransactionDoc {
     @Autowired
     private TransactionService service;
 
-    @CrossOrigin
-    @PutMapping("cancel/{id}")
-    public ResponseEntity<Void> cancelTransaction(@PathVariable Long id) {
-
-        service.cancel(id);
-        return ResponseEntity.noContent().build();
-    }
-
-    @CrossOrigin
-    @PutMapping("finish/{id}")
-    public ResponseEntity<Void> finishTransaction(@PathVariable Long id) {
-
-        service.finish(id);
-        return ResponseEntity.noContent().build();
-    }
-
     @GetMapping
     @CrossOrigin
     public ResponseEntity<List<ViewTransactionDto>> listTransactions(
