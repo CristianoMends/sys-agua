@@ -52,16 +52,7 @@ public class PurchaseServiceImpl implements PurchaseService {
     }
 
     private void saveOnTransactionHistory(Purchase purchase){
-        Transaction transaction = new Transaction(
-                TransactionStatus.PENDING,
-                purchase.getTotalValue(),
-                TransactionType.EXPENSE,
-                purchase.getPaymentMethod(),
-                purchase.getDescription(),
-                null,
-                purchase
-        );
-        this.transactionService.save(transaction);
+
     }
 
     @Override
