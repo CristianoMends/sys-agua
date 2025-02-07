@@ -3,9 +3,8 @@ package com.api.sysagua.docs;
 import com.api.sysagua.dto.order.CreateOrderDto;
 import com.api.sysagua.dto.order.UpdateOrderDto;
 import com.api.sysagua.dto.order.ViewOrderDto;
-import com.api.sysagua.enumeration.OrderStatus;
+import com.api.sysagua.enumeration.DeliveryStatus;
 import com.api.sysagua.enumeration.PaymentMethod;
-import com.api.sysagua.model.Order;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -48,7 +47,7 @@ public interface OrderDoc {
             Long customerId,
             Long deliveryPersonId,
             Long productOrderId,
-            OrderStatus status,
+            DeliveryStatus status,
             BigDecimal receivedAmountStart,
             BigDecimal receivedAmountEnd,
             BigDecimal totalAmountStart,
