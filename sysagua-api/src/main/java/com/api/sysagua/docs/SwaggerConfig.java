@@ -100,5 +100,12 @@ public class SwaggerConfig {
                 .pathsToMatch("/orders/**")
                 .build();
     }
+    @Bean
+    public GroupedOpenApi cashierApi() {
+        return GroupedOpenApi.builder()
+                .group("Caixa")
+                .pathsToMatch("/cashier/**")
+                .build();
+    }
 
 }
