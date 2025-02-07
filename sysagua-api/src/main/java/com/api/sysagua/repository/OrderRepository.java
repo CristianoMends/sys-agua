@@ -1,6 +1,6 @@
 package com.api.sysagua.repository;
 
-import com.api.sysagua.enumeration.OrderStatus;
+import com.api.sysagua.enumeration.DeliveryStatus;
 import com.api.sysagua.enumeration.PaymentMethod;
 import com.api.sysagua.model.Order;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -19,7 +19,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             and (:customerId is null or o.customer.id = :customerId) 
             and (:deliveryPersonId is null or o.deliveryPerson.id = :deliveryPersonId) 
             and (:productOrderId is null or productOrders.id = :productOrderId) 
-            and (:status is null or o.status = :status) 
+            and (:deliveryStatus is null or o.deliveryStatus = :deliveryStatus) 
             and ((:receivedAmountStart is null or :receivedAmountEnd is null) or o.receivedAmount between :receivedAmountStart and :receivedAmountEnd) 
             and ((:totalAmountStart is null or :totalAmountEnd is null) or o.totalAmount between :totalAmountStart and :totalAmountEnd) 
             and (:paymentMethod is null or o.paymentMethod = :paymentMethod) 
@@ -32,7 +32,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             @Param("customerId") Long customerId,
             @Param("deliveryPersonId") Long deliveryPersonId,
             @Param("productOrderId") Long productOrderId,
-            @Param("status") OrderStatus status,
+            @Param("deliveryStatus") DeliveryStatus deliveryStatus,
             @Param("receivedAmountStart") BigDecimal receivedAmountStart,
             @Param("receivedAmountEnd") BigDecimal receivedAmountEnd,
             @Param("totalAmountStart") BigDecimal totalAmountStart,
