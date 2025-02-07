@@ -1,6 +1,6 @@
 package com.api.sysagua.dto.order;
 
-import com.api.sysagua.enumeration.OrderStatus;
+import com.api.sysagua.enumeration.DeliveryStatus;
 import com.api.sysagua.enumeration.PaymentMethod;
 import com.api.sysagua.model.Customer;
 import com.api.sysagua.model.DeliveryPerson;
@@ -20,7 +20,7 @@ import java.util.List;
 public class ViewOrderDto {
 
     private Long id;
-    private OrderStatus status;
+    private DeliveryStatus status;
     private BigDecimal receivedAmount;
     private BigDecimal totalAmount;
     private PaymentMethod paymentMethod;
