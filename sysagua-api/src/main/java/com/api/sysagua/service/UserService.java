@@ -28,4 +28,6 @@ public interface UserService {
                         UserAccess access);
 
     void updateUser(UpdateUserDto userDto);
+
+    String getLoggedUser();
 }
