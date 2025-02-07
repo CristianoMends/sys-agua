@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum OrderStatus {
+public enum DeliveryStatus {
 
     PENDING("Pendente"),
     FINISHED("Finalizado"),
