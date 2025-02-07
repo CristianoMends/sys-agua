@@ -1,14 +1,12 @@
 package com.api.sysagua.dto.order;
 
-import com.api.sysagua.enumeration.OrderStatus;
+import com.api.sysagua.enumeration.DeliveryStatus;
 import com.api.sysagua.model.Customer;
 import com.api.sysagua.model.DeliveryPerson;
 import com.api.sysagua.model.Order;
-import com.api.sysagua.model.Product;
 import com.api.sysagua.repository.CustomerRepository;
 import com.api.sysagua.repository.DeliveryPersonRepository;
 import com.api.sysagua.repository.OrderRepository;
-import com.api.sysagua.repository.ProductRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -44,7 +42,7 @@ public class UpdateOrderDto {
     private List<Long> productsId;
 
     @Schema(description = "Status do pedido", example = "FINISHED")
-    private OrderStatus status;
+    private DeliveryStatus status;
 
     @Schema(description = "Valor recebido do pedido", example = "50.00")
     private BigDecimal receivedAmount;
@@ -70,7 +68,7 @@ public class UpdateOrderDto {
         order.setCustomer(customer);
        // order.setProductOrders(products);
         order.setDeliveryPerson(deliveryPerson);
-        order.setStatus(dto.getStatus());
+        order.setDeliveryStatus(dto.getStatus());
 
         orderRepository.save(order);
     }
