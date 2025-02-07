@@ -4,9 +4,8 @@ import com.api.sysagua.docs.OrderDoc;
 import com.api.sysagua.dto.order.CreateOrderDto;
 import com.api.sysagua.dto.order.UpdateOrderDto;
 import com.api.sysagua.dto.order.ViewOrderDto;
-import com.api.sysagua.enumeration.OrderStatus;
+import com.api.sysagua.enumeration.DeliveryStatus;
 import com.api.sysagua.enumeration.PaymentMethod;
-import com.api.sysagua.model.Order;
 import com.api.sysagua.service.OrderService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +41,7 @@ public ResponseEntity<List<ViewOrderDto>> list(
         @RequestParam(required = false) Long customerId,
         @RequestParam(required = false) Long deliveryPersonId,
         @RequestParam(required = false) Long productOrderId,
-        @RequestParam(required = false) OrderStatus status,
+        @RequestParam(required = false) DeliveryStatus status,
         @RequestParam(required = false) BigDecimal receivedAmountStart,
         @RequestParam(required = false) BigDecimal receivedAmountEnd,
         @RequestParam(required = false) BigDecimal totalAmountStart,
