@@ -3,9 +3,8 @@ package com.api.sysagua.service;
 import com.api.sysagua.dto.order.CreateOrderDto;
 import com.api.sysagua.dto.order.UpdateOrderDto;
 import com.api.sysagua.dto.order.ViewOrderDto;
-import com.api.sysagua.enumeration.OrderStatus;
+import com.api.sysagua.enumeration.DeliveryStatus;
 import com.api.sysagua.enumeration.PaymentMethod;
-import com.api.sysagua.model.Order;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -19,7 +18,7 @@ public interface OrderService {
             Long customerId,
             Long deliveryPersonId,
             Long productOrderId,
-            OrderStatus status,
+            DeliveryStatus status,
             BigDecimal receivedAmountStart,
             BigDecimal receivedAmountEnd,
             BigDecimal totalAmountStart,
