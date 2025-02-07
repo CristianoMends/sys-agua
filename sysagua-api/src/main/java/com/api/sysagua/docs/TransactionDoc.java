@@ -21,32 +21,6 @@ public interface TransactionDoc {
 
 
     @Operation(
-            summary = "Cancelamento de uma transação",
-            description = "Este método cancela uma transação com base no ID fornecido."
-    )
-    @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "Transação cancelada com sucesso.", content = @Content()),
-            @ApiResponse(responseCode = "400", description = "Parâmetros inválidos.", content = @Content()),
-            @ApiResponse(responseCode = "404", description = "Transação não encontrada.", content = @Content()),
-            @ApiResponse(responseCode = "403", description = "Acesso não autorizado.", content = @Content()),
-            @ApiResponse(responseCode = "500", description = "Erro interno no servidor.", content = @Content())
-    })
-    ResponseEntity<Void> cancelTransaction(Long id);
-
-    @Operation(
-            summary = "Finalização de uma transação",
-            description = "Este método finaliza uma transação com base no ID fornecido."
-    )
-    @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "Transação finalizada com sucesso.", content = @Content()),
-            @ApiResponse(responseCode = "400", description = "Parâmetros inválidos.", content = @Content()),
-            @ApiResponse(responseCode = "404", description = "Transação não encontrada.", content = @Content()),
-            @ApiResponse(responseCode = "403", description = "Acesso não autorizado.", content = @Content()),
-            @ApiResponse(responseCode = "500", description = "Erro interno no servidor.", content = @Content())
-    })
-    ResponseEntity<Void> finishTransaction(Long id);
-
-    @Operation(
             summary = "Busca de transações por filtros",
             description = "Este método permite buscar transações com base em vários filtros, como valor, tipo, status, forma de pagamento e datas de criação e conclusão."
     )
