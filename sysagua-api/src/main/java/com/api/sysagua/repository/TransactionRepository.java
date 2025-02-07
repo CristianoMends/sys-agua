@@ -41,5 +41,11 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
             @Param("canceledAtEnd") LocalDateTime canceledAtEnd
     );
 
+    @Query("select t from Transaction t where t.status = ?1 order by t.createdAt")
+    List<Transaction> listByStatus(TransactionStatus status);
+
+    @Query("select t from Transaction t where t.type = ?1 order by t.createdAt")
+    List<Transaction> listByType(TransactionType type);
+
 
 }
