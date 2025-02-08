@@ -32,6 +32,7 @@ public class ProductOrder {
     private BigDecimal unitPrice;
     private BigDecimal totalPrice;
 
+
     @PostLoad
     private void calculateItemTotal() {
         this.totalPrice = unitPrice.multiply(BigDecimal.valueOf(quantity));

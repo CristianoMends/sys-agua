@@ -24,10 +24,6 @@ import java.util.List;
 @NoArgsConstructor
 public class UpdateOrderDto {
 
-    private CustomerRepository customerRepository;
-    private OrderRepository orderRepository;
-   // private ProductRepository productRepository;
-    private DeliveryPersonRepository deliveryPersonRepository;
 
     @Schema(description = "Id do pedido", example = "4213")
     private Long id;
@@ -39,7 +35,7 @@ public class UpdateOrderDto {
     private Long deliveryPersonId;
 
     @Schema(description = "Produtos pedidos", example = "Garrafao 20l")
-    private List<Long> productsId;
+    private List<CreateProductOrderDto> productOrder;
 
     @Schema(description = "Status do pedido", example = "FINISHED")
     private DeliveryStatus status;
@@ -49,28 +45,5 @@ public class UpdateOrderDto {
 
     @Schema(description = "Valor total do pedido", example = "80.00")
     private BigDecimal totalAmount;
-
-    public void update(Long orderId, UpdateOrderDto dto){
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new EntityNotFoundException("Pedido não encontrado"));
-
-        Customer customer = customerRepository.findById(dto.getCustomerId())
-                .orElseThrow(() -> new EntityNotFoundException("Cliente não encontrado"));
-
-        /*List<Product> products = productRepository.findAllById(dto.getProductsId());
-        if (products.isEmpty()) {
-            throw new EntityNotFoundException("Nenhum produto encontrado para os IDs fornecidos");
-        }
-*/
-        DeliveryPerson deliveryPerson = deliveryPersonRepository.findById(dto.getDeliveryPersonId())
-                .orElseThrow(() -> new EntityNotFoundException("Entregador não encontrado"));
-
-        order.setCustomer(customer);
-       // order.setProductOrders(products);
-        order.setDeliveryPerson(deliveryPerson);
-        order.setDeliveryStatus(dto.getStatus());
-
-        orderRepository.save(order);
-    }
 
 }

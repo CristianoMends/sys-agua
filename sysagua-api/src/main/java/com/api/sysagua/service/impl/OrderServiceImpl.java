@@ -10,10 +10,12 @@ import com.api.sysagua.model.*;
 import com.api.sysagua.repository.*;
 import com.api.sysagua.service.CashierService;
 import com.api.sysagua.service.OrderService;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import javax.swing.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -79,6 +81,36 @@ public class OrderServiceImpl implements OrderService {
                 () -> new BusinessException("Order not found", HttpStatus.NOT_FOUND)
         );
 
+        var customer = this.customerRepository.findById(id).orElseThrow(
+                () -> new BusinessException("Customer not found", HttpStatus.NOT_FOUND)
+        );
+
+        List<Long> productIds = dto.getProductOrder().stream()
+                .map(CreateProductOrderDto::getProductId)
+                .toList();
+
+        List<Product> products = this.productRepository.findAllById(productIds);
+
+        if (products.isEmpty()) {
+            throw new BusinessException("No products found for the provided IDs", HttpStatus.NOT_FOUND);
+        }
+
+        List<ProductOrder> productOrders = dto.getProductOrder().stream()
+                .map(dtoItem -> {
+                    Product product = products.stream()
+                            .filter(p -> p.getId().equals(dtoItem.getProductId()))
+                            .findFirst()
+                            .orElseThrow(() -> new BusinessException("Product not found", HttpStatus.NOT_FOUND));
+
+                    return new ProductOrder(order, product, dtoItem.getQuantity(), dtoItem.getUnitPrice());
+                })
+                .toList();
+
+
+        var deliveryPerson = this.deliveryPersonRepository.findById(id).orElseThrow(
+                () -> new BusinessException("Delivery person not found", HttpStatus.NOT_FOUND)
+        );
+
         if (order.getDeliveryStatus().equals(DeliveryStatus.FINISHED)) processOrderProducts(order);
 
         switch (order.getPaymentStatus()) {
@@ -86,6 +118,9 @@ public class OrderServiceImpl implements OrderService {
             case CANCELED -> createCanceledTransaction(order);
             case PENDING -> createPendingTransaction(order);
         }
+        order.setCustomer(customer);
+        order.setProductOrders(productOrders);
+        order.setDeliveryPerson(deliveryPerson);
         this.orderRepository.save(order);
     }
 
