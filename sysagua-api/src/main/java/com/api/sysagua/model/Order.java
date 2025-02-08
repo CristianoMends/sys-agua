@@ -78,6 +78,7 @@ public class Order {
         return new ViewOrderDto(
                 getId(),
                 getDeliveryStatus(),
+                getPaymentStatus(),
                 getReceivedAmount(),
                 getTotalAmount(),
                 getPaymentMethod(),

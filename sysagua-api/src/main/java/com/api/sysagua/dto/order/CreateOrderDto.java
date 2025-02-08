@@ -1,6 +1,7 @@
 package com.api.sysagua.dto.order;
 
 import com.api.sysagua.enumeration.PaymentMethod;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -25,7 +26,8 @@ public class CreateOrderDto {
     @NotNull
     private Long deliveryPersonId;
 
-    @Schema(description = "Produtos pedidos")
+    @ArraySchema(schema = @Schema(implementation = CreateProductOrderDto.class))
+    @Schema(description = "Lista de produtos pedidos", example = "[{\"productId\": 1, \"quantity\": 3, \"unitPrice\": 19.99}]")
     @NotNull(message = "Products is mandatory")
     private List<CreateProductOrderDto> productOrders;
 
