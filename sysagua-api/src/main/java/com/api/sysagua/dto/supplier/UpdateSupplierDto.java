@@ -31,6 +31,15 @@ public class UpdateSupplierDto {
     )
     private String cnpj;
 
+    @Schema(description = "Nome fantasia")
+    private String tradeName;
+
+    @Schema(description = "Inscrição estadual")
+    private String stateRegistration;
+
+    @Schema(description = "Inscrição municipal")
+    private String municipalRegistration;
+
     @Pattern(
             regexp = "^[0-9]{13}$",
             message = "Phone must follow the format 5588999999999 (13 digits)."

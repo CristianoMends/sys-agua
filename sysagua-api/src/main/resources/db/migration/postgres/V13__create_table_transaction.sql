@@ -1,5 +1,5 @@
-CREATE TABLE transactions (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS transactions (
+    id BIGINT NOT NULL,
     amount DECIMAL(10,2) NOT NULL,
     status VARCHAR(20) NOT NULL,
     type VARCHAR(20) NOT NULL,
@@ -7,6 +7,7 @@ CREATE TABLE transactions (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     order_id BIGINT,
     purchase_id BIGINT,
+    CONSTRAINT transactions_pkey PRIMARY KEY (id),
     CONSTRAINT fk_order_transactions FOREIGN KEY (order_id) REFERENCES orders(id),
     CONSTRAINT fk_purchase_transactions FOREIGN KEY (purchase_id) REFERENCES purchases(purchase_id)
 );

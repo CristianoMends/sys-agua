@@ -37,6 +37,17 @@ public class CreateSupplierDto {
     )
     private String cnpj;
 
+    @Schema(description = "Nome fantasia", example = "Alpha Ltda")
+    private String tradeName;
+
+    @Schema(description = "Inscrição estadual", example = "123456789")
+    @Pattern(regexp = "\\d+", message = "The state registration must contain only numbers")
+    private String stateRegistration;
+
+    @Schema(description = "Inscrição municipal", example = "987654321")
+    @Pattern(regexp = "\\d+", message = "The municipal registration must contain only numbers")
+    private String municipalRegistration;
+
     @NotBlank(message = "The phone cannot be blank.")
     @Pattern(
             regexp = "^[0-9]{13}$",
@@ -59,7 +70,10 @@ public class CreateSupplierDto {
                 getSocialReason(),
                 getCnpj(),
                 getAddress(),
-                getPhone()
+                getPhone(),
+                getTradeName(),
+                getStateRegistration(),
+                getMunicipalRegistration()
         );
     }
 }

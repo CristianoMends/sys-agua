@@ -3,14 +3,13 @@ package com.api.sysagua.enumeration;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-@Getter
 @AllArgsConstructor
-public enum OrderStatus {
+@Getter
+public enum TransactionStatus {
 
+    PAID("Paga"),
     PENDING("Pendente"),
-    DELIVERED("Entregue"),
-    LATE("Atrasado"),
-    CANCELED("Cancelado");
+    CANCELED("Cancelada");
 
     private final String description;
 }

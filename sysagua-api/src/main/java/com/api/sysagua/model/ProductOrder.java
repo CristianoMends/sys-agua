@@ -1,5 +1,6 @@
 package com.api.sysagua.model;
 
+import com.api.sysagua.dto.order.ViewProductOrderDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -31,8 +32,27 @@ public class ProductOrder {
     private BigDecimal unitPrice;
     private BigDecimal totalPrice;
 
+
     @PostLoad
     private void calculateItemTotal() {
         this.totalPrice = unitPrice.multiply(BigDecimal.valueOf(quantity));
+    }
+
+    public ProductOrder(Order order, Product product, Integer quantity, BigDecimal unitPrice) {
+        setOrder(order);
+        setProduct(product);
+        setQuantity(quantity);
+        setUnitPrice(unitPrice);
+    }
+
+    public ViewProductOrderDto toView() {
+        return new ViewProductOrderDto(
+                getId(),
+                getOrder().getId(),
+                getQuantity(),
+                getUnitPrice(),
+                getTotalPrice(),
+                getProduct() != null? getProduct().toView():null
+        );
     }
 }

@@ -6,6 +6,7 @@ spring:
     driver-class-name: org.postgresql.Driver
 
   jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect  # Dialeto do PostgreSQL
     show-sql: true                                          # Exibe as consultas SQL no console
     generate-ddl: true                                      # Gera DDL automaticamente em testes
     hibernate:

@@ -93,4 +93,19 @@ public class SwaggerConfig {
                 .build();
     }
 
+    @Bean
+    public GroupedOpenApi orderApi() {
+        return GroupedOpenApi.builder()
+                .group("Pedidos")
+                .pathsToMatch("/orders/**")
+                .build();
+    }
+    @Bean
+    public GroupedOpenApi cashierApi() {
+        return GroupedOpenApi.builder()
+                .group("Caixa")
+                .pathsToMatch("/cashier/**")
+                .build();
+    }
+
 }

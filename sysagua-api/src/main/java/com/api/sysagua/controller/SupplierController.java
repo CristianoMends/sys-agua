@@ -34,9 +34,21 @@ public class SupplierController implements SupplierDoc {
             @RequestParam(value = "socialReason",required = false) String socialReason,
             @RequestParam(value = "cnpj", required = false) String cnpj,
             @RequestParam(value = "phone",required = false) String phone,
-            @RequestParam(value = "active", required = false) Boolean active
+            @RequestParam(value = "active", required = false) Boolean active,
+            @RequestParam(required = false) String tradeName,
+            @RequestParam(required = false) String stateRegistration,
+            @RequestParam(required = false) String municipalRegistration
     ){
-        return ResponseEntity.ok(this.service.list(id,socialReason,cnpj,phone, active));
+        return ResponseEntity.ok(this.service.list(
+                id,
+                socialReason,
+                cnpj,
+                phone,
+                active,
+                tradeName,
+                stateRegistration,
+                municipalRegistration
+        ));
     }
 
     @DeleteMapping("{id}")

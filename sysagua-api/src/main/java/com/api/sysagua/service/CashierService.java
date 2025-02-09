@@ -1,20 +1,18 @@
 package com.api.sysagua.service;
 
-
-import com.api.sysagua.dto.transaction.ViewTransactionDto;
+import com.api.sysagua.dto.cashier.ViewCashierDto;
 import com.api.sysagua.enumeration.TransactionStatus;
 import com.api.sysagua.enumeration.TransactionType;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
-public interface TransactionService {
+public interface CashierService {
 
-    List<ViewTransactionDto> list(
-            Long id,
-            TransactionStatus status,
+    void addBalance(BigDecimal balance);
+    ViewCashierDto list(
+            Long transactionId,
+            TransactionStatus transactionStatus,
             BigDecimal amountStart,
             BigDecimal amountEnd,
             TransactionType type,
