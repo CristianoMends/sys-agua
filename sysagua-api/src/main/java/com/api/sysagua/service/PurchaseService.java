@@ -3,6 +3,8 @@ package com.api.sysagua.service;
 import com.api.sysagua.dto.purchase.CreatePurchaseDto;
 import com.api.sysagua.dto.purchase.UpdatePurchaseDto;
 import com.api.sysagua.dto.purchase.ViewPurchaseDto;
+import com.api.sysagua.enumeration.PaymentMethod;
+import com.api.sysagua.enumeration.PaymentStatus;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.math.BigDecimal;
@@ -15,20 +17,25 @@ public interface PurchaseService {
 
     List<ViewPurchaseDto> list(
             Long id,
-            BigDecimal totalValueStart,
-            BigDecimal totalValueEnd,
+            BigDecimal totalAmountStart,
+            BigDecimal totalAmountEnd,
+            BigDecimal paidAmountStart,
+            BigDecimal paidAmountEnd,
             Boolean active,
-            LocalDateTime updatedAtStart,
-            LocalDateTime updatedAtEnd,
+            LocalDateTime entryAtStart,
+            LocalDateTime entryAtEnd,
             LocalDateTime createdAtStart,
             LocalDateTime createdAtEnd,
-            Long supplierId,
-            Long productId,
             LocalDateTime finishedAtStart,
             LocalDateTime finishedAtEnd,
             LocalDateTime canceledAtStart,
             LocalDateTime canceledAtEnd,
-            String description
+            String description,
+            Long supplierId,
+            Long productId,
+            String nfe,
+            PaymentMethod paymentMethod,
+            PaymentStatus paymentStatus
     );
 
     void update(Long id, UpdatePurchaseDto dto);

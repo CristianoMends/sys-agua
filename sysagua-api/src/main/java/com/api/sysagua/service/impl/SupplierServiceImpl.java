@@ -28,13 +28,25 @@ public class SupplierServiceImpl implements SupplierService {
     }
 
     @Override
-    public List<Supplier> list(Long id, String socialReason, String cnpj, String phone, Boolean active) {
+    public List<Supplier> list(
+            Long id,
+            String socialReason,
+            String cnpj,
+            String phone,
+            Boolean active,
+            String tradeName,
+            String stateRegistration,
+            String municipalRegistration
+    ) {
 
         if (cnpj == null) cnpj = "";
         if (phone == null) phone = "";
         if (socialReason == null) socialReason = "";
+        if (tradeName == null) tradeName = "";
+        if (stateRegistration == null) stateRegistration = "";
+        if (municipalRegistration == null) municipalRegistration = "";
 
-        return this.supplierRepository.findByFilters(id,socialReason,cnpj,phone,active);
+        return this.supplierRepository.findByFilters(id,socialReason,cnpj,phone,active, tradeName, stateRegistration, municipalRegistration);
     }
 
     @Override

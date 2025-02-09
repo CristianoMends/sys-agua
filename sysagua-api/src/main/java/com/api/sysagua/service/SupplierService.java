@@ -11,7 +11,16 @@ public interface SupplierService {
 
     void create(CreateSupplierDto dto);
 
-    List<Supplier> list(Long id, String socialReason, String cnpj, String phone, Boolean active);
+    List<Supplier> list(
+            Long id,
+            String socialReason,
+            String cnpj,
+            String phone,
+            Boolean active,
+            String tradeName,
+            String stateRegistration,
+            String municipalRegistration
+    );
 
     void delete(Long id);
 

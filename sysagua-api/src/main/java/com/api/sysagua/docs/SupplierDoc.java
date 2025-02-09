@@ -51,7 +51,14 @@ public interface SupplierDoc {
             @Parameter(description = "Telefone do fornecedor")
             String phone,
             @Parameter(description = "Status ativo do fornecedor")
-            Boolean active);
+            Boolean active,
+            @Parameter(description = "Nome fantasia")
+            String tradeName,
+            @Parameter(description = "Inscrição estadual")
+            String stateRegistration,
+            @Parameter(description = "Inscrição municipal")
+            String municipalRegistration
+    );
 
     @Operation(summary = "Deleta um fornecedor",
             description = "Remove um fornecedor do sistema com base no ID informado.")
