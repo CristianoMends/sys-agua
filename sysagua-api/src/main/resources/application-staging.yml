@@ -8,6 +8,7 @@ spring:
     driver-class-name: org.postgresql.Driver
 
   jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect  # Dialeto do PostgreSQL
     show-sql: false                                          # Em produção, é recomendado desabilitar a exibição de SQL
     generate-ddl: false                                      # Não gerar DDL automaticamente em produção
     hibernate:
