@@ -34,20 +34,12 @@ public class Transaction {
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    private LocalDateTime finishedAt;
-
-    private LocalDateTime canceledAt;
-
     @Column(nullable = false)
     private BigDecimal amount;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private TransactionType type;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private PaymentMethod paymentMethod;
 
     @Column(nullable = false)
     private String description;
@@ -60,11 +52,10 @@ public class Transaction {
     @JoinColumn(name = "purchase_id")
     private Purchase purchase;
 
-    public Transaction(TransactionStatus status, BigDecimal amount, TransactionType type, PaymentMethod paymentMethod, String description, Order order, Purchase purchase) {
+    public Transaction(TransactionStatus status, BigDecimal amount, TransactionType type, String description, Order order, Purchase purchase) {
         this.status = status;
         this.amount = amount;
         this.type = type;
-        this.paymentMethod = paymentMethod;
         this.description = description;
         this.order = order;
         this.purchase = purchase;
@@ -80,14 +71,11 @@ public class Transaction {
                 getId(),
                 getStatus(),
                 getCreatedAt(),
-                getFinishedAt(),
-                getCanceledAt(),
                 getAmount(),
                 getType(),
-                getPaymentMethod(),
                 getDescription(),
-                getOrder() != null ? getOrder().getId() : null,
-                getPurchase() != null ? getPurchase().getId() : null
+                getOrder() != null ? getOrder().toView() : null,
+                getPurchase() != null ? getPurchase().toView() : null
         );
     }
 }
