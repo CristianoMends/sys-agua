@@ -1,6 +1,8 @@
 package com.api.sysagua.dto.purchase;
 
+import com.api.sysagua.enumeration.DeliveryStatus;
 import com.api.sysagua.enumeration.PaymentMethod;
+import com.api.sysagua.enumeration.PaymentStatus;
 import com.api.sysagua.model.Supplier;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -22,14 +24,17 @@ public class ViewPurchaseDto {
     @Schema(description = "Identificador único da compra", example = "1")
     private Long id;
 
-    @Schema(description = "Valor total da compra", example = "1500.00")
-    private BigDecimal totalValue;
+    @Schema(description = "Quantia já paga do valor da compra", example = "249.99")
+    private BigDecimal paidAmount;
+
+    @Schema(description = "Quantia total da compra", example = "549.99")
+    private BigDecimal totalAmount;
 
     @Schema(description = "Data e hora da criação da compra", example = "2025-01-14T10:00:00Z")
     private LocalDateTime createdAt;
 
-    @Schema(description = "Data e hora da criação da compra", example = "2025-01-14T10:00:00Z")
-    private LocalDateTime updatedAt;
+    @Schema(description = "Data e hora da entrada da compra", example = "2025-01-14T10:00:00Z")
+    private LocalDateTime entryAt;
 
     @Schema(description = "Data e hora da cancelamento da compra", example = "2025-01-14T10:00:00Z")
     private LocalDateTime canceledAt;
@@ -39,6 +44,12 @@ public class ViewPurchaseDto {
 
     @Schema(description = "metodo de pagamento", example = "PIX")
     private PaymentMethod paymentMethod;
+
+    @Schema(description = "Status do pagamento da compra", example = "PAID")
+    private PaymentStatus paymentStatus;
+
+    @Schema(description = "Número nota fiscal eletrônica", example = "123456789")
+    private String nfe;
 
     @Schema(description = "Descrição da compra", example = "Sem descrição")
     private String description;
