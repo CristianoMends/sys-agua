@@ -1,7 +1,6 @@
 package com.api.sysagua.service.impl;
 
 import com.api.sysagua.dto.transaction.ViewTransactionDto;
-import com.api.sysagua.enumeration.PaymentMethod;
 import com.api.sysagua.enumeration.TransactionStatus;
 import com.api.sysagua.enumeration.TransactionType;
 import com.api.sysagua.model.*;
@@ -24,21 +23,18 @@ public class TransactionServiceImpl implements TransactionService {
 
 
     @Override
-    public List<ViewTransactionDto> list(Long id, TransactionStatus status, BigDecimal amountStart, BigDecimal amountEnd, TransactionType type, PaymentMethod paymentMethod, String description, LocalDateTime createdAtStart, LocalDateTime createdAtEnd, LocalDateTime finishedAtStart, LocalDateTime finishedAtEnd, LocalDateTime canceledAtStart, LocalDateTime canceledAtEnd) {
+    public List<ViewTransactionDto> list(Long id, TransactionStatus status, BigDecimal amountStart, BigDecimal amountEnd, TransactionType type, String description, LocalDateTime createdAtStart, LocalDateTime createdAtEnd, Long orderId, Long purchaseId) {
         return this.transactionRepository.list(
                 id,
                 status,
                 amountStart,
                 amountEnd,
                 type,
-                paymentMethod,
                 description,
                 createdAtStart,
                 createdAtEnd,
-                finishedAtStart,
-                finishedAtEnd,
-                canceledAtStart,
-                canceledAtEnd
+                orderId,
+                purchaseId
         ).stream().map(Transaction::toView).toList();
     }
 
