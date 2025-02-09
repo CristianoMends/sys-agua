@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
     @Query("""
@@ -35,6 +36,24 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
             @Param("orderId") Long orderId,
             @Param("purchaseId") Long purchaseId
     );
+
+    @Query("""
+            select sum(t.amount) 
+            from Transaction t 
+            where t.type = :type 
+            and t.order.id = :orderId
+            """)
+    Optional<BigDecimal> countReceivedAmountForOrder(@Param("type") TransactionType type,
+                                           @Param("orderId") Long orderId);
+
+    @Query("""
+            select sum(t.amount) 
+            from Transaction t 
+            where t.type = :type 
+            and t.purchase.id = :purchaseId
+            """)
+    Optional<BigDecimal> countReceivedAmountForPurchase(@Param("type") TransactionType type,
+                                                        @Param("purchaseId") Long purchaseId);
 
     @Query("select t from Transaction t where t.status = ?1 order by t.createdAt")
     List<Transaction> listByStatus(TransactionStatus status);
