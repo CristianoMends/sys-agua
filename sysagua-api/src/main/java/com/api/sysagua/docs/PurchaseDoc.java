@@ -4,6 +4,8 @@ package com.api.sysagua.docs;
 import com.api.sysagua.dto.purchase.CreatePurchaseDto;
 import com.api.sysagua.dto.purchase.UpdatePurchaseDto;
 import com.api.sysagua.dto.purchase.ViewPurchaseDto;
+import com.api.sysagua.enumeration.PaymentMethod;
+import com.api.sysagua.enumeration.PaymentStatus;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -47,21 +49,26 @@ public interface PurchaseDoc {
     @GetMapping
     @CrossOrigin
     ResponseEntity<List<ViewPurchaseDto>> list(
-            @Parameter(description = "Identificador da compra") @RequestParam(value = "id", required = false) Long id,
-            @Parameter(description = "Valor total mínimo") @RequestParam(value = "totalValueStart", required = false) BigDecimal totalValueStart,
-            @Parameter(description = "Valor total máximo") @RequestParam(value = "totalValueEnd", required = false) BigDecimal totalValueEnd,
-            @Parameter(description = "Status ativo da compra") @RequestParam(value = "active", required = false) Boolean active,
-            @Parameter(description = "Data de atualização inicial") @RequestParam(value = "updatedAtStart", required = false) LocalDateTime updatedAtStart,
-            @Parameter(description = "Data de atualização final") @RequestParam(value = "updatedAtEnd", required = false) LocalDateTime updatedAtEnd,
-            @Parameter(description = "Data de criação inicial") @RequestParam(value = "createdAtStart", required = false) LocalDateTime createdAtStart,
-            @Parameter(description = "Data de criação final") @RequestParam(value = "createdAtEnd", required = false) LocalDateTime createdAtEnd,
-            @Parameter(description = "ID do fornecedor") @RequestParam(value = "supplierId", required = false) Long supplierId,
-            @Parameter(description = "ID do produto") @RequestParam(value = "productId", required = false) Long productId,
-            @Parameter(description = "Data de finalização inicial") LocalDateTime finishedAtStart,
-            @Parameter(description = "Data de finalização final") LocalDateTime finishedAtEnd,
-            @Parameter(description = "Data de cancelamento inicial") LocalDateTime canceledAtStart,
-            @Parameter(description = "Data de cancelamento final") LocalDateTime canceledAtEnd,
-            @Parameter(description = "Descrição") String description
+            Long id,
+            BigDecimal totalAmountStart,
+            BigDecimal totalAmountEnd,
+            BigDecimal paidAmountStart,
+            BigDecimal paidAmountEnd,
+            Boolean active,
+            LocalDateTime entryAtStart,
+            LocalDateTime entryAtEnd,
+            LocalDateTime createdAtStart,
+            LocalDateTime createdAtEnd,
+            LocalDateTime finishedAtStart,
+            LocalDateTime finishedAtEnd,
+            LocalDateTime canceledAtStart,
+            LocalDateTime canceledAtEnd,
+            String description,
+            Long supplierId,
+            Long productId,
+            String nfe,
+            PaymentMethod paymentMethod,
+            PaymentStatus paymentStatus
     );
 
     @Operation(summary = "Atualiza uma compra",
