@@ -5,6 +5,7 @@ import com.api.sysagua.dto.order.UpdateOrderDto;
 import com.api.sysagua.dto.order.ViewOrderDto;
 import com.api.sysagua.enumeration.DeliveryStatus;
 import com.api.sysagua.enumeration.PaymentMethod;
+import com.api.sysagua.enumeration.PaymentStatus;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -56,7 +57,8 @@ public interface OrderDoc {
             LocalDateTime createdAtStart,
             LocalDateTime createdAtEnd,
             LocalDateTime finishedAtStart,
-            LocalDateTime finishedAtEnd
+            LocalDateTime finishedAtEnd,
+            PaymentStatus paymentStatus
     );
 
     @Operation(

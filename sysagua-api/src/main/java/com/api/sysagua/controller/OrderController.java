@@ -6,6 +6,7 @@ import com.api.sysagua.dto.order.UpdateOrderDto;
 import com.api.sysagua.dto.order.ViewOrderDto;
 import com.api.sysagua.enumeration.DeliveryStatus;
 import com.api.sysagua.enumeration.PaymentMethod;
+import com.api.sysagua.enumeration.PaymentStatus;
 import com.api.sysagua.service.OrderService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +42,7 @@ public ResponseEntity<List<ViewOrderDto>> list(
         @RequestParam(required = false) Long customerId,
         @RequestParam(required = false) Long deliveryPersonId,
         @RequestParam(required = false) Long productOrderId,
-        @RequestParam(required = false) DeliveryStatus status,
+        @RequestParam(required = false) DeliveryStatus deliveryStatus,
         @RequestParam(required = false) BigDecimal receivedAmountStart,
         @RequestParam(required = false) BigDecimal receivedAmountEnd,
         @RequestParam(required = false) BigDecimal totalAmountStart,
@@ -50,14 +51,15 @@ public ResponseEntity<List<ViewOrderDto>> list(
         @RequestParam(required = false) LocalDateTime createdAtStart,
         @RequestParam(required = false) LocalDateTime createdAtEnd,
         @RequestParam(required = false) LocalDateTime finishedAtStart,
-        @RequestParam(required = false) LocalDateTime finishedAtEnd
+        @RequestParam(required = false) LocalDateTime finishedAtEnd,
+        @RequestParam(required = false) PaymentStatus paymentStatus
 ){
     List<ViewOrderDto> orders = service.list(
             id,
             customerId,
             deliveryPersonId,
             productOrderId,
-            status,
+            deliveryStatus,
             receivedAmountStart,
             receivedAmountEnd,
             totalAmountStart,
@@ -66,7 +68,8 @@ public ResponseEntity<List<ViewOrderDto>> list(
             createdAtStart,
             createdAtEnd,
             finishedAtStart,
-            finishedAtEnd
+            finishedAtEnd,
+            paymentStatus
     );
     return ResponseEntity.ok(orders);
 }
