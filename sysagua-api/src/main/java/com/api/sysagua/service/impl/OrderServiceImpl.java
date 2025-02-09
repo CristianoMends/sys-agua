@@ -213,8 +213,8 @@ public class OrderServiceImpl implements OrderService {
                 TransactionStatus.PAID,
                 order.getReceivedAmount(),
                 TransactionType.INCOME,
-                "Pedido pago",
-                order,
+                String.format("Pagamento confirmado! O pedido foi pago com sucesso. Valor total: R$ %.2f, valor recebido: R$ %.2f. A transação foi concluída e o pedido está finalizado.",
+                        order.getTotalAmount(), order.getReceivedAmount()),                order,
                 null
         );
         this.transactionRepository.save(t);
@@ -224,8 +224,8 @@ public class OrderServiceImpl implements OrderService {
         var t = new Transaction(
                 TransactionStatus.CANCELED,
                 order.getReceivedAmount(),
-                TransactionType.INCOME,
-                "Pedido cancelado",
+                TransactionType.EXPENSE,
+                "Pedido cancelado. O valor foi registrado como despesa.",
                 order,
                 null
         );
