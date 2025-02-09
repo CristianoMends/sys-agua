@@ -53,19 +53,12 @@ public class Order {
     private String description;
 
 
-    public Order(Customer customer, DeliveryPerson deliveryPerson, List<ProductOrder> productOrders, DeliveryStatus status) {
-        setCustomer(customer);
-        setDeliveryPerson(deliveryPerson);
-        setProductOrders(productOrders);
-        setDeliveryStatus(status);
-    }
-
     @PrePersist
     private void prePersist(){
         calculateTotalAmount();
         setCreatedAt(LocalDateTime.now());
     }
-    private void calculateTotalAmount(){
+    public void calculateTotalAmount(){
         if (getTotalAmount() != null) return;
 
         this.totalAmount = productOrders.stream()
