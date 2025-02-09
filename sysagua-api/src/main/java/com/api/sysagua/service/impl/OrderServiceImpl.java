@@ -10,12 +10,11 @@ import com.api.sysagua.model.*;
 import com.api.sysagua.repository.*;
 import com.api.sysagua.service.CashierService;
 import com.api.sysagua.service.OrderService;
-import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import javax.swing.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -40,6 +39,7 @@ public class OrderServiceImpl implements OrderService {
     private TransactionRepository transactionRepository;
 
     @Override
+    @Transactional
     public void create(CreateOrderDto dto) {
         var order = new Order();
         order.setCustomer(getCustomerById(dto.getCustomerId()));
@@ -50,13 +50,35 @@ public class OrderServiceImpl implements OrderService {
         order.setTotalAmount(dto.getTotalAmount());
         order.setPaymentMethod(dto.getPaymentMethod());
         order.setDescription(dto.getDescription());
+
+        switch (checkPaymentStatus(order)) {
+            case PAID -> {
+                order.setPaymentStatus(PaymentStatus.PAID);
+                order.setFinishedAt(LocalDateTime.now());
+            }
+            case PENDING -> {
+                order.setPaymentStatus(PaymentStatus.PENDING);
+            }
+        }
         var saved = this.orderRepository.save(order);
 
-        createPendingTransaction(saved);
+        switch (saved.getPaymentStatus()) {
+            case PAID -> createPaidTransaction(saved);
+            case PENDING -> createPendingTransaction(saved);
+        }
+    }
+
+    private PaymentStatus checkPaymentStatus(Order order) {
+        if (order.getTotalAmount() == null) order.calculateTotalAmount();
+
+        if (order.getReceivedAmount().compareTo(order.getTotalAmount()) >= 0) {
+            return PaymentStatus.PAID;
+        }
+        return PaymentStatus.PENDING;
     }
 
     @Override
-    public List<ViewOrderDto> list(Long id, Long customerId, Long deliveryPersonId, Long productOrderId, DeliveryStatus status, BigDecimal receivedAmountStart, BigDecimal receivedAmountEnd, BigDecimal totalAmountStart, BigDecimal totalAmountEnd, PaymentMethod paymentMethod, LocalDateTime createdAtStart, LocalDateTime createdAtEnd, LocalDateTime finishedAtStart, LocalDateTime finishedAtEnd) {
+    public List<ViewOrderDto> list(Long id, Long customerId, Long deliveryPersonId, Long productOrderId, DeliveryStatus status, BigDecimal receivedAmountStart, BigDecimal receivedAmountEnd, BigDecimal totalAmountStart, BigDecimal totalAmountEnd, PaymentMethod paymentMethod, LocalDateTime createdAtStart, LocalDateTime createdAtEnd, LocalDateTime finishedAtStart, LocalDateTime finishedAtEnd,PaymentStatus paymentStatus) {
         return this.orderRepository.list(
                 id,
                 customerId,
@@ -71,7 +93,8 @@ public class OrderServiceImpl implements OrderService {
                 createdAtStart,
                 createdAtEnd,
                 finishedAtStart,
-                finishedAtEnd
+                finishedAtEnd,
+                paymentStatus
         ).stream().map(Order::toView).toList();
     }
 
@@ -152,7 +175,7 @@ public class OrderServiceImpl implements OrderService {
                     order,
                     product,
                     createProductOrderDto.getQuantity(),
-                    createProductOrderDto.getUnitPrice()
+                    createProductOrderDto.getUnitPrice() ==null?product.getPrice():createProductOrderDto.getUnitPrice()
             ));
         });
 
@@ -176,10 +199,9 @@ public class OrderServiceImpl implements OrderService {
     private void createPendingTransaction(Order order) {
         var t = new Transaction(
                 TransactionStatus.PENDING,
-                order.getTotalAmount(),
+                order.getReceivedAmount(),
                 TransactionType.INCOME,
-                order.getPaymentMethod(),
-                "Pedido aguardando pagamento",
+                "Pedido aguardando pagamento - Restante a ser pago: R$"+order.getTotalAmount().subtract(order.getReceivedAmount()),
                 order,
                 null
         );
@@ -189,23 +211,20 @@ public class OrderServiceImpl implements OrderService {
     private void createPaidTransaction(Order order) {
         var t = new Transaction(
                 TransactionStatus.PAID,
-                order.getTotalAmount(),
+                order.getReceivedAmount(),
                 TransactionType.INCOME,
-                order.getPaymentMethod(),
                 "Pedido pago",
                 order,
                 null
         );
-
         this.transactionRepository.save(t);
     }
 
     private void createCanceledTransaction(Order order) {
         var t = new Transaction(
                 TransactionStatus.CANCELED,
-                order.getTotalAmount(),
+                order.getReceivedAmount(),
                 TransactionType.INCOME,
-                order.getPaymentMethod(),
                 "Pedido cancelado",
                 order,
                 null
