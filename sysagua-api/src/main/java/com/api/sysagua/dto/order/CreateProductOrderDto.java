@@ -21,7 +21,7 @@ public class CreateProductOrderDto {
     @Schema(description = "Quantidade do produto solicitada", example = "3")
     private Integer quantity;
 
-    @Schema(description = "Preço unitário de venda do produto", example = "19.99")
+    @Schema(description = "Preço unitário de venda do produto, caso não informado, é adicionado valor unitario do produto", example = "3.50")
     private BigDecimal unitPrice;
 
 }
