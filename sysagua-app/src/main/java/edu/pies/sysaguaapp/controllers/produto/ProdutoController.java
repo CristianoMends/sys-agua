@@ -3,10 +3,10 @@ package edu.pies.sysaguaapp.controllers.produto;
 import edu.pies.sysaguaapp.models.ProductCategory;
 import edu.pies.sysaguaapp.models.ProductLine;
 import edu.pies.sysaguaapp.models.Produto;
-import edu.pies.sysaguaapp.services.ProdutoService;
+import edu.pies.sysaguaapp.services.produto.ProdutoService;
 import edu.pies.sysaguaapp.services.TokenManager;
-import edu.pies.sysaguaapp.services.ProductCategoryService;
-import edu.pies.sysaguaapp.services.ProductLineService;
+import edu.pies.sysaguaapp.services.produto.ProductCategoryService;
+import edu.pies.sysaguaapp.services.produto.ProductLineService;
 import javafx.animation.PauseTransition;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -126,9 +126,7 @@ public class ProdutoController {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/Produtos/AddProdutos.fxml"));
                 Parent form = loader.load();
 
-                // Obter o controlador da nova tela
                 AddProdutoController controller = loader.getController();
-                // Passar o ID do fornecedor para o controlador
                 controller.setProdutoEditando(String.valueOf(produtoSelecionado.getId()));
 
                 rootPane.getChildren().clear();
