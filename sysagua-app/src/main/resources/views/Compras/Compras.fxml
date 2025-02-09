@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import javafx.scene.text.Font?>
+<?import javafx.geometry.Insets?>
+<StackPane fx:id="rootPane" prefHeight="600.0" prefWidth="900.0" style="-fx-background-color: white;" stylesheets="@../../styles/addCompra.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.pies.sysaguaapp.controllers.compras.CompraController">
+    <children>
+        <VBox fx:id="listCompraView" prefHeight="200.0" prefWidth="100.0">
+            <children>
+                <StackPane prefHeight="90.0">
+                    <children>
+                        <Label fx:id="successMessage" alignment="CENTER" minHeight="50.0" style="-fx-text-fill: white; -fx-background-color: green; -fx-font-size: 18px; -fx-border-color: transparent; -fx-border-width: 1; -fx-border-radius: 5;" styleClass="success-Message" text="Cadastro realizado com sucesso!" visible="false" StackPane.alignment="CENTER_RIGHT">
+                            <font>
+                                <Font size="18.0" />
+                            </font>
+                        </Label>
+                        <HBox alignment="CENTER_LEFT" prefHeight="90.0" style="-fx-padding: 10;">
+                            <children>
+                                <Label text="Todas as compras">
+                                    <font>
+                                        <Font size="16.0" />
+                                    </font></Label>
+                                <Region HBox.hgrow="ALWAYS" />
+                                <Button mnemonicParsing="false" onAction="#handleAddCompra" styleClass="menu-button" text="Adicionar">
+                                    <padding>
+                                        <Insets left="10.0" />
+                                    </padding></Button>
+                            </children>
+                        </HBox>
+                    </children>
+                    <padding>
+                        <Insets right="20.0" />
+                    </padding>
+                </StackPane>
+                <HBox alignment="CENTER_LEFT" spacing="10.0" style="-fx-border-color: #C8CBD9; -fx-border-width: 0 0 1px 0;">
+                    <children>
+                        <Label text="filtros aqui">
+                            <font>
+                                <Font size="16.0" />
+                            </font>
+                            <padding>
+                                <Insets left="10.0" />
+                            </padding>
+                        </Label>
+                    </children>
+                </HBox>
+                <StackPane prefWidth="917.0" VBox.vgrow="SOMETIMES">
+                    <children>
+                        <TreeTableView fx:id="tabelaCompra">
+                            <columnResizePolicy>
+                                <TreeTableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                            </columnResizePolicy>
+                        </TreeTableView>
+                    </children>
+                </StackPane>
+            </children>
+        </VBox>
+    </children>
+</StackPane>
+
