@@ -1,6 +1,5 @@
 package com.api.sysagua.repository;
 
-import com.api.sysagua.enumeration.PaymentMethod;
 import com.api.sysagua.enumeration.TransactionStatus;
 import com.api.sysagua.enumeration.TransactionType;
 import com.api.sysagua.model.Transaction;
@@ -19,11 +18,10 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
             and (:status is null or t.status = :status) 
             and ((:amountStart is null or :amountEnd is null) or t.amount between :amountStart and :amountEnd) 
             and (:type is null or t.type = :type) 
-            and (:paymentMethod is null or t.paymentMethod = :paymentMethod) 
             and (:description is null or t.description like concat('%', :description, '%')) 
+            and (:orderId is null or t.order.id = :orderId)
+            and (:purchaseId is null or t.purchase.id = :purchaseId)
             and ((CAST(:createdAtStart as TIMESTAMP) is null or CAST(:createdAtEnd as TIMESTAMP) is null) or t.createdAt between :createdAtStart and :createdAtEnd) 
-            and ((CAST(:finishedAtStart as TIMESTAMP) is null or CAST(:finishedAtEnd as TIMESTAMP) is null) or t.finishedAt between :finishedAtStart and :finishedAtEnd) 
-            and ((CAST(:canceledAtStart as TIMESTAMP) is null or CAST(:canceledAtEnd as TIMESTAMP) is null) or t.canceledAt between :canceledAtStart and :canceledAtEnd)
             order by t.createdAt""")
     List<Transaction> list(
             @Param("id") Long id,
@@ -31,14 +29,11 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
             @Param("amountStart") BigDecimal amountStart,
             @Param("amountEnd") BigDecimal amountEnd,
             @Param("type") TransactionType type,
-            @Param("paymentMethod") PaymentMethod paymentMethod,
             @Param("description") String description,
             @Param("createdAtStart") LocalDateTime createdAtStart,
             @Param("createdAtEnd") LocalDateTime createdAtEnd,
-            @Param("finishedAtStart") LocalDateTime finishedAtStart,
-            @Param("finishedAtEnd") LocalDateTime finishedAtEnd,
-            @Param("canceledAtStart") LocalDateTime canceledAtStart,
-            @Param("canceledAtEnd") LocalDateTime canceledAtEnd
+            @Param("orderId") Long orderId,
+            @Param("purchaseId") Long purchaseId
     );
 
     @Query("select t from Transaction t where t.status = ?1 order by t.createdAt")

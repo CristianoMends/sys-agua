@@ -37,14 +37,11 @@ public interface TransactionDoc {
             BigDecimal amountStart,
             BigDecimal amountEnd,
             TransactionType type,
-            PaymentMethod paymentMethod,
             String description,
             LocalDateTime createdAtStart,
             LocalDateTime createdAtEnd,
-            LocalDateTime finishedAtStart,
-            LocalDateTime finishedAtEnd,
-            LocalDateTime canceledAtStart,
-            LocalDateTime canceledAtEnd
+            Long orderId,
+            Long purchaseId
     );
 }
 

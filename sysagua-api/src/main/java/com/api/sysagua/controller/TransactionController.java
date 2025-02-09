@@ -2,7 +2,6 @@ package com.api.sysagua.controller;
 
 import com.api.sysagua.docs.TransactionDoc;
 import com.api.sysagua.dto.transaction.ViewTransactionDto;
-import com.api.sysagua.enumeration.PaymentMethod;
 import com.api.sysagua.enumeration.TransactionStatus;
 import com.api.sysagua.enumeration.TransactionType;
 import com.api.sysagua.service.TransactionService;
@@ -29,14 +28,11 @@ public class TransactionController implements TransactionDoc {
             @RequestParam(required = false) BigDecimal amountStart,
             @RequestParam(required = false) BigDecimal amountEnd,
             @RequestParam(required = false) TransactionType type,
-            @RequestParam(required = false) PaymentMethod paymentMethod,
             @RequestParam(required = false) String description,
             @RequestParam(required = false) LocalDateTime createdAtStart,
             @RequestParam(required = false) LocalDateTime createdAtEnd,
-            @RequestParam(required = false) LocalDateTime finishedAtStart,
-            @RequestParam(required = false) LocalDateTime finishedAtEnd,
-            @RequestParam(required = false) LocalDateTime canceledAtStart,
-            @RequestParam(required = false) LocalDateTime canceledAtEnd
+            @RequestParam(required = false) Long orderId,
+            @RequestParam(required = false) Long purchaseId
     ) {
 
         List<ViewTransactionDto> transactions = service.list(
@@ -45,14 +41,11 @@ public class TransactionController implements TransactionDoc {
                 amountStart,
                 amountEnd,
                 type,
-                paymentMethod,
                 description,
                 createdAtStart,
                 createdAtEnd,
-                finishedAtStart,
-                finishedAtEnd,
-                canceledAtStart,
-                canceledAtEnd
+                orderId,
+                purchaseId
         );
         return ResponseEntity.ok(transactions);
     }

@@ -2,7 +2,6 @@ package com.api.sysagua.service;
 
 
 import com.api.sysagua.dto.transaction.ViewTransactionDto;
-import com.api.sysagua.enumeration.PaymentMethod;
 import com.api.sysagua.enumeration.TransactionStatus;
 import com.api.sysagua.enumeration.TransactionType;
 
@@ -19,14 +18,11 @@ public interface TransactionService {
             BigDecimal amountStart,
             BigDecimal amountEnd,
             TransactionType type,
-            PaymentMethod paymentMethod,
             String description,
             LocalDateTime createdAtStart,
             LocalDateTime createdAtEnd,
-            LocalDateTime finishedAtStart,
-            LocalDateTime finishedAtEnd,
-            LocalDateTime canceledAtStart,
-            LocalDateTime canceledAtEnd
+            Long orderId,
+            Long purchaseId
     );
 
 }
