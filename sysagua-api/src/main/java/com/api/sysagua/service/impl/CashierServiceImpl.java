@@ -1,14 +1,12 @@
 package com.api.sysagua.service.impl;
 
 import com.api.sysagua.dto.cashier.ViewCashierDto;
-import com.api.sysagua.enumeration.PaymentMethod;
 import com.api.sysagua.enumeration.TransactionStatus;
 import com.api.sysagua.enumeration.TransactionType;
 import com.api.sysagua.model.Cashier;
 import com.api.sysagua.model.Transaction;
 import com.api.sysagua.repository.TransactionRepository;
 import com.api.sysagua.service.CashierService;
-import com.api.sysagua.service.UserService;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,8 +17,6 @@ import java.math.BigDecimal;
 @Service
 public class CashierServiceImpl implements CashierService {
 
-    @Autowired
-    private UserService userService;
 
     @Autowired
     private TransactionRepository transactionRepository;
@@ -51,7 +47,6 @@ public class CashierServiceImpl implements CashierService {
                 TransactionStatus.PAID,
                 balance,
                 TransactionType.INCOME,
-                PaymentMethod.UNDEFINED,
                 "Incremento de saldo por usuário",
                 null,
                 null
