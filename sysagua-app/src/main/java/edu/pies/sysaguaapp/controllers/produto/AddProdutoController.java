@@ -3,23 +3,24 @@ package edu.pies.sysaguaapp.controllers.produto;
 import edu.pies.sysaguaapp.models.ProductCategory;
 import edu.pies.sysaguaapp.models.ProductLine;
 import edu.pies.sysaguaapp.models.Produto;
-import edu.pies.sysaguaapp.services.ProductCategoryService;
-import edu.pies.sysaguaapp.services.ProductLineService;
-import edu.pies.sysaguaapp.services.ProdutoService;
+import edu.pies.sysaguaapp.services.produto.ProductCategoryService;
+import edu.pies.sysaguaapp.services.produto.ProductLineService;
+import edu.pies.sysaguaapp.services.produto.ProdutoService;
 import edu.pies.sysaguaapp.services.TokenManager;
-import javafx.animation.PauseTransition;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Cursor;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
-import javafx.util.Duration;
+import javafx.stage.Stage;
 import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class AddProdutoController {
     private final ProdutoService produtoService;
@@ -45,10 +46,7 @@ public class AddProdutoController {
     private Label nomeErrorLabel, categoriaErrorLabel, custoErrorLabel, precoUnitarioErrorLabel, marcaErrorLabel, linhaErrorLabel, unidadeErrorLabel;
 
     @FXML
-    private Button btnSalvar;
-
-    @FXML
-    private Button btnCancelar;
+    private Button btnSalvar, btnCancelar;
 
     @FXML
     private ComboBox<String> linhaComboBox;
@@ -60,6 +58,10 @@ public class AddProdutoController {
     private List<ProductCategory> categorias;
     private List<ProductLine> linhas;
     Produto produtoEditando = null;
+    @Setter
+    private boolean fecharAoSair = false;
+    @Setter
+    private Consumer<Void> onProdutoSalvo;
 
 
     public AddProdutoController() {
@@ -73,6 +75,7 @@ public class AddProdutoController {
         carregarCategorias();
         carregarLinhas();
         validarCampos();
+
     }
 
 
@@ -119,6 +122,9 @@ public class AddProdutoController {
                     produtoService.editarProduto(novoProduto, token);
                 } else {
                     produtoService.criarProduto(novoProduto, token);
+                    if (onProdutoSalvo != null) {
+                        onProdutoSalvo.accept(null);
+                    }
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -131,7 +137,12 @@ public class AddProdutoController {
             }
 
             clearFieldForm();
-            carregarTela("/views/Produtos/Produtos.fxml");
+            if (fecharAoSair) {
+                Stage stage = (Stage) btnSalvar.getScene().getWindow();
+                stage.close();
+            } else {
+                carregarTela("/views/Produtos/Produtos.fxml");
+            }
         }
     }
 
@@ -225,7 +236,12 @@ public class AddProdutoController {
     private void handleCancelar() {
         clearFieldForm();
         this.produtoEditando = null;
-        carregarTela("/views/Produtos/Produtos.fxml");
+        if (fecharAoSair) {
+            Stage stage = (Stage) btnCancelar.getScene().getWindow();
+            stage.close();
+        } else {
+            carregarTela("/views/Produtos/Produtos.fxml");
+        }
     }
 
     /*------------------- produtos --------------*/
