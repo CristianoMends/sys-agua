@@ -1,6 +1,6 @@
 package com.api.sysagua;
 
-import com.api.sysagua.enumeration.OrderStatus;
+import com.api.sysagua.enumeration.DeliveryStatus;
 import com.api.sysagua.enumeration.PaymentMethod;
 import com.api.sysagua.model.Order;
 import com.api.sysagua.repository.OrderRepository;
@@ -34,7 +34,7 @@ class OrderServiceTest {
     @BeforeEach
     void setUp() {
         order1 = new Order();
-        order1.setStatus(OrderStatus.PENDING);
+        order1.setStatus(DeliveryStatus.PENDING);
         order1.setReceivedAmount(new BigDecimal("50.00"));
         order1.setTotalAmount(new BigDecimal("100.00"));
         order1.setPaymentMethod(PaymentMethod.MONEY);
@@ -42,7 +42,7 @@ class OrderServiceTest {
         order1.setFinishedAt(LocalDateTime.now());
 
         order2 = new Order();
-        order2.setStatus(OrderStatus.PENDING);
+        order2.setStatus(DeliveryStatus.PENDING);
         order2.setReceivedAmount(new BigDecimal("150.00"));
         order2.setTotalAmount(new BigDecimal("200.00"));
         order2.setPaymentMethod(PaymentMethod.PIX);

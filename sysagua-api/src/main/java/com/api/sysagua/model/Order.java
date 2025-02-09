@@ -1,7 +1,9 @@
 package com.api.sysagua.model;
 
-import com.api.sysagua.enumeration.OrderStatus;
+import com.api.sysagua.dto.order.ViewOrderDto;
+import com.api.sysagua.enumeration.DeliveryStatus;
 import com.api.sysagua.enumeration.PaymentMethod;
+import com.api.sysagua.enumeration.PaymentStatus;
 import lombok.*;
 import jakarta.persistence.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -33,7 +35,7 @@ public class Order {
     private List<ProductOrder> productOrders;
 
     @Enumerated(EnumType.STRING)
-    private OrderStatus status;
+    private DeliveryStatus deliveryStatus;
 
     private BigDecimal receivedAmount;
     private BigDecimal totalAmount;
@@ -41,16 +43,45 @@ public class Order {
     @Enumerated(EnumType.STRING)
     private PaymentMethod paymentMethod;
 
+    @Enumerated(EnumType.STRING)
+    private PaymentStatus paymentStatus;
+
     @CreatedDate
     private LocalDateTime createdAt;
-
     private LocalDateTime finishedAt;
+    private LocalDateTime canceledAt;
+    private String description;
 
-    @PostLoad
-    private void calculateTotalAmount() {
+
+    @PrePersist
+    private void prePersist(){
+        calculateTotalAmount();
+        setCreatedAt(LocalDateTime.now());
+    }
+    public void calculateTotalAmount(){
+        if (getTotalAmount() != null) return;
+
         this.totalAmount = productOrders.stream()
                 .map(p -> p.getUnitPrice()
                         .multiply(BigDecimal.valueOf(p.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    public ViewOrderDto toView() {
+        return new ViewOrderDto(
+                getId(),
+                getDeliveryStatus(),
+                getPaymentStatus(),
+                getReceivedAmount(),
+                getTotalAmount(),
+                getPaymentMethod(),
+                getCreatedAt(),
+                getFinishedAt(),
+                getCanceledAt(),
+                getDescription(),
+                getCustomer(),
+                getDeliveryPerson(),
+                getProductOrders().stream().map(ProductOrder::toView).toList()
+        );
     }
 }

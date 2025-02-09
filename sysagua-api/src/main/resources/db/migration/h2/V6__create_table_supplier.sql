@@ -9,5 +9,8 @@ CREATE TABLE suppliers (
     neighborhood VARCHAR(50),
     street VARCHAR(255),
     city VARCHAR(100),
-    state VARCHAR(2)
+    state VARCHAR(2),
+    trade_name VARCHAR(50),
+    state_registration VARCHAR(50),
+    municipal_registration VARCHAR(50)
 );
