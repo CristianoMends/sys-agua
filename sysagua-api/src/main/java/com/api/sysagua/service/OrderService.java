@@ -5,6 +5,7 @@ import com.api.sysagua.dto.order.UpdateOrderDto;
 import com.api.sysagua.dto.order.ViewOrderDto;
 import com.api.sysagua.enumeration.DeliveryStatus;
 import com.api.sysagua.enumeration.PaymentMethod;
+import com.api.sysagua.enumeration.PaymentStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -27,7 +28,8 @@ public interface OrderService {
             LocalDateTime createdAtStart,
             LocalDateTime createdAtEnd,
             LocalDateTime finishedAtStart,
-            LocalDateTime finishedAtEnd
+            LocalDateTime finishedAtEnd,
+            PaymentStatus paymentStatus
     );
 
     void update(Long id, UpdateOrderDto dto);
