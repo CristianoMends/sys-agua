@@ -1,8 +1,8 @@
 CREATE TABLE IF NOT EXISTS products (
     product_id BIGINT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
-    price NUMERIC(10,2) PRECISION NOT NULL,
-    cost NUMERIC(10,2) PRECISION NOT NULL,
+    price NUMERIC(10,2) NOT NULL,
+    cost NUMERIC(10,2) NOT NULL,
     unit VARCHAR(255) NOT NULL,
     brand VARCHAR(255),
     category_id BIGINT,

@@ -1,6 +1,6 @@
 CREATE TABLE transactions (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    amount DECIMAL(19,2) NOT NULL,
+    amount DECIMAL(10,2) NOT NULL,
     status VARCHAR(20) NOT NULL,
     type VARCHAR(20) NOT NULL,
     description VARCHAR(255) NOT NULL,
