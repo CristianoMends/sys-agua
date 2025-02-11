@@ -14,6 +14,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Cursor;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -30,6 +31,7 @@ public class ProdutoController {
     private final ProdutoService produtoService;
     private final ProductCategoryService productCategoryService;
     private final ProductLineService productLineService;
+    private final String token;
 
     @FXML
     private StackPane rootPane;
@@ -41,7 +43,7 @@ public class ProdutoController {
     private HBox paginationContainer;
 
     @FXML
-    private Button btnAnterior, btnProximo;
+    private Button btnAnterior, btnProximo, btnAdicionar;
 
     @FXML
     private Label successMessage;
@@ -63,6 +65,7 @@ public class ProdutoController {
         this.productCategoryService = new ProductCategoryService();
         this.productLineService = new ProductLineService();
         this.produtosObservable = FXCollections.observableArrayList();
+        token = TokenManager.getInstance().getToken();
     }
 
     @FXML
@@ -73,6 +76,7 @@ public class ProdutoController {
         carregarLinhas();
         showMenuContext();
         configurarFiltroInativos();
+        btnAdicionar.setCursor(Cursor.HAND);
     }
 
     /*------------------- produtos --------------*/
@@ -139,9 +143,21 @@ public class ProdutoController {
     }
 
     private void handleClonarProduto() {
-        Produto produtoSelecionado = (Produto) tabelaProdutos.getSelectionModel().getSelectedItem();
+        Produto produtoSelecionado = tabelaProdutos.getSelectionModel().getSelectedItem();
         if (produtoSelecionado != null) {
-            System.out.println("clonar produtos");
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/Produtos/AddProdutos.fxml"));
+                Parent form = loader.load();
+
+                AddProdutoController controller = loader.getController();
+                controller.setProdutoClonado(String.valueOf(produtoSelecionado.getId()));
+
+                rootPane.getChildren().clear();
+                rootPane.getChildren().add(form);
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.out.println("Erro ao carregar formulário de produto: " + e.getMessage());
+            }
         }
     }
 
@@ -149,11 +165,18 @@ public class ProdutoController {
         Produto produtoSelecionado = tabelaProdutos.getSelectionModel().getSelectedItem();
         if (produtoSelecionado != null) {
             try {
-                String token = TokenManager.getInstance().getToken();
                 produtoService.inativarProduto(produtoSelecionado, token);
+                int index = produtosObservable.indexOf(produtoSelecionado);
+                if (index != -1) {
+                    produtosObservable.set(index, produtoSelecionado);
+                }
+                tabelaProdutos.refresh();
             } catch (Exception e) {
-                e.printStackTrace();
-                System.out.println("Erro ao inativar produto: " + e.getMessage());
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Erro");
+                alert.setHeaderText("Falha ao inativar produto");
+                alert.setContentText("Produto não pode ser inativado pois compõe estoque. Zere o estoque primeiro.");
+                alert.showAndWait();
             }
         }
     }
@@ -224,7 +247,6 @@ public class ProdutoController {
 
     private void carregarProdutos() {
         try {
-            String token = TokenManager.getInstance().getToken();
             List<Produto> todosProdutos = produtoService.buscarProdutos(token);
 
             // Filtra os produtos ativos se o checkbox não estiver marcado
