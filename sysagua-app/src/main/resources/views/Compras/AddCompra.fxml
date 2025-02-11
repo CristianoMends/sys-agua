@@ -8,6 +8,7 @@
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
@@ -33,7 +34,6 @@
                         <Region HBox.hgrow="ALWAYS" />
                         <Button fx:id="btnCancelar" onAction="#handleCancelar" style="-fx-background-color: #FEBAC6; -fx-text-fill: #F2383A;" styleClass="menu-button" text="Cancelar" />
                         <Button fx:id="btnSalvar" onAction="#handleSalvar" style="-fx-background-color: #DDE4F0; -fx-text-fill: #5A6ACF;" styleClass="menu-button" text="Salvar" />
-                        <Label fx:id="saveErrorLabel" managed="false" style="-fx-text-fill: red;" text="Adicione algum produto" visible="false" />
                     </children>
                 </HBox>
                 <padding>
@@ -53,7 +53,7 @@
                         <Separator prefWidth="200.0" />
                         <VBox alignment="CENTER" spacing="5.0">
                             <children>
-                                <HBox spacing="10.0">
+                                <HBox alignment="CENTER_LEFT" spacing="10.0">
                                     <children>
                                         <Label minWidth="120.0" styleClass="label-field" text="DATA DA ENTRADA" />
                                         <DatePicker fx:id="dataEntrada" />
@@ -64,7 +64,7 @@
                         </VBox>
                         <VBox alignment="CENTER" spacing="5.0">
                             <children>
-                                <HBox spacing="10.0" VBox.vgrow="SOMETIMES">
+                                <HBox alignment="CENTER_LEFT" spacing="10.0" VBox.vgrow="SOMETIMES">
                                     <children>
                                         <Label minWidth="120.0" styleClass="label-field" text="FORNECEDOR" />
                                         <ComboBox fx:id="fornecedorComboBox" promptText="Fornecedor" styleClass="combo-box" HBox.hgrow="ALWAYS" />
@@ -75,7 +75,7 @@
                         </VBox>
                         <VBox alignment="CENTER" spacing="5.0">
                             <children>
-                                <HBox spacing="10.0" VBox.vgrow="SOMETIMES">
+                                <HBox alignment="CENTER_LEFT" spacing="10.0" VBox.vgrow="SOMETIMES">
                                     <children>
                                         <Label minWidth="120.0" styleClass="label-field" text="NUMERO DA NFE" />
                                         <TextField fx:id="numeroNfeField" maxWidth="1.7976931348623157E308" styleClass="text-field" HBox.hgrow="SOMETIMES" />
@@ -84,6 +84,22 @@
                                 <Label fx:id="nfeErrorLabel" managed="false" style="-fx-text-fill: red;" text="Campo inválido" visible="false" />
                             </children>
                         </VBox>
+                  <VBox alignment="CENTER" spacing="5.0">
+                     <children>
+                        <HBox alignment="CENTER_LEFT" spacing="10.0" VBox.vgrow="SOMETIMES">
+                           <children>
+                              <Label minWidth="120.0" styleClass="label-field" text="FORMA DE PAGAMENTO" />
+                              <ComboBox fx:id="metodoPagamento" promptText="Tipo" styleClass="combo-box" HBox.hgrow="ALWAYS" />
+                           </children>
+                        </HBox>
+                        <Label fx:id="fornecedorErrorLabel1" managed="false" style="-fx-text-fill: red;" text="Campo inválido" visible="false" />
+                     </children>
+                  </VBox>
+                  <HBox prefHeight="100.0" prefWidth="200.0">
+                     <children>
+                        <TextArea fx:id="descricao" prefHeight="50.0" promptText="Descrição" HBox.hgrow="SOMETIMES" />
+                     </children>
+                  </HBox>
                         <VBox alignment="CENTER_LEFT" spacing="5.0">
                             <Label styleClass="switchDetails" text="ADICIONAR PRODUTOS">
                         <font>
@@ -93,7 +109,7 @@
                         </VBox>
                         <VBox alignment="CENTER_LEFT" spacing="5.0">
                             <children>
-                                <HBox spacing="10.0">
+                                <HBox alignment="CENTER_LEFT" spacing="10.0">
                                     <children>
                                         <Label minWidth="120.0" styleClass="label-field" text="PRODUTO" />
                                         <ComboBox fx:id="produtoComboBox" promptText="Produto" styleClass="combo-box" HBox.hgrow="ALWAYS" />
@@ -110,8 +126,8 @@
                                  <children>
                                     <HBox spacing="10.0">
                                        <children>
-                                                    <Label minWidth="120.0" styleClass="label-field" text="QUANTIDADE" />
-                                                    <TextField fx:id="quantidadeField" maxWidth="1.7976931348623157E308" styleClass="text-field" HBox.hgrow="ALWAYS" />
+                                            <Label minWidth="120.0" styleClass="label-field" text="QUANTIDADE" />
+                                            <TextField fx:id="quantidadeField" maxWidth="1.7976931348623157E308" styleClass="text-field" HBox.hgrow="ALWAYS" />
                                        </children>
                                     </HBox>
                                               <Label fx:id="quantidadeErrorLabel" managed="false" style="-fx-text-fill: red;" text="Campo inválido" visible="false" />
@@ -134,7 +150,7 @@
                         </VBox>
                   <HBox alignment="CENTER_RIGHT" prefWidth="200.0">
                      <children>
-                        <Button fx:id="btnNovoProduto" onAction="#handleNovoProduto" mnemonicParsing="false" styleClass="switchDetails" text="Cadastrar novo produto" />
+                        <Button fx:id="btnNovoProduto" mnemonicParsing="false" onAction="#handleNovoProduto" styleClass="switchDetails" text="Cadastrar novo produto" />
                         <Region HBox.hgrow="ALWAYS" />
                         <Button fx:id="btnInserir" mnemonicParsing="false" onAction="#handleInserir" styleClass="menu-button" text="Adicionar" />
                      </children>
@@ -175,6 +191,7 @@
                         </VBox>
                   <VBox prefHeight="200.0" VBox.vgrow="SOMETIMES">
                      <children>
+                        <Label fx:id="saveErrorLabel" managed="false" style="-fx-text-fill: red;" text="Adicione algum produto" visible="false" />
                         <HBox spacing="20.0">
                            <children>
                               <Label text="Total de itens:">

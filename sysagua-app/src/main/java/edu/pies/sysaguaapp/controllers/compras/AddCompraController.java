@@ -3,6 +3,7 @@ package edu.pies.sysaguaapp.controllers.compras;
 import edu.pies.sysaguaapp.controllers.produto.AddProdutoController;
 import edu.pies.sysaguaapp.dtos.compra.ItemCompraDto;
 import edu.pies.sysaguaapp.dtos.compra.SendCompraDto;
+import edu.pies.sysaguaapp.enumeration.PaymentMethod;
 import edu.pies.sysaguaapp.models.Fornecedor;
 import edu.pies.sysaguaapp.models.Produto;
 import edu.pies.sysaguaapp.models.compras.ItemCompra;
@@ -28,6 +29,7 @@ import javafx.stage.Stage;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,6 +38,7 @@ public class AddCompraController {
     private final CompraService compraService;
     private final ProdutoService produtoService;
     private final FornecedorService fornecedorService;
+    private final String token;
 
     @FXML
     private StackPane rootPane;
@@ -54,6 +57,12 @@ public class AddCompraController {
 
     @FXML
     private ComboBox<Produto> produtoComboBox;
+
+    @FXML
+    private ComboBox<PaymentMethod> metodoPagamento;
+
+    @FXML
+    private TextArea descricao;
 
     @FXML
     private ObservableList<ItemCompra> produtosAddList;
@@ -82,6 +91,7 @@ public class AddCompraController {
         produtoService = new ProdutoService();
         fornecedorService = new FornecedorService();
         produtosAddList = FXCollections.observableArrayList();
+        token = TokenManager.getInstance().getToken();
     }
 
     @FXML
@@ -106,6 +116,8 @@ public class AddCompraController {
         produtosAddList.addListener((ListChangeListener.Change<? extends ItemCompra> change) -> {
             atualizarTotais();
         });
+
+        metodoPagamento.setItems(FXCollections.observableArrayList(PaymentMethod.values()));
 
         atualizarTotais();
         showMenuContext();
@@ -156,6 +168,12 @@ public class AddCompraController {
             try {
                 SendCompraDto novaCompra = new SendCompraDto();
                 novaCompra.setSupplierId(fornecedorComboBox.getValue().getId());
+                novaCompra.setNfe(numeroNfeField.getText());
+                novaCompra.setEntryAt(dataEntrada.getValue().atTime(LocalTime.now()).toString());
+                novaCompra.setPaymentMethod(metodoPagamento.getValue());
+                novaCompra.setDescription(descricao.getText());
+                novaCompra.setPaidAmount(BigDecimal.ZERO);
+                novaCompra.setTotalAmount(BigDecimal.ZERO);
 
                 List<ItemCompraDto> itensDto = produtosAddList.stream()
                         .map(item -> {
@@ -169,7 +187,6 @@ public class AddCompraController {
 
                 novaCompra.setItems(itensDto);
 
-                String token = TokenManager.getInstance().getToken();
                 compraService.cadastrarCompra(novaCompra, token);
 
                 clearAllForm();
@@ -274,7 +291,6 @@ public class AddCompraController {
     private void carregarListaProdutos(){
 
         try {
-            String token = TokenManager.getInstance().getToken();
             List<Produto> produtos = produtoService.buscarProdutos(token).stream()
                     .filter(Produto::isActive)
                     .sorted((p1, p2) -> Long.compare(p1.getId(), p2.getId()))
@@ -315,7 +331,6 @@ public class AddCompraController {
     private void carregarListaFornecedores(){
 
         try {
-            String token = TokenManager.getInstance().getToken();
             List<Fornecedor> fornecedores = fornecedorService.buscarFornecedores(token).stream()
                     .filter(Fornecedor::isActive)
                     .sorted((p1, p2) -> Long.compare(p1.getId(), p2.getId()))

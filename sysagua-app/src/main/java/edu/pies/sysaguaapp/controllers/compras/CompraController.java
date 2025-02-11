@@ -24,6 +24,7 @@ import java.util.*;
 public class CompraController {
 
     private final CompraService compraService;
+    private final String token;
 
     @FXML
     private StackPane rootPane;
@@ -48,6 +49,7 @@ public class CompraController {
     public CompraController() {
         this.compraService = new CompraService();
         this.compraObservable = FXCollections.observableArrayList();
+        token = TokenManager.getInstance().getToken();
     }
 
     @FXML
@@ -97,7 +99,12 @@ public class CompraController {
     private void handleCancelarCompra() {
         Compra compraSelecionada = tabelaCompra.getSelectionModel().getSelectedItem().getValue();
         if (compraSelecionada != null) {
-            System.out.println("inativar compra");
+            try {
+                compraService.cancelarCompra(compraSelecionada, token);
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.out.println("Erro ao cancelar compra " + e.getMessage());
+            }
         }
     }
 
@@ -181,7 +188,6 @@ public class CompraController {
 
     private void carregarCompras() {
         try {
-            String token = TokenManager.getInstance().getToken();
             List<Compra> listaCompras = compraService.buscarCompras(token);
 
 //            if (!exibirInativosCheckBox.isSelected()) {
