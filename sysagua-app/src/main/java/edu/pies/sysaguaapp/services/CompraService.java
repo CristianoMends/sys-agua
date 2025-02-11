@@ -2,8 +2,10 @@ package edu.pies.sysaguaapp.services;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import edu.pies.sysaguaapp.dtos.compra.SendCompraDto;
 import edu.pies.sysaguaapp.models.compras.Compra;
+
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -19,6 +21,7 @@ public class CompraService {
     public CompraService() {
         this.httpClient = HttpClient.newHttpClient();
         this.objectMapper = new ObjectMapper();
+        this.objectMapper.registerModule(new JavaTimeModule());
     }
 
     public List<Compra> buscarCompras(String token) throws Exception {
@@ -119,7 +122,7 @@ public class CompraService {
         if (response.statusCode() == 204) {
             return null;
         } else {
-            throw new Exception("Erro ao deletar: " + response.body());
+            throw new Exception("Erro ao cancelar: " + response.body());
         }
     }
 }
