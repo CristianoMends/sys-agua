@@ -18,7 +18,7 @@ public class SendCompraDto {
     private Long supplierId;
     private BigDecimal paidAmount;
     private BigDecimal totalAmount;
-    private String entryAt;
+    private LocalDateTime entryAt;
     private PaymentMethod paymentMethod;
     private String nfe;
     private String description;
