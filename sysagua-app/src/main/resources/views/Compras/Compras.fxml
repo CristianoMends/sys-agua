@@ -1,10 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-
-<?import javafx.scene.text.Font?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TreeTableView?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
 <StackPane fx:id="rootPane" prefHeight="600.0" prefWidth="900.0" style="-fx-background-color: white;" stylesheets="@../../styles/addCompra.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.pies.sysaguaapp.controllers.compras.CompraController">
     <children>
         <VBox fx:id="listCompraView" prefHeight="200.0" prefWidth="100.0">
@@ -22,11 +32,6 @@
                                     <font>
                                         <Font size="16.0" />
                                     </font></Label>
-                                <Region HBox.hgrow="ALWAYS" />
-                                <Button mnemonicParsing="false" onAction="#handleAddCompra" styleClass="menu-button" text="Adicionar">
-                                    <padding>
-                                        <Insets left="10.0" />
-                                    </padding></Button>
                             </children>
                         </HBox>
                     </children>
@@ -34,17 +39,78 @@
                         <Insets right="20.0" />
                     </padding>
                 </StackPane>
-                <HBox alignment="CENTER_LEFT" spacing="10.0" style="-fx-border-color: #C8CBD9; -fx-border-width: 0 0 1px 0;">
+                <HBox alignment="CENTER_LEFT" style="-fx-border-color: #C8CBD9; -fx-border-width: 0 0 1px 0;">
                     <children>
-                        <Label text="filtros aqui">
-                            <font>
-                                <Font size="16.0" />
-                            </font>
-                            <padding>
-                                <Insets left="10.0" />
-                            </padding>
-                        </Label>
+                  <HBox maxWidth="700.0" spacing="10.0">
+                     <children>
+                        <VBox maxWidth="200.0" minWidth="100.0">
+                           <children>
+                              <Label text="Intervalo de datas" />
+                              <HBox spacing="10.0">
+                                 <children>
+                                    <DatePicker fx:id="datePickerInicio" promptText="Inicial" />
+                                    <DatePicker fx:id="datePickerFim" promptText="Final" />
+                                 </children>
+                              </HBox>
+                           </children>
+                        </VBox>
+                        <VBox>
+                           <children>
+                              <Label text="Fornecedor" />
+                              <ComboBox fx:id="comboFornecedor" prefWidth="150.0" promptText="Selecione" />
+                           </children>
+                        </VBox>
+                        <VBox>
+                           <children>
+                              <Label text="Status pagamento" />
+                              <ComboBox fx:id="comboStatusPagamento" prefWidth="150.0" promptText="Selecione" />
+                           </children>
+                        </VBox>
+                        <VBox alignment="BOTTOM_CENTER" minWidth="120.0">
+                           <children>
+                              <HBox alignment="BOTTOM_CENTER" spacing="10.0">
+                                 <children>
+                                    <Button fx:id="btnFiltrar" mnemonicParsing="false" onAction="#handleFiltrar" styleClass="menu-button" text="Filtrar">
+                                       <padding>
+                                          <Insets left="10.0" />
+                                       </padding>
+                                    </Button>
+                                     <Button fx:id="btnClearFilter" visible="false" managed="false" minHeight="28.0" minWidth="28.0" mnemonicParsing="false" onAction="#handleLimparFiltros" style="-fx-background-color: transparent;">
+                                         <graphic>
+                                             <ImageView fitHeight="28" fitWidth="28" pickOnBounds="true" preserveRatio="true">
+                                                 <Image url="@../../icons/compras/cancel.png" />
+                                             </ImageView>
+                                         </graphic>
+                                     </Button>
+                                 </children>
+                              </HBox>
+                           </children>
+                        </VBox>
+                        <VBox alignment="BOTTOM_CENTER" minWidth="120.0">
+                           <children>
+                              <HBox alignment="CENTER" spacing="5.0">
+                                 <children>
+                                    <Label text="Exibir mês atual" />
+                                    <CheckBox fx:id="exibirCompraMes" mnemonicParsing="false" />
+                                 </children>
+                              </HBox>
+                           </children>
+                        </VBox>
+                     </children>
+                  </HBox>
+                          <Region HBox.hgrow="ALWAYS" />
+                  <HBox alignment="BOTTOM_CENTER">
+                     <children>
+                        <Button fx:id="btnAdicionar" mnemonicParsing="false" onAction="#handleAddCompra" styleClass="menu-button" text="Adicionar">
+                        <padding>
+                            <Insets left="10.0" />
+                        </padding></Button>
+                     </children>
+                  </HBox>
                     </children>
+               <padding>
+                  <Insets bottom="10.0" left="20.0" right="20.0" />
+               </padding>
                 </HBox>
                 <StackPane prefWidth="917.0" VBox.vgrow="SOMETIMES">
                     <children>
@@ -59,4 +125,3 @@
         </VBox>
     </children>
 </StackPane>
-
