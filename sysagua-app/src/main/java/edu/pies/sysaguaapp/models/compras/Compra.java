@@ -19,15 +19,15 @@ public class Compra {
     private Long id;
     private BigDecimal totalValue;
     private Boolean active;
-    private String updatedAt;
-    private String createdAt;
+    private LocalDateTime updatedAt;
+    private LocalDateTime createdAt;
     private List<ItemCompra> items;
     private Fornecedor supplier;
     private BigDecimal paidAmount;
     private BigDecimal totalAmount;
-    private String entryAt;
-    private String canceledAt;
-    private String finishedAt;
+    private LocalDateTime entryAt;
+    private LocalDateTime canceledAt;
+    private LocalDateTime finishedAt;
     private PaymentMethod paymentMethod;
     private PaymentStatus paymentStatus;
     private String nfe;
@@ -38,8 +38,8 @@ public class Compra {
         items = new ArrayList<>();
     }
 
-    public Compra(String createdAt) {
-        this.createdAt = createdAt;
+    public Compra(LocalDateTime entryAt) {
+        this.entryAt = entryAt;
         items = new ArrayList<>();
     }
 }
