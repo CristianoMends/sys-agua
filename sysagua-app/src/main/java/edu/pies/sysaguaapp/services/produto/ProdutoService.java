@@ -127,6 +127,8 @@ public class ProdutoService {
 
         if (response.statusCode() == 204) {
             return null;
+        } else if (response.statusCode() == 400) {
+            throw new Exception("Produto não pode ser inativado pois compõe estoque: " + response.body());
         } else {
             throw new Exception("Erro ao inativar produto: " + response.body());
         }
