@@ -1,7 +1,11 @@
 package edu.pies.sysaguaapp.controllers.compras;
 
+import edu.pies.sysaguaapp.enumeration.PaymentMethod;
+import edu.pies.sysaguaapp.enumeration.PaymentStatus;
+import edu.pies.sysaguaapp.models.Fornecedor;
 import edu.pies.sysaguaapp.models.compras.Compra;
 import edu.pies.sysaguaapp.services.CompraService;
+import edu.pies.sysaguaapp.services.FornecedorService;
 import edu.pies.sysaguaapp.services.TokenManager;
 import javafx.animation.PauseTransition;
 import javafx.beans.property.SimpleObjectProperty;
@@ -10,21 +14,26 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Cursor;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import javafx.util.Duration;
+import javafx.util.StringConverter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class CompraController {
 
     private final CompraService compraService;
     private final String token;
+    private final FornecedorService fornecedorService;
 
     @FXML
     private StackPane rootPane;
@@ -33,21 +42,28 @@ public class CompraController {
     private TreeTableView<Compra> tabelaCompra;
 
     @FXML
-    private HBox paginationContainer;
-
-    @FXML
-    private Button btnAnterior, btnProximo;
-
-    @FXML
     private Label successMessage;
 
     @FXML
-    private CheckBox exibirInativosCheckBox;
+    private Button btnAdicionar, btnFiltrar, btnClearFilter;
+
+    @FXML
+    private DatePicker datePickerInicio, datePickerFim;
+
+    @FXML
+    private ComboBox<Fornecedor> comboFornecedor;
+
+    @FXML
+    private ComboBox<PaymentStatus> comboStatusPagamento;
+
+    @FXML
+    private CheckBox exibirCompraMes;
 
     private ObservableList<Compra> compraObservable;
 
     public CompraController() {
-        this.compraService = new CompraService();
+        compraService = new CompraService();
+        fornecedorService = new FornecedorService();
         this.compraObservable = FXCollections.observableArrayList();
         token = TokenManager.getInstance().getToken();
     }
@@ -57,8 +73,19 @@ public class CompraController {
         configurarTabela();
         carregarCompras();
         showMenuContext();
+        btnAdicionar.setCursor(Cursor.HAND);
+        btnFiltrar.setCursor(Cursor.HAND);
+        btnClearFilter.setCursor(Cursor.HAND);
+        popularFiltros();
+        exibirCompraMes.selectedProperty().addListener((obs, oldValue, newValue) -> {
+            if (newValue) {
+                filtrarPorMesAtual();
+            } else {
+                carregarCompras();
+            }
+        });
+        exibirCompraMes.setSelected(true);
     }
-
 
 
     /*------------------- fornecedor --------------*/
@@ -115,13 +142,12 @@ public class CompraController {
 
         TreeTableColumn<Compra, String> colunaData = new TreeTableColumn<>("Data");
         colunaData.setCellValueFactory(param -> {
-            String createdAt = param.getValue().getValue().getCreatedAt();
-            if (createdAt != null && !createdAt.isEmpty()) {
-                return configurarData(createdAt);
+            LocalDateTime entryAt = param.getValue().getValue().getEntryAt();
+            if (entryAt != null) {
+                return new SimpleStringProperty(entryAt.toLocalDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
             }
             return new SimpleStringProperty("");
         });
-
 
         TreeTableColumn<Compra, String> colunaFornecedor = new TreeTableColumn<>("Fornecedor");
         colunaFornecedor.setCellValueFactory(param -> {
@@ -134,12 +160,11 @@ public class CompraController {
             return new SimpleStringProperty(compra.getSupplier().getSocialReason());
         });
 
-
         TreeTableColumn<Compra, BigDecimal> colunaValorTotal = new TreeTableColumn<>("Valor Total");
         colunaValorTotal.setCellValueFactory(param ->
                 new SimpleObjectProperty<>(param.getValue().getValue().getTotalValue()));
 
-        TreeTableColumn<Compra, String> colunaStatus = new TreeTableColumn<>("Status");
+        TreeTableColumn<Compra, String> colunaStatus = new TreeTableColumn<>("Pagamento");
         colunaStatus.setCellValueFactory(param -> {
             Compra compra = param.getValue().getValue();
 
@@ -147,14 +172,12 @@ public class CompraController {
                 return new SimpleStringProperty("");
             }
 
-            return new SimpleStringProperty(compra.getActive() ? "Ativo" : "Inativo");
-
+            return new SimpleStringProperty(compra.getPaymentStatus().getDescription());
         });
 
         // Adiciona as colunas na TreeTableView
         tabelaCompra.getColumns().clear();
         tabelaCompra.getColumns().addAll(colunaData, colunaFornecedor, colunaValorTotal, colunaStatus);
-
 
         tabelaCompra.setRowFactory(tv -> {
             TreeTableRow<Compra> row = new TreeTableRow<Compra>() {
@@ -185,34 +208,109 @@ public class CompraController {
         tabelaCompra.setShowRoot(false);
     }
 
+    @FXML
+    private void handleFiltrar() {
+        try {
+            List<Compra> listaCompras = compraService.buscarCompras(token);
+
+            LocalDate inicio = datePickerInicio.getValue();
+            LocalDate fim = datePickerFim.getValue();
+            if (inicio != null) {
+                listaCompras = listaCompras.stream()
+                        .filter(compra -> compra.getEntryAt() != null && 
+                                !compra.getEntryAt().toLocalDate().isBefore(inicio))
+                        .collect(Collectors.toList());
+            }
+            if (fim != null) {
+                listaCompras = listaCompras.stream()
+                        .filter(compra -> compra.getEntryAt() != null && 
+                                !compra.getEntryAt().toLocalDate().isAfter(fim))
+                        .collect(Collectors.toList());
+            }
+
+            if (comboFornecedor.getValue() != null) {
+                Long fornecedorSelecionadoId = comboFornecedor.getValue().getId();
+                if (fornecedorSelecionadoId != null) {
+                    listaCompras = listaCompras.stream()
+                            .filter(compra -> compra.getSupplier().getId() != null &&
+                                    fornecedorSelecionadoId.equals(compra.getSupplier().getId()))
+                            .collect(Collectors.toList());
+                }
+            }
+
+
+            if (comboStatusPagamento.getValue() != null) {
+                String statusSelecionado = comboStatusPagamento.getValue().getDescription();
+                if (statusSelecionado != null) {
+                    listaCompras = listaCompras.stream()
+                            .filter(compra -> statusSelecionado.equals(compra.getPaymentStatus().getDescription()))
+                            .collect(Collectors.toList());
+                }
+            }
+
+            // Reagrupar as compras filtradas por data
+            agruparCompras(listaCompras);
+
+            btnClearFilter.setVisible(true);
+            btnClearFilter.setManaged(true);
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Erro ao aplicar os filtros: " + e.getMessage());
+        }
+    }
+
+    private void filtrarPorMesAtual() {
+        try {
+            List<Compra> listaCompras = compraService.buscarCompras(token);
+            LocalDate hoje = LocalDate.now();
+            int mesAtual = hoje.getMonthValue();
+            int anoAtual = hoje.getYear();
+    
+            listaCompras = listaCompras.stream()
+                    .filter(compra -> compra.getEntryAt() != null &&
+                            compra.getEntryAt().toLocalDate().getMonthValue() == mesAtual &&
+                            compra.getEntryAt().toLocalDate().getYear() == anoAtual)
+                    .collect(Collectors.toList());
+    
+            Map<LocalDate, TreeItem<Compra>> gruposPorData = new LinkedHashMap<>();
+            for (Compra compra : listaCompras) {
+                LocalDate data = compra.getEntryAt().toLocalDate();
+                gruposPorData.putIfAbsent(data, new TreeItem<>(new Compra(data.atStartOfDay())));
+                gruposPorData.get(data).getChildren().add(new TreeItem<>(compra));
+            }
+            TreeItem<Compra> root = new TreeItem<>(new Compra());
+            root.getChildren().addAll(gruposPorData.values());
+            tabelaCompra.setRoot(root);
+            tabelaCompra.setShowRoot(false);
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Erro ao filtrar por mês atual: " + e.getMessage());
+        }
+    }
+
+    
+    @FXML
+    private void handleLimparFiltros() {
+        datePickerInicio.setValue(null);
+        datePickerFim.setValue(null);
+        comboFornecedor.setValue(null);
+        comboStatusPagamento.setValue(null);
+        carregarCompras();
+        filtrarPorMesAtual();
+        
+        btnClearFilter.setVisible(false);
+        btnClearFilter.setManaged(false);
+    }
+    
+    //------------------- Carregar dados -------------------//
 
     private void carregarCompras() {
         try {
             List<Compra> listaCompras = compraService.buscarCompras(token);
 
-//            if (!exibirInativosCheckBox.isSelected()) {
-//                listaCompras.removeIf(compra -> !compra.getActive());
-//            }
-
-            // Criar um mapa de agrupamento por data
-            Map<String, TreeItem<Compra>> gruposPorData = new LinkedHashMap<>();
-
-            for (Compra compra : listaCompras) {
-                String data = compra.getCreatedAt();
-
-                // Se ainda não houver um grupo para essa data, criamos
-                gruposPorData.putIfAbsent(data, new TreeItem<>(new Compra(data)));
-
-                // Adicionamos a compra como filha desse grupo
-                gruposPorData.get(data).getChildren().add(new TreeItem<>(compra));
-            }
-
-            // Define a raiz da tabela com os grupos de data
-            TreeItem<Compra> root = new TreeItem<>(new Compra());
-            root.getChildren().addAll(gruposPorData.values());
-
-            tabelaCompra.setRoot(root);
-            tabelaCompra.setShowRoot(false); // Oculta a raiz principal
+            agruparCompras(listaCompras);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -220,14 +318,98 @@ public class CompraController {
         }
     }
 
+    private void agruparCompras(List<Compra> listaCompras) {
+        Map<LocalDate, TreeItem<Compra>> gruposPorData = new LinkedHashMap<>();
+
+        for (Compra compra : listaCompras) {
+            LocalDate data = compra.getEntryAt().toLocalDate();
+
+            gruposPorData.putIfAbsent(data, new TreeItem<>(new Compra(data.atStartOfDay())));
+
+            gruposPorData.get(data).getChildren().add(new TreeItem<>(compra));
+        }
+
+        // Define a raiz da tabela com os grupos de data
+        TreeItem<Compra> root = new TreeItem<>(new Compra());
+        root.getChildren().addAll(gruposPorData.values());
+
+        // Atualiza a TreeTableView com a raiz e oculta a raiz principal
+        tabelaCompra.setRoot(root);
+        tabelaCompra.setShowRoot(false); // Oculta a raiz principal
+    }
+
+    private void carregarListaFornecedores(){
+
+        try {
+            List<Fornecedor> fornecedores = fornecedorService.buscarFornecedores(token).stream()
+                    .filter(Fornecedor::isActive)
+                    .sorted((p1, p2) -> Long.compare(p1.getId(), p2.getId()))
+                    .collect(Collectors.toList());
+            comboFornecedor.setItems(FXCollections.observableArrayList(fornecedores));
+
+            comboFornecedor.setCellFactory(param -> new ListCell<>() {
+                @Override
+                protected void updateItem(Fornecedor item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty || item == null) {
+                        setText(null);
+                    } else {
+                        setText(item.getId() + " - " + item.getSocialReason());
+                    }
+                }
+            });
+
+            comboFornecedor.setButtonCell(new ListCell<Fornecedor>() {
+                protected void updateItem(Fornecedor item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty || item == null) {
+                        setText(null);
+                    } else {
+                        setText(item.getId() + " - " + item.getSocialReason());
+                    }
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println(e.getMessage());
+        }
+
+    }
+
+    private void popularFiltros() {
+        try {
+            carregarListaFornecedores();
+            comboStatusPagamento.setItems(FXCollections.observableArrayList(PaymentStatus.values()));
+            comboStatusPagamento.setConverter(new StringConverter<PaymentStatus>() {
+                @Override
+                public String toString(PaymentStatus status) {
+                    return status != null ? status.getDescription() : "";
+                }
+                @Override
+                public PaymentStatus fromString(String string) {
+                    for (PaymentStatus status : PaymentStatus.values()) {
+                        if (status.getDescription().equals(string)) {
+                            return status;
+                        }
+                    }
+                    return null;
+                }
+            });
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Erro ao carregar filtros: " + e.getMessage());
+        }
+    }
+
     /*---------------- formatações -------------------*/
-    private SimpleStringProperty configurarData(String data) {
-        DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSS");
+    private String configurarData(String data) {
+        DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSS");
         DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-        LocalDate date = LocalDate.parse(data, inputFormatter);
+        LocalDateTime date = LocalDateTime.parse(data, inputFormatter);
 
-        return new SimpleStringProperty(date.format(outputFormatter));
+        return date.format(outputFormatter);
     }
 
     /*------------------------ mensagens ---------------*/
