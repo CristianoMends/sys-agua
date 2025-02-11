@@ -7,6 +7,7 @@ import edu.pies.sysaguaapp.services.FornecedorService;
 import edu.pies.sysaguaapp.services.TokenManager;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Cursor;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.layout.StackPane;
@@ -47,6 +48,8 @@ public class AddFornecedorController {
 
     public AddFornecedorController() {
         fornecedorService = new FornecedorService();
+        btnCancelar.setCursor(Cursor.HAND);
+        btnSalvar.setCursor(Cursor.HAND);
     }
 
     @FXML

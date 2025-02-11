@@ -26,6 +26,7 @@ public class AddProdutoController {
     private final ProdutoService produtoService;
     private final ProductCategoryService productCategoryService;
     private final ProductLineService productLineService;
+    private final String token;
 
     @FXML
     private StackPane rootPane;
@@ -62,12 +63,14 @@ public class AddProdutoController {
     private boolean fecharAoSair = false;
     @Setter
     private Consumer<Void> onProdutoSalvo;
+    private Produto produtoClonado = null;
 
 
     public AddProdutoController() {
         this.produtoService = new ProdutoService();
         this.productCategoryService = new ProductCategoryService();
         this.productLineService = new ProductLineService();
+        token = TokenManager.getInstance().getToken();
     }
 
     @FXML
@@ -75,6 +78,8 @@ public class AddProdutoController {
         carregarCategorias();
         carregarLinhas();
         validarCampos();
+        btnCancelar.setCursor(Cursor.HAND);
+        btnSalvar.setCursor(Cursor.HAND);
 
     }
 
@@ -90,15 +95,18 @@ public class AddProdutoController {
 
     private Produto criarProduto() {
         Produto novoProduto = new Produto();
+
         novoProduto.setName(nomeField.getText());
         ProductCategory categoriaSelecionada = categorias.stream()
                 .filter(c -> c.getName().equals(categoriaComboBox.getValue()))
                 .findFirst()
                 .orElse(null);
+
         ProductLine linhaSelecionada = linhas.stream()
                 .filter(l -> l.getName().equals(linhaComboBox.getValue()))
                 .findFirst()
                 .orElse(null);
+
         novoProduto.setCategoryId(categoriaSelecionada != null ? categoriaSelecionada.getId() : null);
         novoProduto.setLineId(linhaSelecionada != null ? linhaSelecionada.getId() : null);
         novoProduto.setCost(new BigDecimal(custoField.getText().replace(",", ".")));
@@ -106,6 +114,7 @@ public class AddProdutoController {
         novoProduto.setUnit(unidadeField.getText());
         novoProduto.setBrand(marcaField.getText());
         novoProduto.setNcm(ncmField.getText());
+
         return novoProduto;
     }
 
@@ -115,7 +124,6 @@ public class AddProdutoController {
             Produto novoProduto = criarProduto();
 
             try {
-                String token = TokenManager.getInstance().getToken();
                 if (produtoEditando != null) {
                     novoProduto.setId(produtoEditando.getId());
                     novoProduto.setActive(true);
@@ -137,6 +145,8 @@ public class AddProdutoController {
             }
 
             clearFieldForm();
+            produtoClonado = null;
+            produtoEditando = null;
             if (fecharAoSair) {
                 Stage stage = (Stage) btnSalvar.getScene().getWindow();
                 stage.close();
@@ -235,7 +245,8 @@ public class AddProdutoController {
     @FXML
     private void handleCancelar() {
         clearFieldForm();
-        this.produtoEditando = null;
+        produtoEditando = null;
+        produtoClonado = null;
         if (fecharAoSair) {
             Stage stage = (Stage) btnCancelar.getScene().getWindow();
             stage.close();
@@ -248,11 +259,20 @@ public class AddProdutoController {
 
     public void setProdutoEditando(String id) {
         try{
-            String token = TokenManager.getInstance().getToken();
             produtoEditando = produtoService.buscarProdutoId(id, token);
             updateButtonText();
             preencherCampos(produtoEditando);
         } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Erro ao carregar produto" + e.getMessage());
+        }
+    }
+
+    public void setProdutoClonado(String id) {
+        try {
+            produtoClonado = produtoService.buscarProdutoId(id, token);
+            preencherCampos(produtoClonado);
+        }catch (Exception e) {
             e.printStackTrace();
             System.out.println("Erro ao carregar produto" + e.getMessage());
         }

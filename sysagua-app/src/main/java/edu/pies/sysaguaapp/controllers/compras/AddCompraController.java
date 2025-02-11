@@ -4,6 +4,7 @@ import edu.pies.sysaguaapp.controllers.produto.AddProdutoController;
 import edu.pies.sysaguaapp.dtos.compra.ItemCompraDto;
 import edu.pies.sysaguaapp.dtos.compra.SendCompraDto;
 import edu.pies.sysaguaapp.enumeration.PaymentMethod;
+import edu.pies.sysaguaapp.enumeration.PaymentStatus;
 import edu.pies.sysaguaapp.models.Fornecedor;
 import edu.pies.sysaguaapp.models.Produto;
 import edu.pies.sysaguaapp.models.compras.ItemCompra;
@@ -26,9 +27,11 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.util.StringConverter;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -118,6 +121,21 @@ public class AddCompraController {
         });
 
         metodoPagamento.setItems(FXCollections.observableArrayList(PaymentMethod.values()));
+        metodoPagamento.setConverter(new StringConverter<PaymentMethod>() {
+            @Override
+            public String toString(PaymentMethod metodo) {
+                return metodo != null ? metodo.getDescription() : "";
+            }
+            @Override
+            public PaymentMethod fromString(String string) {
+                for (PaymentMethod metodo : PaymentMethod.values()) {
+                    if (metodo.getDescription().equals(string)) {
+                        return metodo;
+                    }
+                }
+                return null;
+            }
+        });
 
         atualizarTotais();
         showMenuContext();
@@ -169,7 +187,7 @@ public class AddCompraController {
                 SendCompraDto novaCompra = new SendCompraDto();
                 novaCompra.setSupplierId(fornecedorComboBox.getValue().getId());
                 novaCompra.setNfe(numeroNfeField.getText());
-                novaCompra.setEntryAt(dataEntrada.getValue().atTime(LocalTime.now()).toString());
+                novaCompra.setEntryAt(dataEntrada.getValue().atTime(LocalTime.now()));
                 novaCompra.setPaymentMethod(metodoPagamento.getValue());
                 novaCompra.setDescription(descricao.getText());
                 novaCompra.setPaidAmount(BigDecimal.ZERO);
@@ -364,9 +382,6 @@ public class AddCompraController {
             System.out.println(e.getMessage());
         }
 
-
-
-
     }
 
     private void atualizarTotais() {
@@ -494,6 +509,16 @@ public class AddCompraController {
             dataErrorLabel.setManaged(false);
         }
 
+        if (dataEntrada.getValue().isAfter(LocalDate.now())) {
+            dataErrorLabel.setText("Data de entrada não pode ser uma data futura.");
+            dataErrorLabel.setVisible(true);
+            dataErrorLabel.setManaged(true);
+            isValid = false;
+        } else {
+            dataErrorLabel.setVisible(false);
+            dataErrorLabel.setManaged(false);
+        }
+
         return isValid;
     }
 
@@ -501,7 +526,7 @@ public class AddCompraController {
         // Validar números
         configurarValidacaoDinheiro(precoField, precoErrorLabel);
         configurarValidacaoNumerica(quantidadeField, quantidadeErrorLabel);
-        configurarValidacaoNumerica(numeroNfeField, nfeErrorLabel);
+        configurarValidacaoNfe(numeroNfeField, nfeErrorLabel);
     }
 
 
@@ -547,6 +572,26 @@ public class AddCompraController {
             return null; // Rejeita mudanças inválidas
         });
         textField.setTextFormatter(formatter);
+    }
+
+    private void configurarValidacaoNfe(TextField textField, Label errorLabel) {
+        textField.textProperty().addListener((observable, oldValue, newValue) -> {
+            String digits = newValue.replaceAll("[^\\d]", "");
+
+            if (digits.length() > 9) {
+                digits = digits.substring(0, 9);
+            }
+
+            textField.setText(digits);
+
+            if (digits.length() == 9) {
+                errorLabel.setVisible(false);
+                errorLabel.setManaged(false);
+            } else {
+                errorLabel.setVisible(true);
+                errorLabel.setManaged(true);
+            }
+        });
     }
 
     private void clearProdutoForm(){
