@@ -45,6 +45,10 @@ public class Transaction {
     private String description;
 
     @ManyToOne
+    @JoinColumn(name = "responsible_id")
+    private User responsibleUser;
+
+    @ManyToOne
     @JoinColumn(name = "order_id")
     private Order order;
 
@@ -52,11 +56,12 @@ public class Transaction {
     @JoinColumn(name = "purchase_id")
     private Purchase purchase;
 
-    public Transaction(TransactionStatus status, BigDecimal amount, TransactionType type, String description, Order order, Purchase purchase) {
+    public Transaction(TransactionStatus status, BigDecimal amount, TransactionType type, String description, User responsibleUser, Order order, Purchase purchase) {
         this.status = status;
         this.amount = amount;
         this.type = type;
         this.description = description;
+        this.responsibleUser = responsibleUser;
         this.order = order;
         this.purchase = purchase;
     }
@@ -74,8 +79,9 @@ public class Transaction {
                 getAmount(),
                 getType(),
                 getDescription(),
-                getOrder() != null ? getOrder().toView() : null,
-                getPurchase() != null ? getPurchase().toView() : null
+                getResponsibleUser()    != null ? getResponsibleUser()  : null,
+                getOrder()              != null ? getOrder().toView()   : null,
+                getPurchase()           != null ? getPurchase().toView() : null
         );
     }
 }

@@ -1,8 +1,6 @@
 package com.api.sysagua.docs;
 
 import com.api.sysagua.dto.transaction.ViewTransactionDto;
-import com.api.sysagua.model.Transaction;
-import com.api.sysagua.enumeration.PaymentMethod;
 import com.api.sysagua.enumeration.TransactionStatus;
 import com.api.sysagua.enumeration.TransactionType;
 import io.swagger.v3.oas.annotations.Operation;
@@ -15,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Tag(name = "Transaction Controller", description = "Controlador responsável pela gestão das transações financeiras.")
 public interface TransactionDoc {
@@ -40,6 +39,7 @@ public interface TransactionDoc {
             String description,
             LocalDateTime createdAtStart,
             LocalDateTime createdAtEnd,
+            UUID reposnsibleUserId,
             Long orderId,
             Long purchaseId
     );
