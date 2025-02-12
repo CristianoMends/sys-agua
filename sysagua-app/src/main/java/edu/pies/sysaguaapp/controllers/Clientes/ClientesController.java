@@ -1,6 +1,5 @@
 package edu.pies.sysaguaapp.controllers;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.pies.sysaguaapp.models.Address;
 import edu.pies.sysaguaapp.models.Clientes;
 import edu.pies.sysaguaapp.services.ClientesService;
@@ -11,6 +10,8 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseButton;
@@ -33,11 +34,14 @@ public class ClientesController {
     @FXML
     private TextField nomeField;
 
+    @FXML
+    private CheckBox exibirInativosCheckBox;
+
 
     @FXML
     private VBox addressBox;
     @FXML
-    private TextField numberField, fullAddressField, idField;
+    private TextField numberField;
 
     @FXML
     private TextField streetField;
@@ -109,6 +113,22 @@ public class ClientesController {
         configurarTabela();
         carregarClientes();
         showMenuContext();
+        exibirInativosCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> carregarClientes());
+    }
+
+    @FXML
+    private void handleAddCliente(){
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("views/Clientes/AddClientes.fxml"));
+            Parent form = loader.load();
+
+            rootPane.getChildren().clear();
+            rootPane.getChildren().add(form);
+
+        } catch (Exception e){
+                e.printStackTrace();
+                System.out.println("Erro ao carregar formulário de cliente: " + e.getMessage());
+        }
     }
 
     private void showOverlay() {
@@ -298,19 +318,22 @@ public class ClientesController {
     }
 
     private void handleEditarCliente() {
-        Clientes clienteSelecionado = (Clientes) tabelaClientes.getSelectionModel().getSelectedItem();
+        Clientes clienteSelecionado = tabelaClientes.getSelectionModel().getSelectedItem();
 
         if (clienteSelecionado != null) {
             try{
-                clearFieldForm();
-                preencherCampos(clienteSelecionado);
-                clienteEditado = clienteSelecionado;
-                updateButtonText();
-                showOverlay();
-                listClienteView.setDisable(true);
-                showForm();
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/Clientes/AddClientes.fxml"));
+                Parent form = loader.load();
+
+                AddClienteController controller = loader.getController();
+
+                controller.setClienteEditando(String.valueOf(clienteSelecionado.getId()));
+
+                rootPane.getChildren().clear();
+                rootPane.getChildren().add(form);
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                e.printStackTrace();
+                System.out.println("Erro ao carregar formulário de cliente: " + e.getMessage());
             }
         }
     }
@@ -342,10 +365,7 @@ public class ClientesController {
             try{
                 String token = TokenManager.getInstance().getToken();
                 ClientesService.inativarCliente(clienteSelecionado, token);
-                tabelaClientes.getItems().remove(clienteSelecionado);
-                clientesObservable.remove(clienteSelecionado);
-                
-                showSuccessMessageInativarCliente("Cliente inativado com sucesso!");
+
             } catch(Exception e){
                 e.printStackTrace();
                 System.out.println("Erro ao inativar cliente: " + e.getMessage());
@@ -355,30 +375,23 @@ public class ClientesController {
             System.out.println("Nenhum cliente selecionado!");
         }
     }
-    private void showSuccessMessageInativarCliente(String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Sucesso");
-        alert.setHeaderText(null);
-        alert.setContentText(message); 
-        alert.showAndWait();
-    }
 
     private void carregarClientes() {
         try {
             String token = TokenManager.getInstance().getToken();
             List<Clientes> todosClientes = clienteService.buscarClientes(token);
 
+            if(!exibirInativosCheckBox.isSelected()) {
+                todosClientes.removeIf(cliente -> !cliente.getActive());
+            }
 
-            List<Clientes> clientesAtivos = todosClientes.stream()
-            .filter(cliente -> cliente.getActive())
-            .collect(Collectors.toList());
 
-            totalPaginas = (int) Math.ceil((double) clientesAtivos.size() / itensPorPagina);
+            totalPaginas = (int) Math.ceil((double) todosClientes.size() / itensPorPagina);
 
             // Filtra os produtos para a página atual
             int inicio = paginaAtual * itensPorPagina;
-            int fim = Math.min(inicio + itensPorPagina, clientesAtivos.size());
-            List<Clientes> clientesPagina = clientesAtivos.subList(inicio, fim);
+            int fim = Math.min(inicio + itensPorPagina, todosClientes.size());
+            List<Clientes> clientesPagina = todosClientes.subList(inicio, fim);
 
             // Atualiza a lista observável
             clientesObservable.setAll(clientesPagina);
@@ -387,7 +400,7 @@ public class ClientesController {
 
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("Erro ao carregar clientes: " + e.getMessage());
+            System.out.println("Erro ao carregar lista:" + e.getMessage());
         }
     }
 
@@ -462,134 +475,7 @@ public class ClientesController {
         tabelaClientes.getColumns().addAll(colunaId, colunaNome, colunaEnderecoCompleto, colunaTelefone, colunaCnpj);
         tabelaClientes.setItems(clientesObservable);
     }
-
-    /*--------- validações ----------*/
-    private void validarCampos() {
-        // Validar números
-        configurarValidacaoNumerica(numberField);
-        configurarValidacaoTelefone(telefoneField);
-        configurarValidacaoCNPJ(CNPJField);
-        // Validar Textos
-        configurarValidacaoTexto(nomeField);
-        configurarValidacaoTexto(streetField);
-        configurarValidacaoTexto(neighborhoodField);
-        configurarValidacaoTexto(cityField);
-        configurarValidacaoTexto(stateField);
-    }
-    private boolean validarCamposComErros(StringBuilder erroMensagem) {
-        boolean isValid = true;
-
-        if (!validarCampoTexto(nomeField)) {
-            erroMensagem.append("- Nome\n");
-            isValid = false;
-        }
-
-        // Validando número
-        if (numberField.getText().isEmpty() || !numberField.getText().matches("[\\d\\s]*")) {
-            numberField.setStyle("-fx-border-color: red;");
-            erroMensagem.append("- Número\n");
-            isValid = false;
-        } else {
-            numberField.setStyle(null); // Remove o estilo de erro se válido
-        }
-
-        if (!validarCampoTexto(streetField)) {
-            erroMensagem.append("- Rua\n");
-            isValid = false;
-        }
-
-        if (!validarCampoTexto(neighborhoodField)) {
-            erroMensagem.append("- Bairro\n");
-            isValid = false;
-        }
-
-        if (!validarCampoTexto(cityField)) {
-            erroMensagem.append("- Cidade\n");
-            isValid = false;
-        }
-
-        if (!validarCampoTexto(stateField)) {
-            erroMensagem.append("- Estado\n");
-            isValid = false;
-        }
-
-        // Validando telefone
-        if (telefoneField.getText().isEmpty() || !telefoneField.getText().matches("(\\d{2})?(\\d{2})\\d{8,9}")) {
-            telefoneField.setStyle("-fx-border-color: red;");
-            erroMensagem.append("- Telefone\n");
-            isValid = false;
-        } else {
-            telefoneField.setStyle(null);
-        }
-
-        // Validando CNPJ
-        if (CNPJField.getText().isEmpty() || !CNPJField.getText().matches("\\d{2}\\.\\d{3}\\.\\d{3}/\\d{4}-\\d{2}")) {
-            CNPJField.setStyle("-fx-border-color: red;");
-            erroMensagem.append("- CNPJ\n");
-            isValid = false;
-        } else {
-            CNPJField.setStyle(null);
-        }
-
-        return isValid;
-    }
-
-    private boolean validarCampoTexto(TextField textField) {
-        if (textField.getText().isEmpty() || !textField.getText().matches("[\\p{L}\\s]*")) {
-            textField.setStyle("-fx-border-color: red;");
-            return false;
-        } else {
-            textField.setStyle(null); // Remove o estilo de erro se válido
-            return true;
-        }
-    }
-
-    private void configurarValidacaoNumerica(TextField textField) {
-        TextFormatter<String> formatter = new TextFormatter<>(change -> {
-            if (change.getText().matches(("[\\d\\s]*"))) { // Permite números e espaços
-                return change;
-            }
-            return null; // Rejeita mudanças inválidas
-        });
-        textField.setTextFormatter(formatter);
-    }
-
-    private void configurarValidacaoTelefone(TextField textField) {
-        TextFormatter<String> formatter = new TextFormatter<>(change -> {
-            String novoTexto = change.getControlNewText();
-
-            if (novoTexto.matches("(\\d{2})?(\\d{2})\\d{8,9}")) {
-                // Formato: Código do país (2 dígitos) + DDD (2 dígitos) + Número (8 ou 9 dígitos)
-                return change;
-            }
-
-            return null; // Rejeita mudanças inválidas
-        });
-        textField.setTextFormatter(formatter);
-    }
-
-    private void configurarValidacaoCNPJ(TextField textField) {
-        TextFormatter<String> formatter = new TextFormatter<>(change -> {
-            String novoTexto = change.getControlNewText();
-
-            // Regex para validar o formato de CNPJ
-            if (novoTexto.matches("\\d{2}\\.\\d{3}\\.\\d{3}/\\d{4}-\\d{2}")) {
-                return change; // Aceita formato válido
-            }
-
-            return null; // Rejeita mudanças inválidas
-        });
-        textField.setTextFormatter(formatter);
-    }
-    private void configurarValidacaoTexto(TextField textField) {
-        textField.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (!newValue.matches("[\\p{L}\\s\\d.,-]*")) { // Permite letras, espaços, números, '.', ',' e '-'
-                textField.setText(oldValue);
-            }
-        });
-    }
-
-
+    
     private void showSucessMessage() {
         successMessage.setVisible(true);
         successMessage.toFront();
