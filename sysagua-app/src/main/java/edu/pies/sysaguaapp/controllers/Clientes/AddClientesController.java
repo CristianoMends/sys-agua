@@ -129,8 +129,8 @@ public class AddClientesController {
         endereco.setNeighborhood(neighborhoodField.getText().trim());
         endereco.setCity(cityField.getText().trim());
         endereco.setState(stateField.getText().trim());
-
         novoCliente.setAddress(endereco);
+        novoCliente.setActive(true);
 
         return novoCliente;
     }
