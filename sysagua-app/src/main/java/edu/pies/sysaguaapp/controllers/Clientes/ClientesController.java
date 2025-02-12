@@ -1,4 +1,4 @@
-package edu.pies.sysaguaapp.controllers;
+package edu.pies.sysaguaapp.controllers.Clientes;
 
 import edu.pies.sysaguaapp.models.Address;
 import edu.pies.sysaguaapp.models.Clientes;
@@ -11,100 +11,48 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Cursor;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
-import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class ClientesController {
 
     private ClientesService clienteService;
+    private final String token;
+    private Address address;
 
     @FXML
     private StackPane rootPane;
 
     @FXML
-    private Label successMessage;
-
-    @FXML
-    private TextField nomeField;
-
-    @FXML
-    private CheckBox exibirInativosCheckBox;
-
-
-    @FXML
-    private VBox addressBox;
-    @FXML
-    private TextField numberField;
-
-    @FXML
-    private TextField streetField;
-
-
-    @FXML
-    private TextField neighborhoodField;
-
-
-    @FXML
-    private TextField cityField;
-
-
-    @FXML
-    private TextField stateField;
-
-    private Address address;
-
-    @FXML
-    private TextField telefoneField;
-
-
-    @FXML
-    private TextField CNPJField;
-
-
-    @FXML
-    private BorderPane formCadastroClientes;
-
-    @FXML
-    private Button btnAnterior;
-
-    @FXML
-    private Rectangle overlay;
-
-    @FXML
-    private Button btnProximo;
-
-    @FXML
-    private VBox listClienteView;
-
-    @FXML
-    private VBox detailsFormCliente;
+    private TableView<Clientes> tabelaClientes;
 
     @FXML
     private HBox paginationContainer;
 
     @FXML
-    private Button btnSalvar;
+    private Button btnAnterior, btnProximo, btnAdicionar;
 
     @FXML
-    private Button btnCancelar;
+    private Label successMessage;
 
     @FXML
-    private TableView<Clientes> tabelaClientes;
+    private CheckBox exibirInativosCheckBox;
+
     private ObservableList<Clientes> clientesObservable;
     private int paginaAtual = 0;
     private final int itensPorPagina = 18;
     private int totalPaginas;
-    private Clientes clienteEditado = null;
+
 
     public ClientesController() {
         this.clienteService = new ClientesService();
+        token = TokenManager.getInstance().getToken();
         this.clientesObservable = FXCollections.observableArrayList();
     }
 
@@ -113,151 +61,20 @@ public class ClientesController {
         configurarTabela();
         carregarClientes();
         showMenuContext();
+        btnAdicionar.setCursor(Cursor.HAND);
         exibirInativosCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> carregarClientes());
     }
 
     @FXML
-    private void handleAddCliente(){
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("views/Clientes/AddClientes.fxml"));
+    private void handleAddCliente() {
+        try{
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/Clientes/AddCliente.fxml"));
             Parent form = loader.load();
-
             rootPane.getChildren().clear();
             rootPane.getChildren().add(form);
-
         } catch (Exception e){
-                e.printStackTrace();
-                System.out.println("Erro ao carregar formulário de cliente: " + e.getMessage());
-        }
-    }
-
-    private void showOverlay() {
-        overlay.maxWidth(rootPane.widthProperty().get());
-        overlay.maxHeight(rootPane.heightProperty().get());
-        overlay.widthProperty().bind(rootPane.widthProperty());
-        overlay.heightProperty().bind(rootPane.heightProperty());
-        overlay.setVisible(true);
-        overlay.setManaged(true);
-    }
-
-    private void hideOverlay() {
-        overlay.setVisible(false);
-        overlay.setManaged(false);
-    }
-
-    @FXML
-    private void updateButtonText() {
-        if (clienteEditado != null) {
-            btnSalvar.setText("Editar");
-        } else {
-            btnSalvar.setText("Salvar");
-        }
-    }
-
-    @FXML
-    private void handleSalvar() {
-        StringBuilder erroMensagem = new StringBuilder();
-
-        // Verifica se há campos inválidos
-        if (!validarCamposComErros(erroMensagem)) {
-            // Caso algum campo tenha erro, não permite salvar
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Erro");
-            alert.setHeaderText("Campos inválidos");
-            alert.setContentText(erroMensagem.toString()); // Exibe a mensagem detalhada
-            alert.showAndWait();
-            return; // Interrompe o salvamento
-        }
-            String nome = nomeField.getText();
-            String telefoneStr = telefoneField.getText();
-            String cnpjStr = CNPJField.getText();
-            String numeroStr = numberField.getText();
-            String rua = streetField.getText();
-            String bairro = neighborhoodField.getText();
-            String cidade = cityField.getText();
-            String estado = stateField.getText();
-
-
-        validarCampos();
-
-            // Cria o objeto Address
-            Address clienteAddress = new Address();
-            clienteAddress.setNumber(numeroStr);
-            clienteAddress.setStreet(rua);
-            clienteAddress.setNeighborhood(bairro);
-            clienteAddress.setCity(cidade);
-            clienteAddress.setState(estado);
-
-
-            Clientes novoCliente = new Clientes();
-            novoCliente.setName(nome);
-            novoCliente.setAddress(clienteAddress);
-            novoCliente.setPhone(telefoneStr);
-            novoCliente.setCnpj(cnpjStr);
-
-            try{
-                String token = TokenManager.getInstance().getToken();
-                if (clienteEditado != null){
-                    novoCliente.setId(clienteEditado.getId());
-                    novoCliente.setActive(true);
-                    ClientesService.editarCliente(novoCliente, token);
-                    clientesObservable.set(clientesObservable.indexOf(clienteEditado), novoCliente);
-                }
-                else{
-                    novoCliente.setActive(true);
-                    ClientesService.criarCliente(novoCliente, token);
-                    clientesObservable.add(novoCliente);
-                }        
-        } catch (Exception e) {
             e.printStackTrace();
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Erro");
-            alert.setHeaderText("Falha ao criar cliente");
-            System.out.println(e.getMessage());
-            alert.setContentText(e.getMessage());
-            hideForm();
-            hideOverlay();
-            alert.showAndWait();
-            return;
-        }
-        hideForm();
-        hideOverlay();
-        clearFieldForm();
-        listClienteView.setDisable(false);
-        showSucessMessage();
-        carregarClientes();
-    }
-
-    private void mostrarAlerta(String title, String header, String content) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setHeaderText(header);
-        alert.setContentText(content);
-        alert.showAndWait();
-    }
-
-    private void clearFieldForm() {
-        nomeField.clear();
-        telefoneField.clear();
-        CNPJField.clear();
-        numberField.clear();
-        streetField.clear();
-        neighborhoodField.clear();
-        cityField.clear();
-        stateField.clear();
-    }
-
-    @FXML
-    private void handleCancelar() {
-        hideForm();
-        hideOverlay();
-        listClienteView.setDisable(false);
-    }
-
-    @FXML
-    private void handleDetailsClienteModal() {
-        if (!detailsFormCliente.isVisible()) {
-            showModal(detailsFormCliente);
+            System.out.println("Erro ao carregar formulário de cliente: " + e.getMessage());
         }
     }
 
@@ -271,26 +88,6 @@ public class ClientesController {
     private void hideDetailsModal(VBox root) {
         root.setManaged(false);
         root.setVisible(false);
-    }
-
-    @FXML
-    private void handleAddCliente() {
-        if (!formCadastroClientes.isVisible()) {
-            showOverlay();  
-            showForm();
-            listClienteView.setDisable(true);
-        }
-    }
-
-    private void showForm() {
-        formCadastroClientes.setManaged(true);
-        formCadastroClientes.toFront();
-        formCadastroClientes.setVisible(true);
-    }
-
-    private void hideForm() {
-        formCadastroClientes.setVisible(false);
-        formCadastroClientes.setManaged(false);
     }
 
     private void showMenuContext(){
@@ -322,10 +119,10 @@ public class ClientesController {
 
         if (clienteSelecionado != null) {
             try{
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/Clientes/AddClientes.fxml"));
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/Clientes/AddCliente.fxml"));
                 Parent form = loader.load();
 
-                AddClienteController controller = loader.getController();
+                AddClientesController controller = loader.getController();
 
                 controller.setClienteEditando(String.valueOf(clienteSelecionado.getId()));
 
@@ -338,42 +135,76 @@ public class ClientesController {
         }
     }
 
-    private void preencherCampos(Clientes cliente) {
-        nomeField.setText(cliente.getName());
-        Address clienteAddress = cliente.getAddress();
-        if (clienteAddress != null) { // Verifica se o endereço não é nulo
-            numberField.setText(clienteAddress.getNumber());
-            streetField.setText(clienteAddress.getStreet());
-            neighborhoodField.setText(clienteAddress.getNeighborhood());
-            cityField.setText(clienteAddress.getCity());
-            stateField.setText(clienteAddress.getState());
-        } else {
-            // Caso o cliente não tenha endereço, limpa os campos relacionados
-            numberField.setText("");
-            streetField.setText("");
-            neighborhoodField.setText("");
-            cityField.setText("");
-            stateField.setText("");
-        }
-        telefoneField.setText(cliente.getPhone());
-        CNPJField.setText(cliente.getCnpj());
-    }
-
     private void handleInativarCliente() {
         Clientes clienteSelecionado = tabelaClientes.getSelectionModel().getSelectedItem();
         if (clienteSelecionado != null) {
             try{
                 String token = TokenManager.getInstance().getToken();
                 ClientesService.inativarCliente(clienteSelecionado, token);
-
+                tabelaClientes.getItems().remove(clienteSelecionado);
+                tabelaClientes.refresh();
             } catch(Exception e){
                 e.printStackTrace();
                 System.out.println("Erro ao inativar cliente: " + e.getMessage());
             }            
         }
-        else{
-            System.out.println("Nenhum cliente selecionado!");
-        }
+    }
+
+    private void configurarTabela() {
+        // Configuração das colunas da tabela
+        TableColumn<Clientes, Long> colunaId = new TableColumn<>("Código");
+        colunaId.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getId()));
+        colunaId.setStyle("-fx-alignment: CENTER;");
+        colunaId.setSortType(TableColumn.SortType.ASCENDING);
+
+        TableColumn<Clientes, String> colunaNome = new TableColumn<>("Nome");
+        colunaNome.setCellValueFactory(new PropertyValueFactory<>("name"));
+        colunaNome.setStyle("-fx-alignment: CENTER;");
+
+        TableColumn<Clientes, String> colunaEnderecoCompleto = new TableColumn<>("Endereço");
+        colunaEnderecoCompleto.setCellValueFactory(cellData -> {
+            String numero = cellData.getValue().getAddress().getNumber();
+            String rua = cellData.getValue().getAddress().getStreet();
+            String bairro = cellData.getValue().getAddress().getNeighborhood();
+            String cidade = cellData.getValue().getAddress().getCity();
+            String estado = cellData.getValue().getAddress().getState();
+
+            String enderecoFormatado = String.format("%s, %s - %s, %s - %s", bairro, numero, rua, cidade, estado);
+            return new SimpleStringProperty(enderecoFormatado);
+        });
+
+        TableColumn<Clientes, String> colunaTelefone = new TableColumn<>("Telefone");
+        colunaTelefone.setCellValueFactory(new PropertyValueFactory<>("phone"));
+
+        TableColumn<Clientes, String> colunaCnpj = new TableColumn<>("CNPJ");
+        colunaCnpj.setCellValueFactory(new PropertyValueFactory<>("cnpj"));
+
+        TableColumn<Clientes, String> colunaStatus = new TableColumn<>("Status");
+        colunaStatus.setCellValueFactory(cellData -> {
+            if(cellData.getValue().getActive()){
+                return new SimpleStringProperty("Ativo");
+            }
+            return new SimpleStringProperty("Inativo");
+        });
+        colunaStatus.setStyle("-fx-alignment: CENTER;");
+
+        tabelaClientes.getColumns().addAll(colunaId, colunaNome, colunaEnderecoCompleto, colunaTelefone, colunaCnpj);
+        tabelaClientes.setItems(clientesObservable);
+
+        tabelaClientes.setRowFactory(tv -> new TableRow<>() {
+            @Override
+            protected void updateItem(Clientes cliente, boolean empty) {
+                super.updateItem(cliente, empty);
+                if (cliente == null || empty) {
+                    setStyle("");
+                } else if (!cliente.getActive()) {
+                    setStyle("-fx-text-fill: red;");
+                } else {
+                    setStyle("");
+                }
+            }
+        });
+
     }
 
     private void carregarClientes() {
@@ -385,15 +216,12 @@ public class ClientesController {
                 todosClientes.removeIf(cliente -> !cliente.getActive());
             }
 
-
             totalPaginas = (int) Math.ceil((double) todosClientes.size() / itensPorPagina);
 
-            // Filtra os produtos para a página atual
             int inicio = paginaAtual * itensPorPagina;
             int fim = Math.min(inicio + itensPorPagina, todosClientes.size());
             List<Clientes> clientesPagina = todosClientes.subList(inicio, fim);
 
-            // Atualiza a lista observável
             clientesObservable.setAll(clientesPagina);
             atualizarEstadoBotoes();
             atualizarPaginacao();
@@ -403,6 +231,8 @@ public class ClientesController {
             System.out.println("Erro ao carregar lista:" + e.getMessage());
         }
     }
+
+
 
     private void atualizarPaginacao() {
         paginationContainer.getChildren().clear();
@@ -444,37 +274,6 @@ public class ClientesController {
         }
     }
 
-    private void configurarTabela() {
-        // Configuração das colunas da tabela
-        TableColumn<Clientes, Long> colunaId = new TableColumn<>("Código");
-        colunaId.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getId()));
-
-
-        TableColumn<Clientes, String> colunaNome = new TableColumn<>("Nome");
-        colunaNome.setCellValueFactory(new PropertyValueFactory<>("name"));
-
-        TableColumn<Clientes, String> colunaEnderecoCompleto = new TableColumn<>("Endereço");
-        colunaEnderecoCompleto.setCellValueFactory(cellData -> {
-            String numero = cellData.getValue().getAddress().getNumber();
-            String rua = cellData.getValue().getAddress().getStreet();
-            String bairro = cellData.getValue().getAddress().getNeighborhood();
-            String cidade = cellData.getValue().getAddress().getCity();
-            String estado = cellData.getValue().getAddress().getState();
-
-            String enderecoFormatado = String.format("%s, %s - %s, %s - %s", rua, numero, bairro, cidade, estado);
-            return new SimpleStringProperty(enderecoFormatado);
-        });
-
-
-        TableColumn<Clientes, String> colunaTelefone = new TableColumn<>("Telefone");
-        colunaTelefone.setCellValueFactory(new PropertyValueFactory<>("phone"));
-
-        TableColumn<Clientes, String> colunaCnpj = new TableColumn<>("CNPJ");
-        colunaCnpj.setCellValueFactory(new PropertyValueFactory<>("cnpj"));
-
-        tabelaClientes.getColumns().addAll(colunaId, colunaNome, colunaEnderecoCompleto, colunaTelefone, colunaCnpj);
-        tabelaClientes.setItems(clientesObservable);
-    }
     
     private void showSucessMessage() {
         successMessage.setVisible(true);
