@@ -23,7 +23,6 @@ import java.util.List;
 public class StockServiceImpl implements StockService {
     @Autowired
     private StockRepository stockRepository;
-
     @Autowired
     private ProductRepository productRepository;
     @Autowired
@@ -49,7 +48,9 @@ public class StockServiceImpl implements StockService {
         if (stock.isPresent()) {
             stock.get().setTotalEntries(stock.get().getTotalEntries() + dto.getQuantity());
             stock.get().setUpdatedAt(LocalDateTime.now().atZone(ZoneId.of("America/Sao_Paulo")).toLocalDateTime());
-            this.stockRepository.save(stock.get());
+            var saved = this.stockRepository.save(stock.get());
+
+            saveStockHistory(saved, MovementType.ENTRY, dto.getQuantity(), "Entrada de produto");
             return;
         }
 
@@ -61,7 +62,7 @@ public class StockServiceImpl implements StockService {
         newStock.setCreatedAt(LocalDateTime.now().atZone(ZoneId.of("America/Sao_Paulo")).toLocalDateTime());
         var saved = this.stockRepository.save(newStock);
 
-        saveStockHistory(saved, MovementType.ENTRY, dto.getQuantity(), "Criado estoque do produto "+product.getName());
+        saveStockHistory(saved, MovementType.ENTRY, dto.getQuantity(), "Criação de estoque");
     }
 
     @Override
@@ -122,7 +123,9 @@ public class StockServiceImpl implements StockService {
         }
 
         stock.setUpdatedAt(LocalDateTime.now());
-        this.stockRepository.save(stock);
+        var saved = this.stockRepository.save(stock);
+
+        saveStockHistory(saved, MovementType.ENTRY, dto.getQuantity(), "Atualização de estoque");
     }
 
     void saveStockHistory(Stock stock, MovementType type, int quantity, String description){
