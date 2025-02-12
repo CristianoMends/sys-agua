@@ -33,7 +33,7 @@ public class ClientesService {
             return objectMapper.readValue(response.body(), new TypeReference<List<Clientes>>() {
             });
         } else {
-            throw new Exception("Erro ao buscar clientes: ");
+            throw new Exception("Erro ao buscar: " + response.body());
         }
     }
 
@@ -52,20 +52,9 @@ public class ClientesService {
 
         // Verificar a resposta
         if (response.statusCode() == 201) {
-            if (response.body() != null && !response.body().isEmpty()) {
-                // Se o corpo não estiver vazio, desserializar e retornar o cliente
-                return objectMapper.readValue(response.body(), Clientes.class);
-            } else {
-                // Se o corpo estiver vazio, apenas retornar o cliente que foi enviado
-                System.out.println("Cliente criado com sucesso, mas sem dados retornados.");
-                return clientes;
-            }
-        } else if (response.statusCode() == 400) {
-            System.out.println("Erro ao criar cliente: " + response.body());
-            throw new Exception("Erro ao criar cliente: ");
+            return null;
         } else {
-            System.out.println("Server response: " + response.body());
-            throw new Exception("Erro ao criar cliente: ");
+            throw new Exception("Erro ao cadastrar: " + response.body());
         }
     }
     public static Clientes editarCliente(Clientes cliente, String token) throws Exception {
@@ -80,48 +69,56 @@ public class ClientesService {
 
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
-        if (response.statusCode() == 200 || response.statusCode() == 204) {
-        if (response.body().isEmpty()) {
-            return cliente; // Retorna o cliente sem alterações se não houver corpo na resposta
+        if (response.statusCode() == 204) {
+            return null;
         } else {
-            try {
-                return objectMapper.readValue(response.body(), Clientes.class); // Tenta converter a resposta para o objeto Cliente
-            } catch (IOException e) {
-                throw new Exception("Erro ao processar a resposta do servidor: ");
-            }
+            throw new Exception("Erro ao atualizar: " + response.body());
         }
-    } else {
-        throw new Exception("Erro ao editar cliente: ");
-    }
     }
     public static Clientes inativarCliente(Clientes cliente, String token) throws Exception {
-        cliente.setActive(false);
-    
-        String clienteJson = objectMapper.writeValueAsString(cliente);
         String urlComId = BASE_URL + "/" + cliente.getId();
         
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(urlComId))
-                .PUT(HttpRequest.BodyPublishers.ofString(clienteJson)) // Envia a atualização do cliente
+                .DELETE()
                 .header("Content-Type", "application/json")
                 .header("Authorization", "Bearer " + token)
                 .build();
     
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-    
-        if (response.statusCode() == 200 || response.statusCode() == 204) {
-            if (response.body().isEmpty()) {
-                return cliente;
-            } else {
-                try {
-                    return objectMapper.readValue(response.body(), Clientes.class);
-                } catch (IOException e) {
-                    throw new Exception("Erro ao processar a resposta do servidor: ");
-                }
-            }
+
+        if (response.statusCode() == 204) {
+            return null;
         } else {
-            throw new Exception("Erro ao inativar cliente: ");
+            throw new Exception("Erro ao deletar: " + response.body());
         }
     }
+
+    public Clientes buscarClienteId(String id, String token) throws Exception {
+        String urlComId = BASE_URL + "?id=" + id;
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(urlComId))
+                .GET()
+                .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer " + token)
+                .build();
+
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() == 200) {
+            if (response.body().isEmpty()) {
+                return null;
+            }
+            List<Clientes> clientes = objectMapper.readValue(response.body(), new TypeReference<List<Clientes>>() {});
+            if (!clientes.isEmpty()) {
+                return clientes.get(0);
+            }
+            return null;
+        } else {
+            throw new Exception("Erro ao buscar cliente: " + response.body());
+        }
+    }
+
     
 }
