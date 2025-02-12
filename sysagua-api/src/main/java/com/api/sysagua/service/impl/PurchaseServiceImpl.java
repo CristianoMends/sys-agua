@@ -1,11 +1,13 @@
 package com.api.sysagua.service.impl;
 
 import com.api.sysagua.dto.purchase.*;
+import com.api.sysagua.dto.stock.AddProductDto;
 import com.api.sysagua.enumeration.*;
 import com.api.sysagua.exception.BusinessException;
 import com.api.sysagua.model.*;
 import com.api.sysagua.repository.*;
 import com.api.sysagua.service.PurchaseService;
+import com.api.sysagua.service.StockService;
 import com.api.sysagua.service.UserService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +29,7 @@ public class PurchaseServiceImpl implements PurchaseService {
     @Autowired
     private SupplierRepository supplierRepository;
     @Autowired
-    private StockRepository stockRepository;
+    private StockService stockService;
     @Autowired
     private TransactionRepository transactionRepository;
     @Autowired
@@ -84,14 +86,15 @@ public class PurchaseServiceImpl implements PurchaseService {
             purchase.setSupplier(supplier);
         }
 
-        if (dto.getNfe()            != null) purchase.setNfe(dto.getNfe());
-        if (dto.getEntryAt()        != null) purchase.setEntryAt(dto.getEntryAt());
-        if (dto.getDescription()    != null) purchase.setDescription(dto.getDescription());
-        if (dto.getPaymentMethod()  != null) purchase.setPaymentMethod(dto.getPaymentMethod());
-        if (dto.getPaymentStatus()  != null) purchase.setPaymentStatus(dto.getPaymentStatus());
+        if (dto.getNfe() != null) purchase.setNfe(dto.getNfe());
+        if (dto.getEntryAt() != null) purchase.setEntryAt(dto.getEntryAt());
+        if (dto.getDescription() != null) purchase.setDescription(dto.getDescription());
+        if (dto.getPaymentMethod() != null) purchase.setPaymentMethod(dto.getPaymentMethod());
+        if (dto.getPaymentStatus() != null) purchase.setPaymentStatus(dto.getPaymentStatus());
         var differenceAmounts = BigDecimal.ZERO;
         if (dto.getPaidAmount() != null) {
-            if (dto.getPaidAmount().compareTo(purchase.getPaidAmount()) <= 0) throw new BusinessException("amount paid must be greater than the previous one");
+            if (dto.getPaidAmount().compareTo(purchase.getPaidAmount()) <= 0)
+                throw new BusinessException("amount paid must be greater than the previous one");
 
             differenceAmounts = dto.getPaidAmount().subtract(purchase.getPaidAmount());
             purchase.setPaidAmount(dto.getPaidAmount());
@@ -216,18 +219,7 @@ public class PurchaseServiceImpl implements PurchaseService {
     }
 
     private void addEntriesProductOnStock(int quantity, Product product) {
-        var stock = this.stockRepository.findProduct(product.getId()).orElseThrow(
-                () -> new BusinessException("Stock by product not found", HttpStatus.NOT_FOUND)
-        );
-        stock.setTotalEntries(stock.getTotalEntries() + quantity);
-        var saved = this.stockRepository.save(stock);
-        saveStockHistory(saved, MovementType.ENTRY, quantity, "Adicionado produto "+product.getName()+" ao estoque");
-    }
-
-    void saveStockHistory(Stock stock, MovementType type, int quantity, String description){
-        var user = this.userService.getLoggedUser();
-        var history = new StockHistory(user,stock, type, quantity, description);
-        this.stockHistoryRepository.save(history);
+        this.stockService.addProduct(new AddProductDto(product.getId(),quantity));
     }
 
     private void processProductsOnStock(Purchase purchase) {
