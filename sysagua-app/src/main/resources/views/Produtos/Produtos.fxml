@@ -33,7 +33,7 @@
                               <Font size="16.0" />
                            </font></Label>
                           <Region HBox.hgrow="ALWAYS" />
-                          <Button mnemonicParsing="false" onAction="#handleAddProduto" styleClass="menu-button" text="Adicionar" />
+                          <Button fx:id="btnAdicionar" mnemonicParsing="false" onAction="#handleAddProduto" styleClass="menu-button" text="Adicionar" />
                        </children>
                     </HBox>
                </children>

@@ -12,6 +12,9 @@ public class Fornecedor {
     private String cnpj;
     private Address address;
     private String phone;
+    private String tradeName;
+    private String stateRegistration;
+    private String municipalRegistration;
     private Boolean active;
 
     public boolean isActive() {return active;}

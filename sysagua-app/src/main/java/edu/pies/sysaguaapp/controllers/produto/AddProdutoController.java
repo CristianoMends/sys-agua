@@ -3,28 +3,30 @@ package edu.pies.sysaguaapp.controllers.produto;
 import edu.pies.sysaguaapp.models.ProductCategory;
 import edu.pies.sysaguaapp.models.ProductLine;
 import edu.pies.sysaguaapp.models.Produto;
-import edu.pies.sysaguaapp.services.ProductCategoryService;
-import edu.pies.sysaguaapp.services.ProductLineService;
-import edu.pies.sysaguaapp.services.ProdutoService;
+import edu.pies.sysaguaapp.services.produto.ProductCategoryService;
+import edu.pies.sysaguaapp.services.produto.ProductLineService;
+import edu.pies.sysaguaapp.services.produto.ProdutoService;
 import edu.pies.sysaguaapp.services.TokenManager;
-import javafx.animation.PauseTransition;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Cursor;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
-import javafx.util.Duration;
+import javafx.stage.Stage;
 import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class AddProdutoController {
     private final ProdutoService produtoService;
     private final ProductCategoryService productCategoryService;
     private final ProductLineService productLineService;
+    private final String token;
 
     @FXML
     private StackPane rootPane;
@@ -45,10 +47,7 @@ public class AddProdutoController {
     private Label nomeErrorLabel, categoriaErrorLabel, custoErrorLabel, precoUnitarioErrorLabel, marcaErrorLabel, linhaErrorLabel, unidadeErrorLabel;
 
     @FXML
-    private Button btnSalvar;
-
-    @FXML
-    private Button btnCancelar;
+    private Button btnSalvar, btnCancelar;
 
     @FXML
     private ComboBox<String> linhaComboBox;
@@ -60,12 +59,18 @@ public class AddProdutoController {
     private List<ProductCategory> categorias;
     private List<ProductLine> linhas;
     Produto produtoEditando = null;
+    @Setter
+    private boolean fecharAoSair = false;
+    @Setter
+    private Consumer<Void> onProdutoSalvo;
+    private Produto produtoClonado = null;
 
 
     public AddProdutoController() {
         this.produtoService = new ProdutoService();
         this.productCategoryService = new ProductCategoryService();
         this.productLineService = new ProductLineService();
+        token = TokenManager.getInstance().getToken();
     }
 
     @FXML
@@ -73,6 +78,9 @@ public class AddProdutoController {
         carregarCategorias();
         carregarLinhas();
         validarCampos();
+        btnCancelar.setCursor(Cursor.HAND);
+        btnSalvar.setCursor(Cursor.HAND);
+
     }
 
 
@@ -87,15 +95,18 @@ public class AddProdutoController {
 
     private Produto criarProduto() {
         Produto novoProduto = new Produto();
+
         novoProduto.setName(nomeField.getText());
         ProductCategory categoriaSelecionada = categorias.stream()
                 .filter(c -> c.getName().equals(categoriaComboBox.getValue()))
                 .findFirst()
                 .orElse(null);
+
         ProductLine linhaSelecionada = linhas.stream()
                 .filter(l -> l.getName().equals(linhaComboBox.getValue()))
                 .findFirst()
                 .orElse(null);
+
         novoProduto.setCategoryId(categoriaSelecionada != null ? categoriaSelecionada.getId() : null);
         novoProduto.setLineId(linhaSelecionada != null ? linhaSelecionada.getId() : null);
         novoProduto.setCost(new BigDecimal(custoField.getText().replace(",", ".")));
@@ -103,6 +114,7 @@ public class AddProdutoController {
         novoProduto.setUnit(unidadeField.getText());
         novoProduto.setBrand(marcaField.getText());
         novoProduto.setNcm(ncmField.getText());
+
         return novoProduto;
     }
 
@@ -112,13 +124,15 @@ public class AddProdutoController {
             Produto novoProduto = criarProduto();
 
             try {
-                String token = TokenManager.getInstance().getToken();
                 if (produtoEditando != null) {
                     novoProduto.setId(produtoEditando.getId());
                     novoProduto.setActive(true);
                     produtoService.editarProduto(novoProduto, token);
                 } else {
                     produtoService.criarProduto(novoProduto, token);
+                    if (onProdutoSalvo != null) {
+                        onProdutoSalvo.accept(null);
+                    }
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -131,7 +145,14 @@ public class AddProdutoController {
             }
 
             clearFieldForm();
-            carregarTela("/views/Produtos/Produtos.fxml");
+            produtoClonado = null;
+            produtoEditando = null;
+            if (fecharAoSair) {
+                Stage stage = (Stage) btnSalvar.getScene().getWindow();
+                stage.close();
+            } else {
+                carregarTela("/views/Produtos/Produtos.fxml");
+            }
         }
     }
 
@@ -224,19 +245,34 @@ public class AddProdutoController {
     @FXML
     private void handleCancelar() {
         clearFieldForm();
-        this.produtoEditando = null;
-        carregarTela("/views/Produtos/Produtos.fxml");
+        produtoEditando = null;
+        produtoClonado = null;
+        if (fecharAoSair) {
+            Stage stage = (Stage) btnCancelar.getScene().getWindow();
+            stage.close();
+        } else {
+            carregarTela("/views/Produtos/Produtos.fxml");
+        }
     }
 
     /*------------------- produtos --------------*/
 
     public void setProdutoEditando(String id) {
         try{
-            String token = TokenManager.getInstance().getToken();
             produtoEditando = produtoService.buscarProdutoId(id, token);
             updateButtonText();
             preencherCampos(produtoEditando);
         } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Erro ao carregar produto" + e.getMessage());
+        }
+    }
+
+    public void setProdutoClonado(String id) {
+        try {
+            produtoClonado = produtoService.buscarProdutoId(id, token);
+            preencherCampos(produtoClonado);
+        }catch (Exception e) {
             e.printStackTrace();
             System.out.println("Erro ao carregar produto" + e.getMessage());
         }

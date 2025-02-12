@@ -7,8 +7,9 @@ module edu.pies.sysaguaapp {
     requires org.kordamp.bootstrapfx.core;
     requires java.net.http;
     requires java.xml.crypto;
-    requires com.fasterxml.jackson.databind;
     requires static lombok;
+    requires com.fasterxml.jackson.datatype.jsr310;
+    requires com.fasterxml.jackson.databind;
 
     opens edu.pies.sysaguaapp to javafx.fxml;
     exports edu.pies.sysaguaapp;
@@ -21,4 +22,10 @@ module edu.pies.sysaguaapp {
     opens edu.pies.sysaguaapp.controllers.fornecedor to javafx.fxml;
     exports edu.pies.sysaguaapp.controllers.produto;
     opens edu.pies.sysaguaapp.controllers.produto to javafx.fxml;
+    exports edu.pies.sysaguaapp.models.compras;
+    exports edu.pies.sysaguaapp.controllers.compras;
+    opens edu.pies.sysaguaapp.controllers.compras to javafx.fxml;
+    opens edu.pies.sysaguaapp.dtos.compra to com.fasterxml.jackson.databind;
+    exports edu.pies.sysaguaapp.enumeration;
+
 }

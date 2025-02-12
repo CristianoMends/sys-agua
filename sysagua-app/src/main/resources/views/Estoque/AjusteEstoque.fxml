@@ -44,7 +44,7 @@
                <HBox>
                   <children>
                      <Region maxHeight="28.0" minWidth="465.0" />
-                     <Button mnemonicParsing="false" onAction="#handleInserir" styleClass="menu-button" text="Inserir" />
+                     <Button fx:id="btnInserir" mnemonicParsing="false" onAction="#handleInserir" styleClass="menu-button" text="Inserir" />
                   </children>
                </HBox>
                <Region minHeight="50.0" />

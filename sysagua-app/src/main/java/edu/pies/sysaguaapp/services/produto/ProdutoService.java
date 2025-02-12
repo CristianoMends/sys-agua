@@ -1,17 +1,13 @@
-package edu.pies.sysaguaapp.services;
+package edu.pies.sysaguaapp.services.produto;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.pies.sysaguaapp.models.Fornecedor;
 import edu.pies.sysaguaapp.models.Produto;
 
 import java.net.URI;
-import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.List;
 
 public class ProdutoService {
@@ -131,6 +127,8 @@ public class ProdutoService {
 
         if (response.statusCode() == 204) {
             return null;
+        } else if (response.statusCode() == 400) {
+            throw new Exception("Produto não pode ser inativado pois compõe estoque: " + response.body());
         } else {
             throw new Exception("Erro ao inativar produto: " + response.body());
         }

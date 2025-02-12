@@ -7,6 +7,7 @@ import edu.pies.sysaguaapp.services.FornecedorService;
 import edu.pies.sysaguaapp.services.TokenManager;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Cursor;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.layout.StackPane;
@@ -47,6 +48,8 @@ public class AddFornecedorController {
 
     public AddFornecedorController() {
         fornecedorService = new FornecedorService();
+        btnCancelar.setCursor(Cursor.HAND);
+        btnSalvar.setCursor(Cursor.HAND);
     }
 
     @FXML
@@ -57,19 +60,7 @@ public class AddFornecedorController {
     @FXML
     private void handleSalvar() {
         if (validarFormulario()){
-            Fornecedor novoFornecedor = new Fornecedor();
-            novoFornecedor.setSocialReason(razaoSocialField.getText().trim());
-            novoFornecedor.setPhone("55" + telefoneField.getText().trim());
-            novoFornecedor.setCnpj(cnpjField.getText().trim());
-
-            Address endereco = new Address();
-            endereco.setNumber(numeroField.getText().trim());
-            endereco.setStreet(logradouroField.getText().trim());
-            endereco.setNeighborhood(bairroField.getText().trim());
-            endereco.setCity(cidadeField.getText().trim());
-            endereco.setState(estadoField.getText().trim());
-
-            novoFornecedor.setAddress(endereco);
+            Fornecedor novoFornecedor = criarFornecedor();
 
             try {
                 String token = TokenManager.getInstance().getToken();
@@ -92,7 +83,6 @@ public class AddFornecedorController {
         }
 
     }
-
 
     @FXML
     private void handleCancelar() {
@@ -143,6 +133,30 @@ public class AddFornecedorController {
         bairroField.setText(fornecedor.getAddress().getNeighborhood());
         cidadeField.setText(fornecedor.getAddress().getCity());
         estadoField.setText(fornecedor.getAddress().getState());
+        fantasiaField.setText(fornecedor.getTradeName());
+        inscEstadualField.setText(fornecedor.getStateRegistration());
+        inscEstadualField.setText(fornecedor.getMunicipalRegistration());
+    }
+
+    private Fornecedor criarFornecedor(){
+        Fornecedor novoFornecedor = new Fornecedor();
+        novoFornecedor.setSocialReason(razaoSocialField.getText().trim());
+        novoFornecedor.setPhone("55" + telefoneField.getText().trim());
+        novoFornecedor.setCnpj(cnpjField.getText().trim());
+        novoFornecedor.setTradeName(fantasiaField.getText());
+        novoFornecedor.setMunicipalRegistration(inscMunicipalField.getText());
+        novoFornecedor.setStateRegistration(inscEstadualField.getText());
+
+        Address endereco = new Address();
+        endereco.setNumber(numeroField.getText().trim());
+        endereco.setStreet(logradouroField.getText().trim());
+        endereco.setNeighborhood(bairroField.getText().trim());
+        endereco.setCity(cidadeField.getText().trim());
+        endereco.setState(estadoField.getText().trim());
+
+        novoFornecedor.setAddress(endereco);
+
+        return novoFornecedor;
     }
 
 

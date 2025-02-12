@@ -8,6 +8,7 @@ import javafx.beans.property.*;
 import javafx.collections.*;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Cursor;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -19,6 +20,7 @@ import java.util.List;
 
 public class FornecedorController {
     private final FornecedorService fornecedorService;
+    private final String token;
 
     @FXML
     private StackPane rootPane;
@@ -30,15 +32,13 @@ public class FornecedorController {
     private HBox paginationContainer;
 
     @FXML
-    private Button btnAnterior, btnProximo;
+    private Button btnAnterior, btnProximo, btnAdicionar;
 
     @FXML
     private Label successMessage;
 
     @FXML
     private CheckBox exibirInativosCheckBox;
-
-    private Fornecedor fornecedorEditando = null;
 
     private ObservableList<Fornecedor> fornecedorObservable;
     private int paginaAtual = 0;
@@ -47,6 +47,7 @@ public class FornecedorController {
 
     public FornecedorController() {
         this.fornecedorService = new FornecedorService();
+        token = TokenManager.getInstance().getToken();
         this.fornecedorObservable = FXCollections.observableArrayList();
     }
 
@@ -55,6 +56,7 @@ public class FornecedorController {
         configurarTabela();
         carregarFornecedores();
         showMenuContext();
+        btnAdicionar.setCursor(Cursor.HAND);
 
         exibirInativosCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> carregarFornecedores());
     }
@@ -84,10 +86,7 @@ public class FornecedorController {
         MenuItem inativarItem = new MenuItem("Inativar fornecedor");
 
         contextMenu.getItems().addAll(editarItem, inativarItem);
-
         editarItem.setOnAction(event -> handleEditarFornecedor());
-
-
         inativarItem.setOnAction(event -> handleInativarFornecedor());
 
         tabelaFornecedor.setOnMouseClicked(event -> {
@@ -124,8 +123,8 @@ public class FornecedorController {
         Fornecedor fornecedorSelecionado = tabelaFornecedor.getSelectionModel().getSelectedItem();
         if (fornecedorSelecionado != null) {
             try {
-                String token = TokenManager.getInstance().getToken();
                 fornecedorService.inativarFornecedor(fornecedorSelecionado, token);
+                tabelaFornecedor.refresh();
 
             } catch (Exception e) {
                 e.printStackTrace();
