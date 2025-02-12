@@ -34,7 +34,7 @@ public interface CustomerDoc {
             description = "Este método permite buscar clientes com base em vários filtros, como nome, telefone, endereço, etc."
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "sucesso."),
+            @ApiResponse(responseCode = "200", description = "sucesso."),
             @ApiResponse(responseCode = "400", description = "Parâmetros inválidos.", content = @Content()),
             @ApiResponse(responseCode = "404", description = "Não encontrado", content = @Content()),
             @ApiResponse(responseCode = "403", description = "Não autorizado.", content = @Content()),
