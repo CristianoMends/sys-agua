@@ -51,16 +51,17 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y docker-compose
 
-      # Início dos serviços com Docker Compose
-      - name: Start Docker Compose
+      # Criar arquivo .env para o Docker Compose
+      - name: Create .env file for Docker Compose
         run: |
-          DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
-          DEFAULT_EMAIL=${{ secrets.DEFAULT_EMAIL }} \
-          DEFAULT_PASSWORD=${{ secrets.DEFAULT_PASSWORD }} \
-          JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }} \
-          docker-compose up --build -d
-        env:
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" > .env
+          echo "DEFAULT_EMAIL=${{ secrets.DEFAULT_EMAIL }}" >> .env
+          echo "DEFAULT_PASSWORD=${{ secrets.DEFAULT_PASSWORD }}" >> .env
+          echo "JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}" >> .env
+
+      # Início dos serviços com Docker Compose utilizando o arquivo .env
+      - name: Start Docker Compose
+        run: docker-compose up --build -d
 
       # Aguarda que os serviços estejam prontos
       - name: Wait for services to be ready
