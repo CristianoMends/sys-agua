@@ -34,7 +34,7 @@ services:
       DEFAULT_PASSWORD: ${DEFAULT_PASSWORD}  # Senha padrão para autenticação
       JWT_SECRET_KEY: ${JWT_SECRET_KEY}  # Chave secreta para geração de tokens JWT
     depends_on:
-      - db:  # Dependência do serviço da API com o banco de dados
+      - db  # Dependência do serviço da API com o banco de dados
     ports:
       - "8080:8080"  # Mapeia a porta 8080 do container para a porta 8080 do host
     networks:
