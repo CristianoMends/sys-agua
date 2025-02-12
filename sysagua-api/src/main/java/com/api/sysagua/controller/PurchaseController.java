@@ -2,9 +2,12 @@ package com.api.sysagua.controller;
 
 import com.api.sysagua.docs.PurchaseDoc;
 import com.api.sysagua.dto.purchase.*;
+import com.api.sysagua.enumeration.PaymentMethod;
+import com.api.sysagua.enumeration.PaymentStatus;
 import com.api.sysagua.service.PurchaseService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,34 +25,54 @@ public class PurchaseController implements PurchaseDoc {
     @PostMapping()
     public ResponseEntity<Object> create(@RequestBody CreatePurchaseDto dto) {
         this.purchaseService.create(dto);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
-
 
     @GetMapping
     public ResponseEntity<List<ViewPurchaseDto>> list(
-            @RequestParam(value = "id", required = false) Long id,
-            @RequestParam(value = "totalValueStart", required = false) BigDecimal totalValueStart,
-            @RequestParam(value = "totalValueEnd", required = false) BigDecimal totalValueEnd,
-            @RequestParam(value = "active", required = false) Boolean active,
-            @RequestParam(value = "updatedAtStart", required = false) LocalDateTime updatedAtStart,
-            @RequestParam(value = "updatedAtEnd", required = false) LocalDateTime updatedAtEnd,
-            @RequestParam(value = "createdAtStart", required = false) LocalDateTime createdAtStart,
-            @RequestParam(value = "createdAtEnd", required = false) LocalDateTime createdAtEnd,
-            @RequestParam(value = "supplierId", required = false) Long supplierId,
-            @RequestParam(value = "productId", required = false) Long productId
+            @RequestParam(required = false) Long id,
+            @RequestParam(required = false) BigDecimal totalAmountStart,
+            @RequestParam(required = false) BigDecimal totalAmountEnd,
+            @RequestParam(required = false) BigDecimal paidAmountStart,
+            @RequestParam(required = false) BigDecimal paidAmountEnd,
+            @RequestParam(required = false) Boolean active,
+            @RequestParam(required = false) LocalDateTime entryAtStart,
+            @RequestParam(required = false) LocalDateTime entryAtEnd,
+            @RequestParam(required = false) LocalDateTime createdAtStart,
+            @RequestParam(required = false) LocalDateTime createdAtEnd,
+            @RequestParam(required = false) LocalDateTime finishedAtStart,
+            @RequestParam(required = false) LocalDateTime finishedAtEnd,
+            @RequestParam(required = false) LocalDateTime canceledAtStart,
+            @RequestParam(required = false) LocalDateTime canceledAtEnd,
+            @RequestParam(required = false) String description,
+            @RequestParam(required = false) Long supplierId,
+            @RequestParam(required = false) Long productId,
+            @RequestParam(required = false) String nfe,
+            @RequestParam(required = false) PaymentMethod paymentMethod,
+            @RequestParam(required = false) PaymentStatus paymentStatus
     ) {
         return ResponseEntity.ok(this.purchaseService.list(
                 id,
-                totalValueStart,
-                totalValueEnd,
+                totalAmountStart,
+                totalAmountEnd,
+                paidAmountStart,
+                paidAmountEnd,
                 active,
-                updatedAtStart,
-                updatedAtEnd,
+                entryAtStart,
+                entryAtEnd,
                 createdAtStart,
                 createdAtEnd,
+                finishedAtStart,
+                finishedAtEnd,
+                canceledAtStart,
+                canceledAtEnd,
+                description,
                 supplierId,
-                productId));
+                productId,
+                nfe,
+                paymentMethod,
+                paymentStatus
+        ));
     }
 
     @PutMapping("{id}")

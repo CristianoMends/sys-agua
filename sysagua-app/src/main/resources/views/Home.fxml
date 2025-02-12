@@ -55,7 +55,7 @@
                         </ImageView>
                     </graphic>
                 </Button>
-                <TitledPane text="Cadastros Gerais" expanded="false" styleClass="menu-button">
+                <TitledPane fx:id="btnCadastrosGerais" text="Cadastros Gerais" expanded="false" styleClass="menu-button">
                     <!-- <graphic>
                         <ImageView fitHeight="16" fitWidth="16" pickOnBounds="true" preserveRatio="true">
                             <Image url="@../icons/homebar/cadastros.png" />
@@ -77,14 +77,14 @@
                         </ImageView>
                     </graphic>
                 </Button>
-                <Button onAction="#handleCompras" prefWidth="180" styleClass="menu-button" text="Compras">
+                <Button fx:id="btnCompras" onAction="#handleCompras" prefWidth="180" styleClass="menu-button" text="Compras">
                     <graphic>
                         <ImageView fitHeight="16" fitWidth="16" pickOnBounds="true" preserveRatio="true">
                             <Image url="@../icons/homebar/compras.png" />
                         </ImageView>
                     </graphic>
                 </Button>
-                <Button onAction="#handleEstoque" prefWidth="180" styleClass="menu-button" text="Estoque">
+                <Button fx:id="btnEstoque" onAction="#handleEstoque" prefWidth="180" styleClass="menu-button" text="Estoque">
                     <graphic>
                         <ImageView fitHeight="16" fitWidth="16" pickOnBounds="true" preserveRatio="true">
                             <Image url="@../icons/homebar/estoque.png" />

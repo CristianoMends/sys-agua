@@ -79,4 +79,21 @@ public class EntregadorService {
             throw new Exception("Erro ao atualizar: " + response.body());
         }
     }
+
+    public Entregador inativarEntregador(Entregador entregador, String token) throws Exception {
+        String urlEntregador = BASE_URL + "/" + entregador.getId();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(urlEntregador))
+                .DELETE()
+                .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer " + token)
+                .build();
+
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        if (response.statusCode() == 204) {
+            return null;
+        } else {
+            throw new Exception("Erro ao inativar: " + response.body());
+        }
+    }
 }

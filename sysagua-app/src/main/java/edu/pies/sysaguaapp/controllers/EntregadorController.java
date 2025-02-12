@@ -9,6 +9,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.Cursor;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseButton;
@@ -22,6 +23,7 @@ import java.util.List;
 
 public class EntregadorController {
     private final EntregadorService entregadorService;
+    private final String token;
 
     @FXML
     private StackPane rootPane;
@@ -33,16 +35,10 @@ public class EntregadorController {
     private HBox paginationContainer;
 
     @FXML
-    private Button btnAnterior;
+    private Button btnAnterior, btnProximo, btnSalvar, btnCancelar, btnAdicionar;
 
     @FXML
-    private Button btnProximo;
-
-    @FXML
-    private TextField nomeField;
-
-    @FXML
-    private TextField telefoneField;
+    private TextField nomeField, telefoneField;
 
     @FXML
     private BorderPane formCadastroEntregador;
@@ -57,19 +53,7 @@ public class EntregadorController {
     private VBox listEntregadorView;
 
     @FXML
-    private Label successMessage;
-
-    @FXML
-    private Label nomeErrorLabel;
-
-    @FXML
-    private Label telefoneErrorLabel;
-
-    @FXML
-    private Button btnSalvar;
-
-    @FXML
-    private Button btnCancelar;
+    private Label successMessage, nomeErrorLabel, telefoneErrorLabel;
 
     @FXML
     private CheckBox exibirInativosCheckBox;
@@ -83,6 +67,7 @@ public class EntregadorController {
 
     public EntregadorController() {
         this.entregadorService = new EntregadorService();
+        token = TokenManager.getInstance().getToken();
         this.entregadorObservable = FXCollections.observableArrayList();
     }
 
@@ -91,19 +76,12 @@ public class EntregadorController {
         configurarTabela();
         carregarEntregadores();
         showMenuContext();
-
+        validarCampos();
+        btnCancelar.setCursor(Cursor.HAND);
+        btnSalvar.setCursor(Cursor.HAND);
+        btnAdicionar.setCursor(Cursor.HAND);
         exibirInativosCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> carregarEntregadores());
 
-        // Validar texto
-        configurarValidacaoTexto(nomeField);
-        nomeField.textProperty().addListener((obs, oldText, newText) -> {
-            nomeErrorLabel.setVisible(newText.trim().isEmpty());
-        });
-
-        configurarValidacaoTexto(telefoneField);
-        telefoneField.textProperty().addListener((obs, oldText, newText) -> {
-            telefoneErrorLabel.setVisible(newText.trim().isEmpty());
-        });
     }
 
     private void showOverlay() {
@@ -143,7 +121,6 @@ public class EntregadorController {
         novoEntregador.setPhone(telefone);
 
         try {
-            String token = TokenManager.getInstance().getToken();
             if (entregadorEditando != null) {
                 novoEntregador.setId(entregadorEditando.getId());
                 entregadorService.atualizarEntregador(novoEntregador, token);
@@ -159,10 +136,7 @@ public class EntregadorController {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Erro");
             alert.setHeaderText("Falha ao cadastrar");
-            System.out.println(e.getMessage());
             alert.setContentText(e.getMessage());
-            hideForm();
-            hideOverlay();
             alert.showAndWait();
         }
 
@@ -236,7 +210,7 @@ public class EntregadorController {
     }
 
     private void handleEditarEntregador() {
-        Entregador entregadorSelecionado = (Entregador) tabelaEntregador.getSelectionModel().getSelectedItem();
+        Entregador entregadorSelecionado = tabelaEntregador.getSelectionModel().getSelectedItem();
 
         if (entregadorSelecionado != null) {
             try{
@@ -259,9 +233,15 @@ public class EntregadorController {
     }
 
     private void handleInativarEntregador() {
-        Object entregadorSelecionado = tabelaEntregador.getSelectionModel().getSelectedItem();
+        Entregador entregadorSelecionado = tabelaEntregador.getSelectionModel().getSelectedItem();
         if (entregadorSelecionado != null) {
-            System.out.println("Inativar: " + entregadorSelecionado);
+            try {
+                entregadorService.inativarEntregador(entregadorSelecionado, token);
+                tabelaEntregador.refresh();
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.out.println("Erro ao inativar entregador "+e.getMessage());
+            }
         }
     }
 
@@ -316,7 +296,6 @@ public class EntregadorController {
 
     private void carregarEntregadores() {
         try {
-            String token = TokenManager.getInstance().getToken();
             List<Entregador> todosEntregadores = entregadorService.buscarEntregadores(token);
 
             if (!exibirInativosCheckBox.isSelected()) {
@@ -390,21 +369,46 @@ public class EntregadorController {
 
 
     /*--------- validações ----------*/
+    private void validarCampos() {
+        // Validar números
+        configurarValidacaoTelefone(telefoneField, telefoneErrorLabel);
 
-    private void configurarValidacaoNumerica(TextField textField) {
-        TextFormatter<String> formatter = new TextFormatter<>(change -> {
-            if (change.getText().matches("\\d*([.]\\d*)?")) { // Permite números e ponto decimal
-                return change;
-            }
-            return null; // Rejeita mudanças inválidas
-        });
-        textField.setTextFormatter(formatter);
+        // Validar texto
+        configurarValidacaoTexto(nomeField, nomeErrorLabel);
     }
 
-    private void configurarValidacaoTexto(TextField textField) {
+    private void configurarValidacaoTexto(TextField textField, Label errorLabel) {
         textField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.matches("[\\p{L}\\s\\d.,-]*")) { // Permite letras, espaços, números, '.', ',' e '-'
                 textField.setText(oldValue);
+                errorLabel.setVisible(true);
+                errorLabel.setManaged(true);
+            } else {
+                errorLabel.setVisible(false);
+                errorLabel.setManaged(false);
+            }
+        });
+    }
+
+    private void configurarValidacaoTelefone(TextField textField, Label errorLabel) {
+        textField.textProperty().addListener((observable, oldValue, newValue) -> {
+            // Remove qualquer caractere não numérico
+            String digits = newValue.replaceAll("[^\\d]", "");
+
+            // Limita o comprimento do telefone a 11 caracteres
+            if (digits.length() > 11) {
+                digits = digits.substring(0, 11);
+            }
+
+            textField.setText(digits);
+
+            if (digits.length() == 11) {
+                errorLabel.setVisible(false);
+                errorLabel.setManaged(false);
+            } else {
+                errorLabel.setText("Telefone inválido.");
+                errorLabel.setVisible(true);
+                errorLabel.setManaged(true);
             }
         });
     }

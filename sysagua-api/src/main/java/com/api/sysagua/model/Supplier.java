@@ -1,6 +1,6 @@
 package com.api.sysagua.model;
 
-import com.api.sysagua.dto.customer.AddressDto;
+import com.api.sysagua.dto.address.AddressDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -26,11 +26,17 @@ public class Supplier {
     private AddressDto address;
     private String phone;
     private Boolean active;
+    private String tradeName;
+    private String stateRegistration;
+    private String municipalRegistration;
 
-    public Supplier(String socialReason, String cnpj, AddressDto address, String phone) {
+    public Supplier(String socialReason, String cnpj, AddressDto address, String phone, String tradeName, String stateRegistration, String municipalRegistration) {
         this.socialReason = socialReason;
         this.cnpj = cnpj;
         this.address = address;
         this.phone = phone;
+        this.tradeName = tradeName;
+        this.stateRegistration = stateRegistration;
+        this.municipalRegistration = municipalRegistration;
     }
 }

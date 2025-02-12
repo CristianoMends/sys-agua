@@ -2,6 +2,8 @@ package com.api.sysagua.model;
 
 
 import com.api.sysagua.dto.purchase.ViewPurchaseDto;
+import com.api.sysagua.enumeration.PaymentMethod;
+import com.api.sysagua.enumeration.PaymentStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -20,22 +22,40 @@ public class Purchase {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false, name = "purchase_id")
     private Long id;
-    private BigDecimal totalValue;
+    private BigDecimal paidAmount;
+    private BigDecimal totalAmount;
     private Boolean active;
-    private LocalDateTime updatedAt;
+    private LocalDateTime entryAt;
     private LocalDateTime createdAt;
-
+    private LocalDateTime finishedAt;
+    private LocalDateTime canceledAt;
+    private String description;
+    private PaymentMethod paymentMethod;
+    private String nfe;
+    @Enumerated(EnumType.STRING)
+    private PaymentStatus paymentStatus;
     @OneToMany(mappedBy = "purchase", cascade = CascadeType.ALL,orphanRemoval = true)
     private List<ProductPurchase> productPurchases;
-
     @ManyToOne
     @JoinColumn(name = "supplier_id")
     private Supplier supplier;
 
+    @PrePersist
+    private void prePersist(){
+        updateTotalValue();
+        setCreatedAt(LocalDateTime.now());
+    }
+
+    @PreUpdate
+    private void preUpdate(){
+        setActive(true);
+    }
 
 
     public void updateTotalValue() {
-        this.totalValue = productPurchases.stream()
+        if (getTotalAmount() != null) return;
+
+        this.totalAmount = productPurchases.stream()
                 .map(p -> p.getPurchasePrice().multiply(BigDecimal.valueOf(p.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
@@ -43,9 +63,16 @@ public class Purchase {
     public ViewPurchaseDto toView(){
         return new ViewPurchaseDto(
                 getId(),
-                getTotalValue(),
+                getPaidAmount(),
+                getTotalAmount(),
                 getCreatedAt(),
-                getUpdatedAt(),
+                getEntryAt(),
+                getCanceledAt(),
+                getFinishedAt(),
+                getPaymentMethod(),
+                getPaymentStatus(),
+                getNfe(),
+                getDescription(),
                 getActive(),
                 getProductPurchases().stream().map(ProductPurchase::toView).toList(),
                 getSupplier()

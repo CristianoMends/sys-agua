@@ -1,6 +1,6 @@
 package com.api.sysagua.model;
 
-import com.api.sysagua.dto.customer.AddressDto;
+import com.api.sysagua.dto.address.AddressDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

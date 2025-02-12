@@ -20,30 +20,33 @@ public class SupplierServiceImpl implements SupplierService {
 
     @Override
     public void create(CreateSupplierDto dto) {
-        var supplier = this.supplierRepository.findByCnpj(dto.getCnpj());
+        this.validatePhoneAndCnpj(dto.getPhone(), dto.getCnpj());
 
-        if (supplier.isPresent()){
-            throw new BusinessException(String.format("Supplier with cnpj %s has exists",dto.getCnpj()));
-        }
-
-        supplier = this.supplierRepository.findByPhone(dto.getPhone());
-
-        if (supplier.isPresent()){
-            throw new BusinessException(String.format("Supplier with phone %s has exists",dto.getPhone()));
-        }
         var supplierToSave = dto.toModel();
         supplierToSave.setActive(true);
         this.supplierRepository.save(supplierToSave);
     }
 
     @Override
-    public List<Supplier> list(Long id, String socialReason, String cnpj, String phone, Boolean active) {
+    public List<Supplier> list(
+            Long id,
+            String socialReason,
+            String cnpj,
+            String phone,
+            Boolean active,
+            String tradeName,
+            String stateRegistration,
+            String municipalRegistration
+    ) {
 
         if (cnpj == null) cnpj = "";
         if (phone == null) phone = "";
         if (socialReason == null) socialReason = "";
+        if (tradeName == null) tradeName = "";
+        if (stateRegistration == null) stateRegistration = "";
+        if (municipalRegistration == null) municipalRegistration = "";
 
-        return this.supplierRepository.findByFilters(id,socialReason,cnpj,phone,active);
+        return this.supplierRepository.findByFilters(id,socialReason,cnpj,phone,active, tradeName, stateRegistration, municipalRegistration);
     }
 
     @Override
@@ -58,15 +61,39 @@ public class SupplierServiceImpl implements SupplierService {
     public void update(Long id, UpdateSupplierDto dto) {
         var supplier = this.supplierRepository.findById(id).orElseThrow(() -> new BusinessException("Supplier not found",HttpStatus.NOT_FOUND));
 
+        if (!supplier.getCnpj().equals(dto.getCnpj())){
+            this.supplierRepository.findByCnpj(dto.getCnpj()).ifPresent(c ->{
+                throw new BusinessException("There is already a supplier with this CNPJ");
+            });
+        }
+        if (!supplier.getPhone().equals(dto.getPhone())){
+            this.supplierRepository.findByPhone(dto.getPhone()).ifPresent(c ->{
+                throw new BusinessException("There is already a supplier with this Phone");
+            });
+        }
         if (dto.getCnpj() != null) supplier.setCnpj(dto.getCnpj());
         if (dto.getSocialReason() != null) supplier.setSocialReason(dto.getSocialReason());
         if (dto.getPhone() != null) supplier.setPhone(dto.getPhone());
-        if (dto.getCity() != null) supplier.getAddress().setCity(dto.getCity());
-        if (dto.getState() != null) supplier.getAddress().setState(dto.getState());
-        if (dto.getNumber() != null) supplier.getAddress().setNumber(dto.getNumber());
-        if (dto.getStreet() != null) supplier.getAddress().setStreet(dto.getStreet());
-        if (dto.getNeighborhood() != null) supplier.getAddress().setNeighborhood(dto.getNeighborhood());
+        if (dto.getAddress().getCity() != null) supplier.getAddress().setCity(dto.getAddress().getCity());
+        if (dto.getAddress().getState() != null) supplier.getAddress().setState(dto.getAddress().getState());
+        if (dto.getAddress().getNumber() != null) supplier.getAddress().setNumber(dto.getAddress().getNumber());
+        if (dto.getAddress().getStreet() != null) supplier.getAddress().setStreet(dto.getAddress().getStreet());
+        if (dto.getAddress().getNeighborhood() != null) supplier.getAddress().setNeighborhood(dto.getAddress().getNeighborhood());
 
         this.supplierRepository.save(supplier);
+    }
+
+    private void validatePhoneAndCnpj(String phone, String cnpj){
+        this.supplierRepository.findByCnpj(cnpj).ifPresent(
+                c -> {
+                    throw new BusinessException("There is already a customer with this CNPJ");
+                }
+        );
+
+        this.supplierRepository.findByPhone(phone).ifPresent(
+                c -> {
+                    throw new BusinessException("There is already a customer with this PHONE");
+                }
+        );
     }
 }

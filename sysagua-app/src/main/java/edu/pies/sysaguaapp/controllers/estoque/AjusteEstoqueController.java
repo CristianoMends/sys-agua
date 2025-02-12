@@ -3,12 +3,13 @@ package edu.pies.sysaguaapp.controllers.estoque;
 import edu.pies.sysaguaapp.models.Estoque;
 import edu.pies.sysaguaapp.models.Produto;
 import edu.pies.sysaguaapp.services.EstoqueService;
-import edu.pies.sysaguaapp.services.ProdutoService;
+import edu.pies.sysaguaapp.services.produto.ProdutoService;
 import edu.pies.sysaguaapp.services.TokenManager;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Cursor;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.layout.StackPane;
@@ -36,10 +37,7 @@ public class AjusteEstoqueController {
     private TextField quantidadeTextField;
 
     @FXML
-    private Button btnSalvar;
-
-    @FXML
-    private Button btnCancelar;
+    private Button btnSalvar, btnCancelar, btnInserir;
 
     @FXML
     private TableView<Estoque> ajustesTableView;
@@ -68,6 +66,7 @@ public class AjusteEstoqueController {
 
     @FXML
     public void initialize() {
+        btnInserir.setCursor(Cursor.HAND);
         carregarProdutos();
         ajustesTableView.setItems(ajustesList);
         produtoColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getProduct().getName()));

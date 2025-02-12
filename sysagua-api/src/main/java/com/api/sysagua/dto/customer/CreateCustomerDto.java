@@ -1,5 +1,6 @@
 package com.api.sysagua.dto.customer;
 
+import com.api.sysagua.dto.address.AddressDto;
 import com.api.sysagua.model.Customer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
