@@ -6,7 +6,7 @@ import com.api.sysagua.exception.BusinessException;
 import com.api.sysagua.model.*;
 import com.api.sysagua.repository.*;
 import com.api.sysagua.service.PurchaseService;
-import com.api.sysagua.service.TransactionService;
+import com.api.sysagua.service.UserService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -27,11 +27,13 @@ public class PurchaseServiceImpl implements PurchaseService {
     @Autowired
     private SupplierRepository supplierRepository;
     @Autowired
-    private TransactionService transactionService;
-    @Autowired
     private StockRepository stockRepository;
     @Autowired
     private TransactionRepository transactionRepository;
+    @Autowired
+    private StockHistoryRepository stockHistoryRepository;
+    @Autowired
+    private UserService userService;
 
     @Override
     @Transactional
@@ -82,15 +84,14 @@ public class PurchaseServiceImpl implements PurchaseService {
             purchase.setSupplier(supplier);
         }
 
-        if (dto.getNfe() != null) purchase.setNfe(dto.getNfe());
-        if (dto.getEntryAt() != null) purchase.setEntryAt(dto.getEntryAt());
-        if (dto.getDescription() != null) purchase.setDescription(dto.getDescription());
-        if (dto.getPaymentMethod() != null) purchase.setPaymentMethod(dto.getPaymentMethod());
-        if (dto.getPaymentStatus() != null) purchase.setPaymentStatus(dto.getPaymentStatus());
+        if (dto.getNfe()            != null) purchase.setNfe(dto.getNfe());
+        if (dto.getEntryAt()        != null) purchase.setEntryAt(dto.getEntryAt());
+        if (dto.getDescription()    != null) purchase.setDescription(dto.getDescription());
+        if (dto.getPaymentMethod()  != null) purchase.setPaymentMethod(dto.getPaymentMethod());
+        if (dto.getPaymentStatus()  != null) purchase.setPaymentStatus(dto.getPaymentStatus());
         var differenceAmounts = BigDecimal.ZERO;
         if (dto.getPaidAmount() != null) {
-            if (dto.getPaidAmount().compareTo(purchase.getPaidAmount()) <= 0)
-                throw new BusinessException("amount paid must be greater than the previous one");
+            if (dto.getPaidAmount().compareTo(purchase.getPaidAmount()) <= 0) throw new BusinessException("amount paid must be greater than the previous one");
 
             differenceAmounts = dto.getPaidAmount().subtract(purchase.getPaidAmount());
             purchase.setPaidAmount(dto.getPaidAmount());
@@ -219,7 +220,14 @@ public class PurchaseServiceImpl implements PurchaseService {
                 () -> new BusinessException("Stock by product not found", HttpStatus.NOT_FOUND)
         );
         stock.setTotalEntries(stock.getTotalEntries() + quantity);
-        this.stockRepository.save(stock);
+        var saved = this.stockRepository.save(stock);
+        saveStockHistory(saved, MovementType.ENTRY, quantity, "Adicionado produto "+product.getName()+" ao estoque");
+    }
+
+    void saveStockHistory(Stock stock, MovementType type, int quantity, String description){
+        var user = this.userService.getLoggedUser();
+        var history = new StockHistory(user,stock, type, quantity, description);
+        this.stockHistoryRepository.save(history);
     }
 
     private void processProductsOnStock(Purchase purchase) {
@@ -231,11 +239,13 @@ public class PurchaseServiceImpl implements PurchaseService {
     private void createPendingTransaction(Purchase purchase) {
         var amountPending = purchase.getTotalAmount().subtract(purchase.getPaidAmount());
         var description = "Quantia paga R$ " + purchase.getPaidAmount() + ", Quantia pendente R$" + amountPending;
+        var user = this.userService.getLoggedUser();
         var t = new Transaction(
                 TransactionStatus.PENDING,
                 purchase.getPaidAmount(),
                 TransactionType.EXPENSE,
                 description,
+                user,
                 null,
                 purchase
         );
@@ -245,25 +255,28 @@ public class PurchaseServiceImpl implements PurchaseService {
     private void createTransaction(Purchase purchase, TransactionStatus status, BigDecimal amout, TransactionType type) {
         var amountPending = purchase.getTotalAmount().subtract(purchase.getPaidAmount());
         var description = "Quantia paga R$ " + amout + ", Quantia pendente R$" + amountPending;
+        var user = this.userService.getLoggedUser();
         var t = new Transaction(
                 status,
                 amout,
                 type,
                 description,
+                user,
                 null,
                 purchase
         );
         this.transactionRepository.save(t);
     }
 
-
     private void createPaidTransaction(Purchase purchase) {
         var description = "Quantia paga R$ " + purchase.getPaidAmount() + ", de valor total R$" + purchase.getTotalAmount();
+        var user = this.userService.getLoggedUser();
         var t = new Transaction(
                 TransactionStatus.PAID,
                 purchase.getPaidAmount(),
                 TransactionType.EXPENSE,
                 description,
+                user,
                 null,
                 purchase
         );
@@ -272,11 +285,13 @@ public class PurchaseServiceImpl implements PurchaseService {
 
     private void createCanceledTransaction(Purchase purchase) {
         var description = "Compra cancelada. Estorno de transações realizado";
+        var user = this.userService.getLoggedUser();
         var t = new Transaction(
                 TransactionStatus.CANCELED,
                 purchase.getPaidAmount(),
                 TransactionType.INCOME,
                 description,
+                user,
                 null,
                 purchase
         );
