@@ -4,7 +4,8 @@ import com.api.sysagua.docs.TransactionDoc;
 import com.api.sysagua.dto.transaction.ViewTransactionDto;
 import com.api.sysagua.enumeration.TransactionStatus;
 import com.api.sysagua.enumeration.TransactionType;
-import com.api.sysagua.service.TransactionService;
+import com.api.sysagua.model.Transaction;
+import com.api.sysagua.repository.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,13 +13,14 @@ import org.springframework.web.bind.annotation.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("transactions")
 public class TransactionController implements TransactionDoc {
 
     @Autowired
-    private TransactionService service;
+    private TransactionRepository transactionRepository;
 
     @GetMapping
     @CrossOrigin
@@ -31,11 +33,12 @@ public class TransactionController implements TransactionDoc {
             @RequestParam(required = false) String description,
             @RequestParam(required = false) LocalDateTime createdAtStart,
             @RequestParam(required = false) LocalDateTime createdAtEnd,
+            @RequestParam(required = false) UUID reposnsibleUserId,
             @RequestParam(required = false) Long orderId,
             @RequestParam(required = false) Long purchaseId
     ) {
 
-        List<ViewTransactionDto> transactions = service.list(
+        List<ViewTransactionDto> transactions = transactionRepository.list(
                 id,
                 status,
                 amountStart,
@@ -44,9 +47,10 @@ public class TransactionController implements TransactionDoc {
                 description,
                 createdAtStart,
                 createdAtEnd,
+                reposnsibleUserId,
                 orderId,
                 purchaseId
-        );
+        ).stream().map(Transaction::toView).toList();
         return ResponseEntity.ok(transactions);
     }
 }

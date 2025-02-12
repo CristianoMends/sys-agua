@@ -6,6 +6,7 @@ import com.api.sysagua.enumeration.TransactionType;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 public interface CashierService {
 
@@ -19,6 +20,7 @@ public interface CashierService {
             String description,
             LocalDateTime createdAtStart,
             LocalDateTime createdAtEnd,
+            UUID responsibleUserId,
             Long orderId,
             Long purchaseId
     );

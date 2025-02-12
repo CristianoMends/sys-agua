@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # Serviço do banco de dados PostgreSQL
   db:

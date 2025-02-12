@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
     @Query("""
@@ -22,6 +23,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
             and (:description is null or t.description like concat('%', :description, '%')) 
             and (:orderId is null or t.order.id = :orderId)
             and (:purchaseId is null or t.purchase.id = :purchaseId)
+            and (:responsibleUserId is null or t.responsibleUser.id = :responsibleUserId )            
             and ((CAST(:createdAtStart as TIMESTAMP) is null or CAST(:createdAtEnd as TIMESTAMP) is null) or t.createdAt between :createdAtStart and :createdAtEnd) 
             order by t.createdAt""")
     List<Transaction> list(
@@ -33,6 +35,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
             @Param("description") String description,
             @Param("createdAtStart") LocalDateTime createdAtStart,
             @Param("createdAtEnd") LocalDateTime createdAtEnd,
+            @Param("responsibleUserId") UUID responsibleUserId,
             @Param("orderId") Long orderId,
             @Param("purchaseId") Long purchaseId
     );

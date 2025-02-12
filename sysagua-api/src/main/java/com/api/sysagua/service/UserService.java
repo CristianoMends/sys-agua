@@ -29,5 +29,5 @@ public interface UserService {
 
     void updateUser(UpdateUserDto userDto);
 
-    String getLoggedUser();
+    User getLoggedUser();
 }
