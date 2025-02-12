@@ -15,6 +15,10 @@ services:
       - db-data:/var/lib/postgresql/data  # Armazena os dados do banco de forma persistente em um volume
     networks:
       - sysagua-network # Adicionado à rede personalizada
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      retries: 5
 
   # Serviço da API SysAgua
   sysagua-api:
@@ -23,7 +27,7 @@ services:
     container_name: sysagua-api  # Nome do container da API
     environment:
       SPRING_PROFILES_ACTIVE: test      # Perfil ativo do Spring
-      DB_URL: jdbc:postgresql://postgres-db:5432/sysagua_db  # URL de conexão com o banco de dados
+      DB_URL: jdbc:postgresql://db:5432/sysagua_db  # URL de conexão com o banco de dados
       DB_USERNAME: postgres               # Nome de usuário do banco de dados
       DB_PASSWORD: ${DB_PASSWORD}                 # Senha padrão para autenticação
       DEFAULT_EMAIL: ${DEFAULT_EMAIL}  # E-mail padrão para autenticação
