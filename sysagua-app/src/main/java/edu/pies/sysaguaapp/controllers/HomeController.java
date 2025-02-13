@@ -46,41 +46,16 @@ public class HomeController implements Initializable {
     }
 
     private void loadInitView() {
-        loadView("/views/Dashboard.fxml");
+        loadView("/views/Compras/Compras.fxml");
     }
 
     //---------------- menu superior -------------------//
-    @FXML
-    private void handlePesquisar() {
-//        String searchText = searchField.getText();
-        // Lógica de pesquisa (por enquanto só imprime)
-        showMessage("Pesquisar");
-    }
-
-
-    @FXML
-    private void handleUsuario() {
-        // Lógica para abrir configurações
-        showMessage("Abrir Configurações");
-    }
-
-    @FXML
-    private void handleNotificacoes() {
-        // Lógica para abrir notificações
-        showMessage("Abrir Notificações");
-    }
 
     //------------------menu lateral ---------------------//
 
     @FXML
     private void handleDashboard() {
         loadView("/views/Dashboard.fxml");
-    }
-
-
-    @FXML
-    private void handleEntregas() {
-        loadView("/views/Pedidos/Pedido.fxml");
     }
 
     @FXML
@@ -91,26 +66,6 @@ public class HomeController implements Initializable {
     @FXML
     private void handleEstoque() {
         loadView("/views/Estoque/Estoque.fxml");
-    }
-
-    @FXML
-    private void handleFinanceiro() {
-        showMessage("Caixa");
-    }
-
-    @FXML
-    private void handleRelatorio() {
-        showMessage("Relatório");
-    }
-
-    @FXML
-    private void handleAjuda() {
-        showMessage("Usuário");
-    }
-
-    @FXML
-    private void handleCadastrosGerais() {
-        // Removed submenu handling logic
     }
 
     //------------------submenu cadastros gerais ---------------------//
@@ -162,10 +117,6 @@ public class HomeController implements Initializable {
     }
 
     //----------------------------contentBody--------//
-    @FXML
-    private void handleContent() {
-        showMessage("Algum conteúdo aqui");
-    }
 
     private void showMessage(String message) {
         // Cria um novo label com a mensagem

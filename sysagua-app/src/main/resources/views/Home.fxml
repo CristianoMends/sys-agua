@@ -22,7 +22,7 @@
             </StackPane>
             <HBox spacing="2" style="-fx-padding: 5; -fx-alignment: center;" HBox.hgrow="ALWAYS">
                 <TextField fx:id="textField" promptText="Pesquisar..." style="-fx-prompt-text-fill: grey; -fx-font-size: 14px;" styleClass="textField" HBox.hgrow="ALWAYS" />
-                <Button fx:id="searchButton" onAction="#handlePesquisar" styleClass="menu-button">
+                <Button fx:id="searchButton" styleClass="menu-button">
                     <graphic>
                         <ImageView fitHeight="16" fitWidth="16" pickOnBounds="true" preserveRatio="true">
                             <Image url="@../icons/home/searchicon.png" />
@@ -30,31 +30,10 @@
                     </graphic>
                 </Button>
             </HBox>
-            <Button fx:id="userButton" onAction="#handleUsuario" styleClass="menu-button" text="Usuário">
-                <graphic>
-                    <ImageView fitHeight="16" fitWidth="16" pickOnBounds="true" preserveRatio="true">
-                        <Image url="@../icons/home/usericon.png" />
-                    </ImageView>
-                </graphic>
-            </Button>
-            <Button fx:id="notificationButton" onAction="#handleNotificacoes" styleClass="menu-button">
-                <graphic>
-                    <ImageView fitHeight="16" fitWidth="16" pickOnBounds="true" preserveRatio="true">
-                        <Image url="@../icons/home/notif.png" />
-                    </ImageView>
-                </graphic>
-            </Button>
         </HBox>
         <HBox VBox.vgrow="ALWAYS">
             <VBox fx:id="sideMenu" maxWidth="200.0" minWidth="200.0" prefWidth="200.0" spacing="10" style="-fx-background-color: #F1F2F7; -fx-padding: 10;-fx-pref-height: 100%; -fx-fill: true;">
                 <Label style="-fx-text-fill: black; -fx-font-size: 18px; -fx-font-weight: normal;" text="Menu" />
-                <Button onAction="#handleDashboard" prefWidth="180" styleClass="menu-button" text="Dashboard">
-                    <graphic>
-                        <ImageView fitHeight="16" fitWidth="16" pickOnBounds="true" preserveRatio="true">
-                            <Image url="@../icons/homebar/dashboard.png" />
-                        </ImageView>
-                    </graphic>
-                </Button>
                 <TitledPane fx:id="btnCadastrosGerais" text="Cadastros Gerais" expanded="false" styleClass="menu-button">
                     <!-- <graphic>
                         <ImageView fitHeight="16" fitWidth="16" pickOnBounds="true" preserveRatio="true">
@@ -70,13 +49,6 @@
                         </VBox>
                     </content>
                 </TitledPane>
-                <Button onAction="#handleEntregas" prefWidth="180" styleClass="menu-button" text="Entregas">
-                    <graphic>
-                        <ImageView fitHeight="16" fitWidth="16" pickOnBounds="true" preserveRatio="true">
-                            <Image url="@../icons/homebar/entregas.png" />
-                        </ImageView>
-                    </graphic>
-                </Button>
                 <Button fx:id="btnCompras" onAction="#handleCompras" prefWidth="180" styleClass="menu-button" text="Compras">
                     <graphic>
                         <ImageView fitHeight="16" fitWidth="16" pickOnBounds="true" preserveRatio="true">
@@ -88,27 +60,6 @@
                     <graphic>
                         <ImageView fitHeight="16" fitWidth="16" pickOnBounds="true" preserveRatio="true">
                             <Image url="@../icons/homebar/estoque.png" />
-                        </ImageView>
-                    </graphic>
-                </Button>
-                <Button onAction="#handleFinanceiro" prefWidth="180" styleClass="menu-button" text="Financeiro">
-                    <graphic>
-                        <ImageView fitHeight="16" fitWidth="16" pickOnBounds="true" preserveRatio="true">
-                            <Image url="@../icons/homebar/financeiro.png" />
-                        </ImageView>
-                    </graphic>
-                </Button>
-                <Button onAction="#handleRelatorio" prefWidth="180" styleClass="menu-button" text="Relatório">
-                    <graphic>
-                        <ImageView fitHeight="16" fitWidth="16" pickOnBounds="true" preserveRatio="true">
-                            <Image url="@../icons/homebar/relatorios.png" />
-                        </ImageView>
-                    </graphic>
-                </Button>
-                <Button onAction="#handleAjuda" prefWidth="180" styleClass="menu-button" text="Ajuda">
-                    <graphic>
-                        <ImageView fitHeight="16" fitWidth="16" pickOnBounds="true" preserveRatio="true">
-                            <Image url="@../icons/homebar/ajuda.png" />
                         </ImageView>
                     </graphic>
                 </Button>
