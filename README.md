@@ -1,4 +1,4 @@
-<h1 align="center" style="font-weight: bold;">Sys agua💻</h1>
+<h1 align="center" style="font-weight: bold;">Sys Agua 💻</h1>
 
 <p align="center">
  <a href="#technologies">Tecnologias</a> • 
@@ -7,19 +7,31 @@
 
 <p align="center">
     <b>
-        Um sistema desktop completo para gerenciar pedidos, controle de estoque e entregas de água, facilitando a organização do processo logístico e melhorando o atendimento ao cliente.
+        Um sistema completo para gerenciar pedidos, controle de estoque e entregas de água, facilitando a organização do processo logístico e melhorando o atendimento ao cliente.
     </b>
 </p>
 
 <h2 id="technologies">💻 Tecnologias</h2>
 
-- Java 17
-- Spring Boot
-- Hibernate
-- BootstrapFX
-- JavaFx
-- PostgreSQL
+<h3>API REST</h3>
+<a href="https://github.com/CristianoMends/sys-agua/tree/develop/sysagua-api">Link</a>
+- Java  
+- Spring Boot  
+- Spring Data JPA  
+- Spring Security  
+- PostgreSQL  
+- Flyway Migrations
+- JWT
+- Swagger Open API
 - Gradle
+
+<h3>JavaFX</h3>
+<a href="https://github.com/CristianoMends/sys-agua/tree/develop/sysagua-app">Link</a>
+- Java
+- JavaFX  
+- BootstrapFX  
+- FXML  
+- Gradle  
 
 <h2 id="colab">🤝 Colaboradores</h2>
 
