@@ -30,6 +30,7 @@ public class Purchase {
     private LocalDateTime finishedAt;
     private LocalDateTime canceledAt;
     private String description;
+    @Enumerated(EnumType.STRING)
     private PaymentMethod paymentMethod;
     private String nfe;
     @Enumerated(EnumType.STRING)

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("cashier")
@@ -34,6 +35,7 @@ public class CashierController {
             @RequestParam(required = false) String description,
             @RequestParam(required = false) LocalDateTime createdAtStart,
             @RequestParam(required = false) LocalDateTime createdAtEnd,
+            @RequestParam(required = false) UUID responsibleUserId,
             @RequestParam(required = false) Long orderId,
             @RequestParam(required = false) Long purchaseId
     ) {
@@ -46,6 +48,7 @@ public class CashierController {
                 description,
                 createdAtStart,
                 createdAtEnd,
+                responsibleUserId,
                 orderId,
                 purchaseId
         );

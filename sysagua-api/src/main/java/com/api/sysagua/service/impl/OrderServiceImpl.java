@@ -10,6 +10,7 @@ import com.api.sysagua.model.*;
 import com.api.sysagua.repository.*;
 import com.api.sysagua.service.CashierService;
 import com.api.sysagua.service.OrderService;
+import com.api.sysagua.service.UserService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -37,6 +38,10 @@ public class OrderServiceImpl implements OrderService {
     private CashierService cashierService;
     @Autowired
     private TransactionRepository transactionRepository;
+    @Autowired
+    private StockHistoryRepository stockHistoryRepository;
+    @Autowired
+    private UserService userService;
 
     @Override
     @Transactional
@@ -78,7 +83,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<ViewOrderDto> list(Long id, Long customerId, Long deliveryPersonId, Long productOrderId, DeliveryStatus status, BigDecimal receivedAmountStart, BigDecimal receivedAmountEnd, BigDecimal totalAmountStart, BigDecimal totalAmountEnd, PaymentMethod paymentMethod, LocalDateTime createdAtStart, LocalDateTime createdAtEnd, LocalDateTime finishedAtStart, LocalDateTime finishedAtEnd,PaymentStatus paymentStatus) {
+    public List<ViewOrderDto> list(Long id, Long customerId, Long deliveryPersonId, Long productOrderId, DeliveryStatus status, BigDecimal receivedAmountStart, BigDecimal receivedAmountEnd, BigDecimal totalAmountStart, BigDecimal totalAmountEnd, PaymentMethod paymentMethod, LocalDateTime createdAtStart, LocalDateTime createdAtEnd, LocalDateTime finishedAtStart, LocalDateTime finishedAtEnd, PaymentStatus paymentStatus) {
         return this.orderRepository.list(
                 id,
                 customerId,
@@ -175,7 +180,7 @@ public class OrderServiceImpl implements OrderService {
                     order,
                     product,
                     createProductOrderDto.getQuantity(),
-                    createProductOrderDto.getUnitPrice() ==null?product.getPrice():createProductOrderDto.getUnitPrice()
+                    createProductOrderDto.getUnitPrice() == null ? product.getPrice() : createProductOrderDto.getUnitPrice()
             ));
         });
 
@@ -187,7 +192,9 @@ public class OrderServiceImpl implements OrderService {
                 () -> new BusinessException("Stock by product not found", HttpStatus.NOT_FOUND)
         );
         stock.setTotalWithdrawals(stock.getTotalWithdrawals() + quantity);
-        this.stockRepository.save(stock);
+        var saved = this.stockRepository.save(stock);
+
+        saveStockHistory(saved, MovementType.WITHDRAWAL, quantity, "Retirado produto " + product.getName() + " do estoque");
     }
 
     private void processOrderProducts(Order order) {
@@ -197,11 +204,13 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private void createPendingTransaction(Order order) {
+        var user = this.userService.getLoggedUser();
         var t = new Transaction(
                 TransactionStatus.PENDING,
                 order.getReceivedAmount(),
                 TransactionType.INCOME,
-                "Pedido aguardando pagamento - Restante a ser pago: R$"+order.getTotalAmount().subtract(order.getReceivedAmount()),
+                "Pedido aguardando pagamento - Restante a ser pago: R$" + order.getTotalAmount().subtract(order.getReceivedAmount()),
+                user,
                 order,
                 null
         );
@@ -209,27 +218,38 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private void createPaidTransaction(Order order) {
+        var user = this.userService.getLoggedUser();
         var t = new Transaction(
                 TransactionStatus.PAID,
                 order.getReceivedAmount(),
                 TransactionType.INCOME,
                 String.format("Pagamento confirmado! O pedido foi pago com sucesso. Valor total: R$ %.2f, valor recebido: R$ %.2f. A transação foi concluída e o pedido está finalizado.",
-                        order.getTotalAmount(), order.getReceivedAmount()),                order,
+                        order.getTotalAmount(), order.getReceivedAmount()),
+                user,
+                order,
                 null
         );
         this.transactionRepository.save(t);
     }
 
     private void createCanceledTransaction(Order order) {
+        var user = this.userService.getLoggedUser();
         var t = new Transaction(
                 TransactionStatus.CANCELED,
                 order.getReceivedAmount(),
                 TransactionType.EXPENSE,
                 "Pedido cancelado. O valor foi registrado como despesa.",
+                user,
                 order,
                 null
         );
         this.transactionRepository.save(t);
 
+    }
+
+    void saveStockHistory(Stock stock, MovementType type, int quantity, String description) {
+        var user = this.userService.getLoggedUser();
+        var history = new StockHistory(user, stock, type, quantity, description);
+        this.stockHistoryRepository.save(history);
     }
 }

@@ -1,12 +1,14 @@
 package com.api.sysagua.service.impl;
 
 import com.api.sysagua.dto.purchase.*;
+import com.api.sysagua.dto.stock.AddProductDto;
 import com.api.sysagua.enumeration.*;
 import com.api.sysagua.exception.BusinessException;
 import com.api.sysagua.model.*;
 import com.api.sysagua.repository.*;
 import com.api.sysagua.service.PurchaseService;
-import com.api.sysagua.service.TransactionService;
+import com.api.sysagua.service.StockService;
+import com.api.sysagua.service.UserService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -27,11 +29,13 @@ public class PurchaseServiceImpl implements PurchaseService {
     @Autowired
     private SupplierRepository supplierRepository;
     @Autowired
-    private TransactionService transactionService;
-    @Autowired
-    private StockRepository stockRepository;
+    private StockService stockService;
     @Autowired
     private TransactionRepository transactionRepository;
+    @Autowired
+    private StockHistoryRepository stockHistoryRepository;
+    @Autowired
+    private UserService userService;
 
     @Override
     @Transactional
@@ -215,11 +219,7 @@ public class PurchaseServiceImpl implements PurchaseService {
     }
 
     private void addEntriesProductOnStock(int quantity, Product product) {
-        var stock = this.stockRepository.findProduct(product.getId()).orElseThrow(
-                () -> new BusinessException("Stock by product not found", HttpStatus.NOT_FOUND)
-        );
-        stock.setTotalEntries(stock.getTotalEntries() + quantity);
-        this.stockRepository.save(stock);
+        this.stockService.addProduct(new AddProductDto(product.getId(),quantity));
     }
 
     private void processProductsOnStock(Purchase purchase) {
@@ -231,11 +231,13 @@ public class PurchaseServiceImpl implements PurchaseService {
     private void createPendingTransaction(Purchase purchase) {
         var amountPending = purchase.getTotalAmount().subtract(purchase.getPaidAmount());
         var description = "Quantia paga R$ " + purchase.getPaidAmount() + ", Quantia pendente R$" + amountPending;
+        var user = this.userService.getLoggedUser();
         var t = new Transaction(
                 TransactionStatus.PENDING,
                 purchase.getPaidAmount(),
                 TransactionType.EXPENSE,
                 description,
+                user,
                 null,
                 purchase
         );
@@ -245,25 +247,28 @@ public class PurchaseServiceImpl implements PurchaseService {
     private void createTransaction(Purchase purchase, TransactionStatus status, BigDecimal amout, TransactionType type) {
         var amountPending = purchase.getTotalAmount().subtract(purchase.getPaidAmount());
         var description = "Quantia paga R$ " + amout + ", Quantia pendente R$" + amountPending;
+        var user = this.userService.getLoggedUser();
         var t = new Transaction(
                 status,
                 amout,
                 type,
                 description,
+                user,
                 null,
                 purchase
         );
         this.transactionRepository.save(t);
     }
 
-
     private void createPaidTransaction(Purchase purchase) {
         var description = "Quantia paga R$ " + purchase.getPaidAmount() + ", de valor total R$" + purchase.getTotalAmount();
+        var user = this.userService.getLoggedUser();
         var t = new Transaction(
                 TransactionStatus.PAID,
                 purchase.getPaidAmount(),
                 TransactionType.EXPENSE,
                 description,
+                user,
                 null,
                 purchase
         );
@@ -272,11 +277,13 @@ public class PurchaseServiceImpl implements PurchaseService {
 
     private void createCanceledTransaction(Purchase purchase) {
         var description = "Compra cancelada. Estorno de transações realizado";
+        var user = this.userService.getLoggedUser();
         var t = new Transaction(
                 TransactionStatus.CANCELED,
                 purchase.getPaidAmount(),
                 TransactionType.INCOME,
                 description,
+                user,
                 null,
                 purchase
         );

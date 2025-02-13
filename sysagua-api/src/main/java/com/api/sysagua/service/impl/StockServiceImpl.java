@@ -2,11 +2,15 @@ package com.api.sysagua.service.impl;
 
 import com.api.sysagua.dto.stock.AddProductDto;
 import com.api.sysagua.dto.stock.UpdateStockDto;
+import com.api.sysagua.enumeration.MovementType;
 import com.api.sysagua.exception.BusinessException;
 import com.api.sysagua.model.Stock;
+import com.api.sysagua.model.StockHistory;
 import com.api.sysagua.repository.ProductRepository;
+import com.api.sysagua.repository.StockHistoryRepository;
 import com.api.sysagua.repository.StockRepository;
 import com.api.sysagua.service.StockService;
+import com.api.sysagua.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -19,9 +23,12 @@ import java.util.List;
 public class StockServiceImpl implements StockService {
     @Autowired
     private StockRepository stockRepository;
-
     @Autowired
     private ProductRepository productRepository;
+    @Autowired
+    private StockHistoryRepository stockHistoryRepository;
+    @Autowired
+    private UserService userService;
 
     @Override
     public void addProduct(AddProductDto dto) {
@@ -41,7 +48,9 @@ public class StockServiceImpl implements StockService {
         if (stock.isPresent()) {
             stock.get().setTotalEntries(stock.get().getTotalEntries() + dto.getQuantity());
             stock.get().setUpdatedAt(LocalDateTime.now().atZone(ZoneId.of("America/Sao_Paulo")).toLocalDateTime());
-            this.stockRepository.save(stock.get());
+            var saved = this.stockRepository.save(stock.get());
+
+            saveStockHistory(saved, MovementType.ENTRY, dto.getQuantity(), "Entrada de produto");
             return;
         }
 
@@ -51,7 +60,9 @@ public class StockServiceImpl implements StockService {
         newStock.setTotalEntries(0);
         newStock.setTotalWithdrawals(0);
         newStock.setCreatedAt(LocalDateTime.now().atZone(ZoneId.of("America/Sao_Paulo")).toLocalDateTime());
-        this.stockRepository.save(newStock);
+        var saved = this.stockRepository.save(newStock);
+
+        saveStockHistory(saved, MovementType.ENTRY, dto.getQuantity(), "Criação de estoque");
     }
 
     @Override
@@ -112,6 +123,14 @@ public class StockServiceImpl implements StockService {
         }
 
         stock.setUpdatedAt(LocalDateTime.now());
-        this.stockRepository.save(stock);
+        var saved = this.stockRepository.save(stock);
+
+        saveStockHistory(saved, MovementType.ENTRY, dto.getQuantity(), "Atualização de estoque");
+    }
+
+    void saveStockHistory(Stock stock, MovementType type, int quantity, String description){
+        var user = this.userService.getLoggedUser();
+        var history = new StockHistory(user,stock, type, quantity, description);
+        this.stockHistoryRepository.save(history);
     }
 }

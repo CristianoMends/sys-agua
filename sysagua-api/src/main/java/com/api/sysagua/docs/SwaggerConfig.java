@@ -100,6 +100,7 @@ public class SwaggerConfig {
                 .pathsToMatch("/orders/**")
                 .build();
     }
+
     @Bean
     public GroupedOpenApi cashierApi() {
         return GroupedOpenApi.builder()
@@ -107,5 +108,11 @@ public class SwaggerConfig {
                 .pathsToMatch("/cashier/**")
                 .build();
     }
-
+    @Bean
+    public GroupedOpenApi stockHistoryApi() {
+        return GroupedOpenApi.builder()
+                .group("Histórico do Estoque")
+                .pathsToMatch("/stockHistory/**")
+                .build();
+    }
 }

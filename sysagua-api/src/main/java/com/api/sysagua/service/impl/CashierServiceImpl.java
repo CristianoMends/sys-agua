@@ -10,12 +10,14 @@ import com.api.sysagua.repository.OrderRepository;
 import com.api.sysagua.repository.PurchaseRepository;
 import com.api.sysagua.repository.TransactionRepository;
 import com.api.sysagua.service.CashierService;
+import com.api.sysagua.service.UserService;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.math.BigDecimal;
+import java.util.UUID;
 
 @Service
 public class CashierServiceImpl implements CashierService {
@@ -27,6 +29,8 @@ public class CashierServiceImpl implements CashierService {
     private OrderRepository orderRepository;
     @Autowired
     private PurchaseRepository purchaseRepository;
+    @Autowired
+    private UserService userService;
 
     private Cashier cashier;
 
@@ -51,6 +55,7 @@ public class CashierServiceImpl implements CashierService {
             String description,
             LocalDateTime createdAtStart,
             LocalDateTime createdAtEnd,
+            UUID responsibleUserId,
             Long orderId,
             Long purchaseId
     ) {
@@ -63,6 +68,7 @@ public class CashierServiceImpl implements CashierService {
                 description,
                 createdAtStart,
                 createdAtEnd,
+                responsibleUserId,
                 orderId,
                 purchaseId
         );
@@ -72,11 +78,13 @@ public class CashierServiceImpl implements CashierService {
     }
 
     private void createAddBalanceTransaction(BigDecimal balance) {
+        var user = this.userService.getLoggedUser();
         var t = new Transaction(
                 TransactionStatus.PAID,
                 balance,
                 TransactionType.INCOME,
                 "Incremento de saldo por usuário",
+                user,
                 null,
                 null
         );
