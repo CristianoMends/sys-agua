@@ -48,13 +48,13 @@ public class AddFornecedorController {
 
     public AddFornecedorController() {
         fornecedorService = new FornecedorService();
-        btnCancelar.setCursor(Cursor.HAND);
-        btnSalvar.setCursor(Cursor.HAND);
     }
 
     @FXML
     public void initialize() {
         validarCampos();
+        btnCancelar.setCursor(Cursor.HAND);
+        btnSalvar.setCursor(Cursor.HAND);
     }
 
     @FXML

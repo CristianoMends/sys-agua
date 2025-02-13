@@ -27,5 +27,6 @@ module edu.pies.sysaguaapp {
     opens edu.pies.sysaguaapp.controllers.compras to javafx.fxml;
     opens edu.pies.sysaguaapp.dtos.compra to com.fasterxml.jackson.databind;
     exports edu.pies.sysaguaapp.enumeration;
+    opens edu.pies.sysaguaapp.controllers.Clientes to javafx.fxml;
 
 }
