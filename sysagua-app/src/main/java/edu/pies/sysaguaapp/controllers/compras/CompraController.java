@@ -162,7 +162,7 @@ public class CompraController {
 
         TreeTableColumn<Compra, BigDecimal> colunaValorTotal = new TreeTableColumn<>("Valor Total");
         colunaValorTotal.setCellValueFactory(param ->
-                new SimpleObjectProperty<>(param.getValue().getValue().getTotalValue()));
+                new SimpleObjectProperty<>(param.getValue().getValue().getTotalAmount()));
 
         TreeTableColumn<Compra, String> colunaStatus = new TreeTableColumn<>("Pagamento");
         colunaStatus.setCellValueFactory(param -> {

@@ -1,0 +1,105 @@
+.table-view {
+    -fx-border-color: transparent; /* Remove a cor das bordas externas */
+    -fx-background-color: transparent; /* Remove o fundo */
+}
+
+.table-view .column-header-background {
+    -fx-border-color: #C8CBD9; /* Remove bordas dos cabeçalhos */
+    -fx-border-width: 0 0 1px 0;
+    -fx-background-color: transparent; /* Torna o fundo do cabeçalho transparente */
+}
+
+.table-view .column-header .label{
+    -fx-text-fill: Black;
+    -fx-background-color: white;
+}
+
+.menu-button{
+    -fx-text-fill: white;
+    -fx-padding: 5px;
+    -fx-alignment: center;
+    -fx-border-radius: 5px;
+    -fx-background-color: #3498db;
+}
+
+.button-page{
+    -fx-text-fill: #5A6ACF;
+    -fx-background-color: #DDE4F0;
+}
+
+/* Remove ou estiliza a seta de ordenação */
+.table-view .column-header {
+    -fx-background-color: transparent; /* Torna o fundo transparente */
+
+}
+
+.switchDetails{
+    -fx-background-color: transparent;
+    -fx-text-fill: #5A6ACF;
+}
+
+.text-field{
+    -fx-border-color: transparent;
+    -fx-background-color: #F1F2F7;
+    -fx-border-radius: 2px;
+}
+
+.text-field:focused{
+    -fx-border-color: #8EB3FF;
+    -fx-border-radius: 2px;
+    -fx-background-color: white;
+
+}
+
+.label-field {
+    -fx-text-fill: #737B8B;
+}
+
+.success-Message{
+    -fx-border-color: green;
+    -fx-border-radius: 5px;
+}
+
+.combo-box {
+    -fx-border-color: transparent;
+    -fx-background-color: #F1F2F7;
+    -fx-border-radius: 2px;
+}
+
+.combo-box:focused {
+    -fx-border-color: #8EB3FF;
+    -fx-border-radius: 2px;
+    -fx-background-color: white;
+}
+
+.combo-box .list-cell {
+    -fx-background-color: white;
+    -fx-text-fill: #737B8B;
+}
+
+.combo-box .list-cell:filled:selected, .combo-box .list-cell:filled:hover {
+    -fx-background-color: #f1f2f7;
+}
+
+
+.chart {
+    -fx-background-color: #f0f0f0; /* Cor de fundo geral */
+}
+
+.chart-plot-background {
+    -fx-background-color: #ffffff; /* Fundo da área onde o gráfico é desenhado */
+}
+
+.chart-vertical-grid-lines, .chart-horizontal-grid-lines {
+    -fx-stroke: #dcdcdc; /* Cor das linhas da grade */
+}
+
+.chart-legend {
+    -fx-background-color: transparent; /* Fundo da legenda */
+}
+
+
+/*---------- pagination ----------*/
+
+
+

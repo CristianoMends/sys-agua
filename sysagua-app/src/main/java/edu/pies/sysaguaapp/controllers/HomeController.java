@@ -31,6 +31,12 @@ public class HomeController implements Initializable {
 
     public Pane spacer; //espaçador do botão de sair
 
+    @FXML
+    private Button btnCompras, btnEstoque;
+
+    @FXML
+    private TitledPane btnCadastrosGerais;
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         loadInitView();
@@ -40,7 +46,7 @@ public class HomeController implements Initializable {
     }
 
     private void loadInitView() {
-        loadView("/views/Produtos/Produtos.fxml");
+        loadView("/views/Dashboard.fxml");
     }
 
     //---------------- menu superior -------------------//
@@ -68,7 +74,7 @@ public class HomeController implements Initializable {
 
     @FXML
     private void handleDashboard() {
-        showMessage("Dashboard");
+        loadView("/views/Dashboard.fxml");
     }
 
 

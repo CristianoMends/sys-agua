@@ -17,7 +17,6 @@ import java.util.List;
 @AllArgsConstructor
 public class Compra {
     private Long id;
-    private BigDecimal totalValue;
     private Boolean active;
     private LocalDateTime updatedAt;
     private LocalDateTime createdAt;
