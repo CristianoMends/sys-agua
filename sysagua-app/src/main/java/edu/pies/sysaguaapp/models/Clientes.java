@@ -8,7 +8,7 @@ public class Clientes {
     private Address address;
     private String phone;
     private String cnpj;
-    private Boolean active = false;
+    private Boolean active;
     // Getters e Setters
     public void setName(String name) {
         this.name = name;
