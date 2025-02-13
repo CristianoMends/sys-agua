@@ -46,7 +46,7 @@ public class HomeController implements Initializable {
     }
 
     private void loadInitView() {
-        loadView("/views/Produtos/Produtos.fxml");
+        loadView("/views/Dashboard.fxml");
     }
 
     //---------------- menu superior -------------------//
@@ -74,7 +74,7 @@ public class HomeController implements Initializable {
 
     @FXML
     private void handleDashboard() {
-        showMessage("Dashboard");
+        loadView("/views/Dashboard.fxml");
     }
 
 
