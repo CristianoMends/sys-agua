@@ -1,9 +1,6 @@
 package com.api.sysagua.service.impl;
 
-import com.api.sysagua.dto.order.CreateOrderDto;
-import com.api.sysagua.dto.order.CreateProductOrderDto;
-import com.api.sysagua.dto.order.UpdateOrderDto;
-import com.api.sysagua.dto.order.ViewOrderDto;
+import com.api.sysagua.dto.order.*;
 import com.api.sysagua.enumeration.*;
 import com.api.sysagua.exception.BusinessException;
 import com.api.sysagua.model.*;
@@ -18,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -112,7 +110,7 @@ public class OrderServiceImpl implements OrderService {
         var customer = this.customerRepository.findById(id).orElseThrow(
                 () -> new BusinessException("Customer not found", HttpStatus.NOT_FOUND)
         );
-
+/*
         List<Long> productIds = dto.getProductOrder().stream()
                 .map(CreateProductOrderDto::getProductId)
                 .toList();
@@ -133,21 +131,66 @@ public class OrderServiceImpl implements OrderService {
                     return new ProductOrder(order, product, dtoItem.getQuantity(), dtoItem.getUnitPrice());
                 })
                 .toList();
+*/
 
+        if(dto.getStatus() != null){
+            DeliveryStatus newStatus = dto.getStatus();
+
+            if(newStatus == DeliveryStatus.FINISHED){
+                processOrderProducts(order);
+                order.setFinishedAt(LocalDateTime.now());
+
+            }
+            if(newStatus == DeliveryStatus.CANCELED){
+                order.setCanceledAt(LocalDateTime.now());
+
+            }/*else if(ChronoUnit.MINUTES.between(order.getCreatedAt(), LocalDateTime.now()) >= 30){
+                newStatus = DeliveryStatus.LATE;
+
+            }else newStatus = DeliveryStatus.PENDING;*/
+
+            order.setDeliveryStatus(newStatus);
+        }
 
         var deliveryPerson = this.deliveryPersonRepository.findById(id).orElseThrow(
                 () -> new BusinessException("Delivery person not found", HttpStatus.NOT_FOUND)
         );
 
+        if(dto.getReceivedAmount() != null) {
+            order.setReceivedAmount(dto.getReceivedAmount());
+
+            if (dto.getReceivedAmount().compareTo(order.getTotalAmount()) >= 0) {
+                order.setPaymentStatus(PaymentStatus.PAID);
+                //createPaidTransaction(order);
+
+            }else{
+                order.setPaymentStatus(PaymentStatus.PENDING);
+                //createPendingTransaction(order);
+            }
+        }
+
         if (order.getDeliveryStatus().equals(DeliveryStatus.FINISHED)) processOrderProducts(order);
 
-        switch (order.getPaymentStatus()) {
-            case PAID -> createPaidTransaction(order);
-            case CANCELED -> createCanceledTransaction(order);
-            case PENDING -> createPendingTransaction(order);
+        if(order.getPaymentStatus() != null){
+            PaymentStatus paymentStatus = order.getPaymentStatus();
+
+            switch (paymentStatus) {
+                case PAID ->
+                        createPaidTransaction(order);
+                case CANCELED ->
+                    createCanceledTransaction(order);
+                case PENDING -> createPendingTransaction(order);
+            }
+            order.setPaymentStatus(paymentStatus);
         }
+
+
+        if (dto.getDescricao() != null && !dto.getDescricao().isBlank()){
+            order.setDescription(dto.getDescricao());
+        }
+
         order.setCustomer(customer);
-        order.setProductOrders(productOrders);
+  //      order.setProductOrders(productOrders);
         order.setDeliveryPerson(deliveryPerson);
         this.orderRepository.save(order);
     }

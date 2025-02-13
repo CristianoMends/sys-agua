@@ -1,6 +1,7 @@
 package com.api.sysagua.dto.order;
 
 import com.api.sysagua.enumeration.DeliveryStatus;
+import com.api.sysagua.enumeration.PaymentMethod;
 import com.api.sysagua.model.Customer;
 import com.api.sysagua.model.DeliveryPerson;
 import com.api.sysagua.model.Order;
@@ -34,9 +35,9 @@ public class UpdateOrderDto {
     @Schema(description = "Entregador responsável pelo pedido", example = "Pedro")
     private Long deliveryPersonId;
 
-    @Schema(description = "Produtos pedidos", example = "Garrafao 20l")
+    /*@Schema(description = "Produtos pedidos", example = "Garrafao 20l")
     private List<CreateProductOrderDto> productOrder;
-
+*/
     @Schema(description = "Status do pedido", example = "FINISHED")
     private DeliveryStatus status;
 
@@ -45,5 +46,11 @@ public class UpdateOrderDto {
 
     @Schema(description = "Valor total do pedido", example = "80.00")
     private BigDecimal totalAmount;
+
+    @Schema(description = "Método de pagamento do pedido", example = "MONEY")
+    private PaymentMethod paymentMethod;
+
+    @Schema(description = "Descricao do pedido", example = "Entregar para filho do Matheus")
+    private String descricao;
 
 }
