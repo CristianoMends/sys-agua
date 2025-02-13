@@ -130,13 +130,16 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
     }
     @Override
-    public String getLoggedUser() {
+    public User getLoggedUser() {
+        String email = "";
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         if (principal instanceof UserDetails) {
-            return ((UserDetails) principal).getUsername();
+            email =  ((UserDetails) principal).getUsername();
         } else {
-            return principal.toString();
+            email = principal.toString();
         }
+
+        return this.userRepository.findByEmail(email).orElse(null);
     }
 }

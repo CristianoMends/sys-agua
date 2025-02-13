@@ -4,6 +4,7 @@ import com.api.sysagua.dto.order.ViewOrderDto;
 import com.api.sysagua.dto.purchase.ViewPurchaseDto;
 import com.api.sysagua.enumeration.TransactionStatus;
 import com.api.sysagua.enumeration.TransactionType;
+import com.api.sysagua.model.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -35,6 +36,9 @@ public class ViewTransactionDto {
 
     @Schema(description = "Descrição da transação", example = "Pagamento de Pedido")
     private String description;
+
+    @Schema(description = "Usuário reponsavel pela transação")
+    private User responsibleUser;
 
     @Schema(description = "Pedido associado à transação, se aplicável", example = "123")
     private ViewOrderDto order;

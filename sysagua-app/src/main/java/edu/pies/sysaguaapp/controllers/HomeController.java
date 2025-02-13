@@ -80,7 +80,7 @@ public class HomeController implements Initializable {
 
     @FXML
     private void handleEntregas() {
-        showMessage("Entregas");
+        loadView("/views/Pedidos/Pedido.fxml");
     }
 
     @FXML

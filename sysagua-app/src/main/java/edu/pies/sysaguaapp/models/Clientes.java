@@ -40,8 +40,9 @@ public class Clientes {
     public Address getAddress() {
         return address;
     }
-    public void setActive(boolean active){
-        this.active = active;
+
+    public void setActive(Boolean active) {
+    this.active = active;
     }
     public boolean getActive(){
         return active;

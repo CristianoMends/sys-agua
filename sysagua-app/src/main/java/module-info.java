@@ -11,7 +11,6 @@ module edu.pies.sysaguaapp {
     requires com.fasterxml.jackson.datatype.jsr310;
     requires com.fasterxml.jackson.databind;
     requires java.desktop;
-
     opens edu.pies.sysaguaapp to javafx.fxml;
     exports edu.pies.sysaguaapp;
     exports edu.pies.sysaguaapp.controllers;
