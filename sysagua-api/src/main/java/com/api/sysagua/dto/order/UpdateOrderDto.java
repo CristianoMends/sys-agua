@@ -26,9 +26,6 @@ import java.util.List;
 public class UpdateOrderDto {
 
 
-    @Schema(description = "Id do pedido", example = "4213")
-    private Long id;
-
     @Schema(description = "Cliente para o qual o pedido é destinado.", example = "Joao")
     private Long customerId;
 
@@ -51,6 +48,6 @@ public class UpdateOrderDto {
     private PaymentMethod paymentMethod;
 
     @Schema(description = "Descricao do pedido", example = "Entregar para filho do Matheus")
-    private String descricao;
+    private String description;
 
 }

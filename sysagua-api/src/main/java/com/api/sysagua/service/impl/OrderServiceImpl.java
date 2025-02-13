@@ -107,7 +107,7 @@ public class OrderServiceImpl implements OrderService {
                 () -> new BusinessException("Order not found", HttpStatus.NOT_FOUND)
         );
 
-        var customer = this.customerRepository.findById(id).orElseThrow(
+        var customer = this.customerRepository.findById(dto.getCustomerId()).orElseThrow(
                 () -> new BusinessException("Customer not found", HttpStatus.NOT_FOUND)
         );
 /*
@@ -134,17 +134,17 @@ public class OrderServiceImpl implements OrderService {
 */
 
         if(dto.getStatus() != null){
-            DeliveryStatus newStatus = dto.getStatus();
+            DeliveryStatus newStatus = order.getDeliveryStatus();
 
             if(newStatus == DeliveryStatus.FINISHED){
                 processOrderProducts(order);
                 order.setFinishedAt(LocalDateTime.now());
-
             }
+
             if(newStatus == DeliveryStatus.CANCELED){
                 order.setCanceledAt(LocalDateTime.now());
 
-            }/*else if(ChronoUnit.MINUTES.between(order.getCreatedAt(), LocalDateTime.now()) >= 30){
+            }/*if(ChronoUnit.MINUTES.between(order.getCreatedAt(), LocalDateTime.now()) >= 30){
                 newStatus = DeliveryStatus.LATE;
 
             }else newStatus = DeliveryStatus.PENDING;*/
@@ -159,7 +159,7 @@ public class OrderServiceImpl implements OrderService {
         if(dto.getReceivedAmount() != null) {
             order.setReceivedAmount(dto.getReceivedAmount());
 
-            if (dto.getReceivedAmount().compareTo(order.getTotalAmount()) >= 0) {
+            if (dto.getReceivedAmount().compareTo(dto.getTotalAmount()) >= 0) {
                 order.setPaymentStatus(PaymentStatus.PAID);
                 //createPaidTransaction(order);
 
@@ -169,7 +169,7 @@ public class OrderServiceImpl implements OrderService {
             }
         }
 
-        if (order.getDeliveryStatus().equals(DeliveryStatus.FINISHED)) processOrderProducts(order);
+       // if (order.getDeliveryStatus().equals(DeliveryStatus.FINISHED)) processOrderProducts(order);
 
         if(order.getPaymentStatus() != null){
             PaymentStatus paymentStatus = order.getPaymentStatus();
@@ -185,8 +185,8 @@ public class OrderServiceImpl implements OrderService {
         }
 
 
-        if (dto.getDescricao() != null && !dto.getDescricao().isBlank()){
-            order.setDescription(dto.getDescricao());
+        if (dto.getDescription() != null && !dto.getDescription().isBlank()){
+            order.setDescription(dto.getDescription());
         }
 
         order.setCustomer(customer);
