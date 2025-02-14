@@ -1,6 +1,5 @@
 package com.api.sysagua.repository;
 
-import com.api.sysagua.enumeration.TransactionStatus;
 import com.api.sysagua.enumeration.TransactionType;
 import com.api.sysagua.model.Transaction;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -41,20 +40,19 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     @Query("""
             select sum(t.amount) 
             from Transaction t 
-            where t.type = :type 
-            and t.order.id = :orderId
+            where t.order.id = :orderId
             """)
-    Optional<BigDecimal> countReceivedAmountForOrder(@Param("type") TransactionType type,
-                                           @Param("orderId") Long orderId);
+    Optional<BigDecimal> countReceivedAmountByOrderId(@Param("orderId") Long orderId);
 
     @Query("""
             select sum(t.amount) 
             from Transaction t 
-            where t.type = :type 
-            and t.purchase.id = :purchaseId
+            where t.purchase.id = :purchaseId
             """)
-    Optional<BigDecimal> countReceivedAmountForPurchase(@Param("type") TransactionType type,
-                                                        @Param("purchaseId") Long purchaseId);
+    Optional<BigDecimal> countReceivedAmountByPurchaseId(@Param("purchaseId") Long purchaseId);
+
+    @Query("select sum(t.amount) from Transaction t")
+    Optional<BigDecimal> sumBalance();
 
 
     @Query("select t from Transaction t where t.type = ?1 order by t.createdAt")
