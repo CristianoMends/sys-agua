@@ -3,6 +3,7 @@ package com.api.sysagua.service;
 import com.api.sysagua.dto.purchase.CreatePurchaseDto;
 import com.api.sysagua.dto.purchase.UpdatePurchaseDto;
 import com.api.sysagua.dto.purchase.ViewPurchaseDto;
+import com.api.sysagua.dto.transaction.CreateTransactionDto;
 import com.api.sysagua.enumeration.PaymentMethod;
 import com.api.sysagua.enumeration.PaymentStatus;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -38,7 +39,7 @@ public interface PurchaseService {
             PaymentStatus paymentStatus
     );
 
-    void update(Long id, UpdatePurchaseDto dto);
+    void addPayment(Long id, CreateTransactionDto dto);
 
     void delete(Long id);
 
