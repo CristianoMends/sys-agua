@@ -2,6 +2,7 @@ package com.api.sysagua.service.impl;
 
 import com.api.sysagua.dto.purchase.*;
 import com.api.sysagua.dto.stock.AddProductDto;
+import com.api.sysagua.dto.transaction.CreateTransactionDto;
 import com.api.sysagua.enumeration.*;
 import com.api.sysagua.exception.BusinessException;
 import com.api.sysagua.model.*;
@@ -58,78 +59,48 @@ public class PurchaseServiceImpl implements PurchaseService {
         purchase.setPaidAmount(dto.getPaidAmount());
         purchase.setPaymentStatus(PaymentStatus.PENDING);
 
-        switch (checkPaymentStatus(purchase)) {
-            case PAID -> {
-                purchase.setPaymentStatus(PaymentStatus.PAID);
-                purchase.setFinishedAt(LocalDateTime.now());
-            }
-            case PENDING -> purchase.setPaymentStatus(PaymentStatus.PENDING);
+        if (isPaid(purchase)) {
+            purchase.setPaymentStatus(PaymentStatus.PAID);
+            purchase.setFinishedAt(LocalDateTime.now());
+        } else {
+            purchase.setPaymentStatus(PaymentStatus.PENDING);
         }
 
         var saved = this.purchaseRepository.save(purchase);
 
-        switch (saved.getPaymentStatus()) {
-            case PAID -> createPaidTransaction(saved);
-            case PENDING -> createPendingTransaction(saved);
+        if (dto.getPaidAmount() != null) {
+            createTransaction(saved, dto.getPaidAmount(), "Compra registrada");
         }
 
         processProductsOnStock(saved);
     }
 
     @Override
-    @Transactional
-    public void update(Long id, UpdatePurchaseDto dto) {
-        Purchase purchase = findPurchaseById(id);
+    public void addPayment(Long id, CreateTransactionDto dto) {
+        var purchase = this.purchaseRepository.findById(id).orElseThrow(() -> new BusinessException("Purchase not found", HttpStatus.NOT_FOUND));
+        if (!purchase.getActive() || isPaid(purchase)) return;
 
-        if (dto.getSupplierId() != null) {
-            var supplier = findSupplierById(dto.getSupplierId());
-            purchase.setSupplier(supplier);
+        purchase.setPaidAmount(purchase.getPaidAmount().add(dto.getAmount()));
+
+        if (isPaid(purchase)) {
+            purchase.setPaymentStatus(PaymentStatus.PAID);
+        } else {
+            purchase.setPaymentStatus(PaymentStatus.PENDING);
         }
 
-        if (dto.getNfe() != null) purchase.setNfe(dto.getNfe());
-        if (dto.getEntryAt() != null) purchase.setEntryAt(dto.getEntryAt());
-        if (dto.getDescription() != null) purchase.setDescription(dto.getDescription());
-        if (dto.getPaymentMethod() != null) purchase.setPaymentMethod(dto.getPaymentMethod());
-        if (dto.getPaymentStatus() != null) purchase.setPaymentStatus(dto.getPaymentStatus());
-        var differenceAmounts = BigDecimal.ZERO;
-        if (dto.getPaidAmount() != null) {
-            if (dto.getPaidAmount().compareTo(purchase.getPaidAmount()) <= 0)
-                throw new BusinessException("amount paid must be greater than the previous one");
-
-            differenceAmounts = dto.getPaidAmount().subtract(purchase.getPaidAmount());
-            purchase.setPaidAmount(dto.getPaidAmount());
-        }
-        if (dto.getTotalAmount() != null) purchase.setTotalAmount(dto.getTotalAmount());
-
-        switch (checkPaymentStatus(purchase)) {
-            case PAID -> {
-                purchase.setPaymentStatus(PaymentStatus.PAID);
-                purchase.setFinishedAt(LocalDateTime.now());
-            }
-            case CANCELED -> {
-                purchase.setCanceledAt(LocalDateTime.now());
-                purchase.setPaymentStatus(PaymentStatus.CANCELED);
-            }
-            case PENDING -> purchase.setPaymentStatus(PaymentStatus.PENDING);
-
-        }
         var saved = this.purchaseRepository.save(purchase);
-
-        switch (purchase.getPaymentStatus()) {
-            case PENDING ->
-                    createTransaction(saved, TransactionStatus.PENDING, differenceAmounts, TransactionType.EXPENSE);
-            case CANCELED -> createCanceledTransaction(saved);
-            case PAID -> createPaidTransaction(saved);
-        }
-
+        createTransaction(saved, dto.getAmount(), dto.getDescription());
     }
 
     @Override
     public void delete(Long id) {
-        Purchase purchase = findPurchaseById(id);
+        var purchase = this.purchaseRepository.findById(id).orElseThrow(() -> new BusinessException("Purchase not found", HttpStatus.NOT_FOUND));
         purchase.setActive(false);
+        purchase.setPaymentStatus(PaymentStatus.CANCELED);
+        purchase.setCanceledAt(LocalDateTime.now());
+
         var saved = this.purchaseRepository.save(purchase);
-        createCanceledTransaction(saved);
+        processProductRefunds(saved);
     }
 
     @Override
@@ -179,17 +150,10 @@ public class PurchaseServiceImpl implements PurchaseService {
         ).stream().map(Purchase::toView).toList();
     }
 
-    private PaymentStatus checkPaymentStatus(Purchase purchase) {
+    private boolean isPaid(Purchase purchase) {
         if (purchase.getTotalAmount() == null) purchase.updateTotalValue();
 
-        if (purchase.getPaymentStatus().equals(PaymentStatus.CANCELED)) return PaymentStatus.CANCELED;
-
-
-        if (purchase.getPaidAmount().compareTo(purchase.getTotalAmount()) >= 0) {
-            return PaymentStatus.PAID;
-        }
-
-        return PaymentStatus.PENDING;
+        return purchase.getPaidAmount().compareTo(purchase.getTotalAmount()) >= 0;
     }
 
     private List<ProductPurchase> createProductPurchase(List<CreateProductPurchaseDto> dto, Purchase purchase) {
@@ -199,11 +163,6 @@ public class PurchaseServiceImpl implements PurchaseService {
             productPurchases.add(new ProductPurchase(purchase, product, item.getQuantity(), item.getPurchasePrice()));
         }
         return productPurchases;
-    }
-
-    private Purchase findPurchaseById(Long id) {
-        return purchaseRepository.findById(id)
-                .orElseThrow(() -> new BusinessException("Purchase not found", HttpStatus.NOT_FOUND));
     }
 
     private Product findProductById(Long productId) {
@@ -219,7 +178,11 @@ public class PurchaseServiceImpl implements PurchaseService {
     }
 
     private void addEntriesProductOnStock(int quantity, Product product) {
-        this.stockService.addProduct(new AddProductDto(product.getId(),quantity));
+        this.stockService.addProduct(new AddProductDto(product.getId(), quantity));
+    }
+
+    private void remEntriesProductOnStock(int quantity, Product product) {
+        this.stockService.removeProduct(new AddProductDto(product.getId(), quantity));
     }
 
     private void processProductsOnStock(Purchase purchase) {
@@ -228,60 +191,17 @@ public class PurchaseServiceImpl implements PurchaseService {
 
     }
 
-    private void createPendingTransaction(Purchase purchase) {
-        var amountPending = purchase.getTotalAmount().subtract(purchase.getPaidAmount());
-        var description = "Quantia paga R$ " + purchase.getPaidAmount() + ", Quantia pendente R$" + amountPending;
+    private void processProductRefunds(Purchase purchase) {
+        purchase.getProductPurchases()
+                .forEach(p -> remEntriesProductOnStock(p.getQuantity(), p.getProduct()));
+    }
+
+    private void createTransaction(Purchase purchase, BigDecimal amount, String description) {
+
         var user = this.userService.getLoggedUser();
         var t = new Transaction(
-                TransactionStatus.PENDING,
-                purchase.getPaidAmount(),
+                amount,
                 TransactionType.EXPENSE,
-                description,
-                user,
-                null,
-                purchase
-        );
-        this.transactionRepository.save(t);
-    }
-
-    private void createTransaction(Purchase purchase, TransactionStatus status, BigDecimal amout, TransactionType type) {
-        var amountPending = purchase.getTotalAmount().subtract(purchase.getPaidAmount());
-        var description = "Quantia paga R$ " + amout + ", Quantia pendente R$" + amountPending;
-        var user = this.userService.getLoggedUser();
-        var t = new Transaction(
-                status,
-                amout,
-                type,
-                description,
-                user,
-                null,
-                purchase
-        );
-        this.transactionRepository.save(t);
-    }
-
-    private void createPaidTransaction(Purchase purchase) {
-        var description = "Quantia paga R$ " + purchase.getPaidAmount() + ", de valor total R$" + purchase.getTotalAmount();
-        var user = this.userService.getLoggedUser();
-        var t = new Transaction(
-                TransactionStatus.PAID,
-                purchase.getPaidAmount(),
-                TransactionType.EXPENSE,
-                description,
-                user,
-                null,
-                purchase
-        );
-        this.transactionRepository.save(t);
-    }
-
-    private void createCanceledTransaction(Purchase purchase) {
-        var description = "Compra cancelada. Estorno de transações realizado";
-        var user = this.userService.getLoggedUser();
-        var t = new Transaction(
-                TransactionStatus.CANCELED,
-                purchase.getPaidAmount(),
-                TransactionType.INCOME,
                 description,
                 user,
                 null,
