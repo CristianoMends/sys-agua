@@ -69,7 +69,7 @@ public class PurchaseServiceImpl implements PurchaseService {
         var saved = this.purchaseRepository.save(purchase);
 
         if (dto.getPaidAmount() != null) {
-            createTransaction(saved, dto.getPaidAmount(), "Compra registrada");
+            createTransaction(saved, dto.getPaidAmount().negate(), "Compra registrada");
         }
 
         processProductsOnStock(saved);
@@ -89,7 +89,7 @@ public class PurchaseServiceImpl implements PurchaseService {
         }
 
         var saved = this.purchaseRepository.save(purchase);
-        createTransaction(saved, dto.getAmount(), dto.getDescription());
+        createTransaction(saved, dto.getAmount().negate(), dto.getDescription());
     }
 
     @Override
@@ -100,6 +100,8 @@ public class PurchaseServiceImpl implements PurchaseService {
         purchase.setCanceledAt(LocalDateTime.now());
 
         var saved = this.purchaseRepository.save(purchase);
+
+        createTransaction(purchase, purchase.getPaidAmount(), "Estorno de pagamentos");
         processProductRefunds(saved);
     }
 
