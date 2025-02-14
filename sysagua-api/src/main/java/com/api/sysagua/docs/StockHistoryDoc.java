@@ -30,14 +30,15 @@ public interface StockHistoryDoc {
     })
     @GetMapping
     ResponseEntity<List<ViewStockHistoryDto>> list(
-            @Parameter(description = "ID do registro do histórico de estoque") @RequestParam(required = false) Long id,
-            @Parameter(description = "Tipo de movimentação de estoque") @RequestParam(required = false) MovementType tipo,
-            @Parameter(description = "Quantidade mínima para filtro") @RequestParam(required = false) Integer quantidadeMinima,
-            @Parameter(description = "Quantidade máxima para filtro") @RequestParam(required = false) Integer quantidadeMaxima,
-            @Parameter(description = "Data inicial para filtro") @RequestParam(required = false) LocalDateTime dataInicial,
-            @Parameter(description = "Data final para filtro") @RequestParam(required = false) LocalDateTime dataFinal,
-            @Parameter(description = "Descrição da movimentação de estoque") @RequestParam(required = false) String descricao,
-            @Parameter(description = "ID do usuário responsável pela movimentação") @RequestParam(required = false) UUID usuarioResponsavelId,
-            @Parameter(description = "ID do estoque relacionado à movimentação") @RequestParam(required = false) Long estoqueId
+            @Parameter(description = "ID do registro do histórico de estoque") Long id,
+            @Parameter(description = "Tipo de movimentação de estoque") MovementType tipo,
+            @Parameter(description = "Quantidade mínima para filtro") Integer quantidadeMinima,
+            @Parameter(description = "Quantidade máxima para filtro") Integer quantidadeMaxima,
+            @Parameter(description = "Data inicial para filtro") LocalDateTime dataInicial,
+            @Parameter(description = "Data final para filtro") LocalDateTime dataFinal,
+            @Parameter(description = "Descrição da movimentação de estoque") String descricao,
+            @Parameter(description = "ID do usuário responsável pela movimentação") UUID usuarioResponsavelId,
+            @Parameter(description = "ID do estoque relacionado à movimentação") Long estoqueId,
+            @Parameter(description = "ID do produto no estoque") Long productId
     );
 }
