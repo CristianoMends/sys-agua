@@ -24,6 +24,7 @@ public class Purchase {
     private Long id;
     private BigDecimal paidAmount;
     private BigDecimal totalAmount;
+    private BigDecimal balance;
     private Boolean active;
     private LocalDateTime entryAt;
     private LocalDateTime createdAt;
@@ -45,6 +46,7 @@ public class Purchase {
     private void prePersist(){
         updateTotalValue();
         setCreatedAt(LocalDateTime.now());
+        setBalance(totalAmount.subtract(paidAmount));
     }
 
     @PreUpdate
@@ -66,6 +68,7 @@ public class Purchase {
                 getId(),
                 getPaidAmount(),
                 getTotalAmount(),
+                getBalance(),
                 getCreatedAt(),
                 getEntryAt(),
                 getCanceledAt(),
