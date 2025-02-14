@@ -51,6 +51,7 @@ public class OrderServiceImpl implements OrderService {
         order.setDeliveryStatus(DeliveryStatus.PENDING);
         order.setReceivedAmount(dto.getReceivedAmount());
         order.setTotalAmount(dto.getTotalAmount());
+        order.setBalance(dto.getTotalAmount().subtract(dto.getReceivedAmount()));
         order.setPaymentMethod(dto.getPaymentMethod());
         order.setDescription(dto.getDescription());
 
@@ -81,7 +82,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<ViewOrderDto> list(Long id, Long customerId, Long deliveryPersonId, Long productOrderId, DeliveryStatus status, BigDecimal receivedAmountStart, BigDecimal receivedAmountEnd, BigDecimal totalAmountStart, BigDecimal totalAmountEnd, PaymentMethod paymentMethod, LocalDateTime createdAtStart, LocalDateTime createdAtEnd, LocalDateTime finishedAtStart, LocalDateTime finishedAtEnd, PaymentStatus paymentStatus) {
+    public List<ViewOrderDto> list(Long id, Long customerId, Long deliveryPersonId, Long productOrderId, DeliveryStatus status, BigDecimal receivedAmountStart, BigDecimal receivedAmountEnd, BigDecimal totalAmountStart, BigDecimal totalAmountEnd, BigDecimal balanceStart, BigDecimal balanceEnd, PaymentMethod paymentMethod, LocalDateTime createdAtStart, LocalDateTime createdAtEnd, LocalDateTime finishedAtStart, LocalDateTime finishedAtEnd, PaymentStatus paymentStatus) {
         return this.orderRepository.list(
                 id,
                 customerId,
@@ -92,6 +93,8 @@ public class OrderServiceImpl implements OrderService {
                 receivedAmountEnd,
                 totalAmountStart,
                 totalAmountEnd,
+                balanceStart,
+                balanceEnd,
                 paymentMethod,
                 createdAtStart,
                 createdAtEnd,
@@ -107,34 +110,9 @@ public class OrderServiceImpl implements OrderService {
                 () -> new BusinessException("Order not found", HttpStatus.NOT_FOUND)
         );
 
-        var customer = this.customerRepository.findById(dto.getCustomerId()).orElseThrow(
-                () -> new BusinessException("Customer not found", HttpStatus.NOT_FOUND)
-        );
-/*
-        List<Long> productIds = dto.getProductOrder().stream()
-                .map(CreateProductOrderDto::getProductId)
-                .toList();
-
-        List<Product> products = this.productRepository.findAllById(productIds);
-
-        if (products.isEmpty()) {
-            throw new BusinessException("No products found for the provided IDs", HttpStatus.NOT_FOUND);
-        }
-
-        List<ProductOrder> productOrders = dto.getProductOrder().stream()
-                .map(dtoItem -> {
-                    Product product = products.stream()
-                            .filter(p -> p.getId().equals(dtoItem.getProductId()))
-                            .findFirst()
-                            .orElseThrow(() -> new BusinessException("Product not found", HttpStatus.NOT_FOUND));
-
-                    return new ProductOrder(order, product, dtoItem.getQuantity(), dtoItem.getUnitPrice());
-                })
-                .toList();
-*/
 
         if(dto.getStatus() != null){
-            DeliveryStatus newStatus = order.getDeliveryStatus();
+            DeliveryStatus newStatus = dto.getStatus();
 
             if(newStatus == DeliveryStatus.FINISHED){
                 processOrderProducts(order);
@@ -143,33 +121,25 @@ public class OrderServiceImpl implements OrderService {
 
             if(newStatus == DeliveryStatus.CANCELED){
                 order.setCanceledAt(LocalDateTime.now());
+                order.setPaymentStatus(PaymentStatus.CANCELED);
 
-            }/*if(ChronoUnit.MINUTES.between(order.getCreatedAt(), LocalDateTime.now()) >= 30){
-                newStatus = DeliveryStatus.LATE;
-
-            }else newStatus = DeliveryStatus.PENDING;*/
+            }
 
             order.setDeliveryStatus(newStatus);
         }
 
-        var deliveryPerson = this.deliveryPersonRepository.findById(id).orElseThrow(
-                () -> new BusinessException("Delivery person not found", HttpStatus.NOT_FOUND)
-        );
-
         if(dto.getReceivedAmount() != null) {
             order.setReceivedAmount(dto.getReceivedAmount());
 
-            if (dto.getReceivedAmount().compareTo(dto.getTotalAmount()) >= 0) {
+            if (dto.getReceivedAmount().compareTo(dto.getTotalAmount()) == 0) {
                 order.setPaymentStatus(PaymentStatus.PAID);
-                //createPaidTransaction(order);
 
             }else{
                 order.setPaymentStatus(PaymentStatus.PENDING);
-                //createPendingTransaction(order);
+                BigDecimal saldo = dto.getTotalAmount().subtract(dto.getReceivedAmount());
+                order.setBalance(saldo);
             }
         }
-
-       // if (order.getDeliveryStatus().equals(DeliveryStatus.FINISHED)) processOrderProducts(order);
 
         if(order.getPaymentStatus() != null){
             PaymentStatus paymentStatus = order.getPaymentStatus();
@@ -183,15 +153,6 @@ public class OrderServiceImpl implements OrderService {
             }
             order.setPaymentStatus(paymentStatus);
         }
-
-
-        if (dto.getDescription() != null && !dto.getDescription().isBlank()){
-            order.setDescription(dto.getDescription());
-        }
-
-        order.setCustomer(customer);
-  //      order.setProductOrders(productOrders);
-        order.setDeliveryPerson(deliveryPerson);
         this.orderRepository.save(order);
     }
 

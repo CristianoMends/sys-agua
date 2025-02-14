@@ -26,15 +26,6 @@ import java.util.List;
 public class UpdateOrderDto {
 
 
-    @Schema(description = "Cliente para o qual o pedido é destinado.", example = "Joao")
-    private Long customerId;
-
-    @Schema(description = "Entregador responsável pelo pedido", example = "Pedro")
-    private Long deliveryPersonId;
-
-    /*@Schema(description = "Produtos pedidos", example = "Garrafao 20l")
-    private List<CreateProductOrderDto> productOrder;
-*/
     @Schema(description = "Status do pedido", example = "FINISHED")
     private DeliveryStatus status;
 
@@ -44,10 +35,7 @@ public class UpdateOrderDto {
     @Schema(description = "Valor total do pedido", example = "80.00")
     private BigDecimal totalAmount;
 
-    @Schema(description = "Método de pagamento do pedido", example = "MONEY")
-    private PaymentMethod paymentMethod;
-
-    @Schema(description = "Descricao do pedido", example = "Entregar para filho do Matheus")
-    private String description;
+    @Schema(description = "Saldo do cliente no pedido", example = "20.00")
+    private BigDecimal balance;
 
 }

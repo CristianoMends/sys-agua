@@ -6,6 +6,7 @@ CREATE TABLE orders (
     payment_status VARCHAR(50),
     received_amount NUMERIC(10,2),
     total_amount NUMERIC(10,2),
+    balance NUMERIC(10, 2),
     payment_method VARCHAR(50),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     finished_at TIMESTAMP,

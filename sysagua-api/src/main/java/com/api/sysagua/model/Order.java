@@ -39,6 +39,7 @@ public class Order {
 
     private BigDecimal receivedAmount;
     private BigDecimal totalAmount;
+    private BigDecimal balance;
 
     @Enumerated(EnumType.STRING)
     private PaymentMethod paymentMethod;
