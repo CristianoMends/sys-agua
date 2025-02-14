@@ -3,6 +3,7 @@ CREATE TABLE purchases (
     supplier_id BIGINT,
     total_amount NUMERIC(10,2),
     paid_amount NUMERIC(10,2),
+    balance NUMERIC(10,2),
     active BOOLEAN DEFAULT TRUE,
     entry_at TIMESTAMP,
     created_at TIMESTAMP,
