@@ -61,7 +61,6 @@ public class CashierServiceImpl implements CashierService {
     ) {
         var transactions = this.transactionRepository.list(
                 transactionId,
-                transactionStatus,
                 amountStart,
                 amountEnd,
                 type,
@@ -80,7 +79,6 @@ public class CashierServiceImpl implements CashierService {
     private void createAddBalanceTransaction(BigDecimal balance) {
         var user = this.userService.getLoggedUser();
         var t = new Transaction(
-                TransactionStatus.PAID,
                 balance,
                 TransactionType.INCOME,
                 "Incremento de saldo por usuário",

@@ -17,7 +17,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     @Query("""
             select t from Transaction t
             where (:id is null or t.id = :id) 
-            and (:status is null or t.status = :status) 
             and ((:amountStart is null or :amountEnd is null) or t.amount between :amountStart and :amountEnd) 
             and (:type is null or t.type = :type) 
             and (:description is null or t.description like concat('%', :description, '%')) 
@@ -28,7 +27,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
             order by t.createdAt""")
     List<Transaction> list(
             @Param("id") Long id,
-            @Param("status") TransactionStatus status,
             @Param("amountStart") BigDecimal amountStart,
             @Param("amountEnd") BigDecimal amountEnd,
             @Param("type") TransactionType type,
@@ -58,8 +56,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     Optional<BigDecimal> countReceivedAmountForPurchase(@Param("type") TransactionType type,
                                                         @Param("purchaseId") Long purchaseId);
 
-    @Query("select t from Transaction t where t.status = ?1 order by t.createdAt")
-    List<Transaction> listByStatus(TransactionStatus status);
 
     @Query("select t from Transaction t where t.type = ?1 order by t.createdAt")
     List<Transaction> listByType(TransactionType type);
