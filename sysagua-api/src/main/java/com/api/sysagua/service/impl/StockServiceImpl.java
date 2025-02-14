@@ -75,7 +75,7 @@ public class StockServiceImpl implements StockService {
             stock.get().setUpdatedAt(LocalDateTime.now().atZone(ZoneId.of("America/Sao_Paulo")).toLocalDateTime());
             var saved = this.stockRepository.save(stock.get());
 
-            saveStockHistory(saved, MovementType.ENTRY, dto.getQuantity(), "Estorno de produto");
+            saveStockHistory(saved, MovementType.WITHDRAWAL, dto.getQuantity(), "Estorno de produto");
         }
     }
 
