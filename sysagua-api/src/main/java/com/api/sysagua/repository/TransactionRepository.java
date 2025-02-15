@@ -1,6 +1,5 @@
 package com.api.sysagua.repository;
 
-import com.api.sysagua.enumeration.TransactionStatus;
 import com.api.sysagua.enumeration.TransactionType;
 import com.api.sysagua.model.Transaction;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,7 +16,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     @Query("""
             select t from Transaction t
             where (:id is null or t.id = :id) 
-            and (:status is null or t.status = :status) 
             and ((:amountStart is null or :amountEnd is null) or t.amount between :amountStart and :amountEnd) 
             and (:type is null or t.type = :type) 
             and (:description is null or t.description like concat('%', :description, '%')) 
@@ -28,7 +26,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
             order by t.createdAt""")
     List<Transaction> list(
             @Param("id") Long id,
-            @Param("status") TransactionStatus status,
             @Param("amountStart") BigDecimal amountStart,
             @Param("amountEnd") BigDecimal amountEnd,
             @Param("type") TransactionType type,
@@ -43,23 +40,20 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     @Query("""
             select sum(t.amount) 
             from Transaction t 
-            where t.type = :type 
-            and t.order.id = :orderId
+            where t.order.id = :orderId
             """)
-    Optional<BigDecimal> countReceivedAmountForOrder(@Param("type") TransactionType type,
-                                           @Param("orderId") Long orderId);
+    Optional<BigDecimal> countReceivedAmountByOrderId(@Param("orderId") Long orderId);
 
     @Query("""
             select sum(t.amount) 
             from Transaction t 
-            where t.type = :type 
-            and t.purchase.id = :purchaseId
+            where t.purchase.id = :purchaseId
             """)
-    Optional<BigDecimal> countReceivedAmountForPurchase(@Param("type") TransactionType type,
-                                                        @Param("purchaseId") Long purchaseId);
+    Optional<BigDecimal> countReceivedAmountByPurchaseId(@Param("purchaseId") Long purchaseId);
 
-    @Query("select t from Transaction t where t.status = ?1 order by t.createdAt")
-    List<Transaction> listByStatus(TransactionStatus status);
+    @Query("select sum(t.amount) from Transaction t")
+    Optional<BigDecimal> sumBalance();
+
 
     @Query("select t from Transaction t where t.type = ?1 order by t.createdAt")
     List<Transaction> listByType(TransactionType type);

@@ -32,7 +32,6 @@ public interface TransactionDoc {
     })
     ResponseEntity<List<ViewTransactionDto>> listTransactions(
             Long id,
-            TransactionStatus status,
             BigDecimal amountStart,
             BigDecimal amountEnd,
             TransactionType type,

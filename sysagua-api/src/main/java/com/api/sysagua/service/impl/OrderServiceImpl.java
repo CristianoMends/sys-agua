@@ -206,7 +206,6 @@ public class OrderServiceImpl implements OrderService {
     private void createPendingTransaction(Order order) {
         var user = this.userService.getLoggedUser();
         var t = new Transaction(
-                TransactionStatus.PENDING,
                 order.getReceivedAmount(),
                 TransactionType.INCOME,
                 "Pedido aguardando pagamento - Restante a ser pago: R$" + order.getTotalAmount().subtract(order.getReceivedAmount()),
@@ -220,7 +219,6 @@ public class OrderServiceImpl implements OrderService {
     private void createPaidTransaction(Order order) {
         var user = this.userService.getLoggedUser();
         var t = new Transaction(
-                TransactionStatus.PAID,
                 order.getReceivedAmount(),
                 TransactionType.INCOME,
                 String.format("Pagamento confirmado! O pedido foi pago com sucesso. Valor total: R$ %.2f, valor recebido: R$ %.2f. A transação foi concluída e o pedido está finalizado.",
@@ -235,7 +233,6 @@ public class OrderServiceImpl implements OrderService {
     private void createCanceledTransaction(Order order) {
         var user = this.userService.getLoggedUser();
         var t = new Transaction(
-                TransactionStatus.CANCELED,
                 order.getReceivedAmount(),
                 TransactionType.EXPENSE,
                 "Pedido cancelado. O valor foi registrado como despesa.",

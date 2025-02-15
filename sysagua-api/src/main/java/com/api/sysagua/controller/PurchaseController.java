@@ -2,6 +2,7 @@ package com.api.sysagua.controller;
 
 import com.api.sysagua.docs.PurchaseDoc;
 import com.api.sysagua.dto.purchase.*;
+import com.api.sysagua.dto.transaction.CreateTransactionDto;
 import com.api.sysagua.enumeration.PaymentMethod;
 import com.api.sysagua.enumeration.PaymentStatus;
 import com.api.sysagua.service.PurchaseService;
@@ -75,13 +76,10 @@ public class PurchaseController implements PurchaseDoc {
         ));
     }
 
-    @PutMapping("{id}")
-    public ResponseEntity<Void> update(
-            @PathVariable Long id,
-            @RequestBody @Valid UpdatePurchaseDto update
-    ) {
-        this.purchaseService.update(id, update);
-        return ResponseEntity.noContent().build();
+    @PostMapping("payment")
+    public ResponseEntity<Void> addPayment(Long id, CreateTransactionDto dto) {
+        this.purchaseService.addPayment(id, dto);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @DeleteMapping("{id}")
