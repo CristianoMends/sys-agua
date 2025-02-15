@@ -50,8 +50,13 @@ public class OrderServiceImpl implements OrderService {
         order.setProductOrders(createListProductOrder(order, dto.getProductOrders()));
         order.setDeliveryStatus(DeliveryStatus.PENDING);
         order.setReceivedAmount(dto.getReceivedAmount());
-        order.setTotalAmount(dto.getTotalAmount());
-        order.setBalance(dto.getTotalAmount().subtract(dto.getReceivedAmount()));
+
+        BigDecimal totalAmount = dto.getProductOrders().stream()
+                .map(product -> product.getUnitPrice().multiply(BigDecimal.valueOf(product.getQuantity())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        order.setTotalAmount(totalAmount);
+
+        order.setBalance(order.getTotalAmount().subtract(dto.getReceivedAmount()));
         order.setPaymentMethod(dto.getPaymentMethod());
         order.setDescription(dto.getDescription());
 
@@ -114,16 +119,16 @@ public class OrderServiceImpl implements OrderService {
         if(dto.getStatus() != null){
             DeliveryStatus newStatus = dto.getStatus();
 
-            if(newStatus == DeliveryStatus.FINISHED){
-                processOrderProducts(order);
-                order.setFinishedAt(LocalDateTime.now());
-            }
-
             if(newStatus == DeliveryStatus.CANCELED){
                 order.setCanceledAt(LocalDateTime.now());
                 order.setPaymentStatus(PaymentStatus.CANCELED);
-
             }
+
+            if(newStatus == DeliveryStatus.FINISHED && order.getDeliveryStatus() != DeliveryStatus.CANCELED){
+                processOrderProducts(order);
+                order.setFinishedAt(LocalDateTime.now());
+            }else throw new BusinessException("Order was canceled");
+
 
             order.setDeliveryStatus(newStatus);
         }
@@ -136,8 +141,7 @@ public class OrderServiceImpl implements OrderService {
 
             }else{
                 order.setPaymentStatus(PaymentStatus.PENDING);
-                BigDecimal saldo = dto.getTotalAmount().subtract(dto.getReceivedAmount());
-                order.setBalance(saldo);
+                order.setBalance(dto.getTotalAmount().subtract(dto.getReceivedAmount()));
             }
         }
 

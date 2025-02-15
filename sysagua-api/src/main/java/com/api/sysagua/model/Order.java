@@ -75,6 +75,7 @@ public class Order {
                 getPaymentStatus(),
                 getReceivedAmount(),
                 getTotalAmount(),
+                getBalance(),
                 getPaymentMethod(),
                 getCreatedAt(),
                 getFinishedAt(),
