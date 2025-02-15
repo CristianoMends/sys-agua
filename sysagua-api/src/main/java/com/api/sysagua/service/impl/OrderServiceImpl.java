@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -109,6 +108,8 @@ public class OrderServiceImpl implements OrderService {
         ).stream().map(Order::toView).toList();
     }
 
+
+
     @Override
     public void update(Long id, UpdateOrderDto dto) {
         var order = this.orderRepository.findById(id).orElseThrow(
@@ -119,41 +120,56 @@ public class OrderServiceImpl implements OrderService {
         if(dto.getStatus() != null){
             DeliveryStatus newStatus = dto.getStatus();
 
-            if(newStatus == DeliveryStatus.CANCELED){
+            if(newStatus == DeliveryStatus.CANCELED && order.getDeliveryStatus() == DeliveryStatus.PENDING){
                 order.setCanceledAt(LocalDateTime.now());
                 order.setPaymentStatus(PaymentStatus.CANCELED);
             }
 
-            if(newStatus == DeliveryStatus.FINISHED && order.getDeliveryStatus() != DeliveryStatus.CANCELED){
+            if(newStatus == DeliveryStatus.FINISHED && order.getDeliveryStatus() == DeliveryStatus.PENDING){
                 processOrderProducts(order);
                 order.setFinishedAt(LocalDateTime.now());
-            }else throw new BusinessException("Order was canceled");
+            }
 
 
             order.setDeliveryStatus(newStatus);
         }
 
         if(dto.getReceivedAmount() != null) {
-            order.setReceivedAmount(dto.getReceivedAmount());
+            BigDecimal previousAmount = order.getReceivedAmount();
+            BigDecimal newAmount = previousAmount.add(dto.getReceivedAmount());
 
-            if (dto.getReceivedAmount().compareTo(dto.getTotalAmount()) == 0) {
+            if(newAmount.compareTo(order.getTotalAmount()) == 0){
+                newAmount = order.getTotalAmount();
                 order.setPaymentStatus(PaymentStatus.PAID);
-
-            }else{
-                order.setPaymentStatus(PaymentStatus.PENDING);
-                order.setBalance(dto.getTotalAmount().subtract(dto.getReceivedAmount()));
             }
+
+            switch (checkPaymentStatus(order)) {
+                case PAID -> {
+                    order.setPaymentStatus(PaymentStatus.PAID);
+                    order.setFinishedAt(LocalDateTime.now());
+                }
+                case CANCELED -> {
+                    order.setCanceledAt(LocalDateTime.now());
+                    order.setPaymentStatus(PaymentStatus.CANCELED);
+                }
+                case PENDING -> order.setPaymentStatus(PaymentStatus.PENDING);
+
+            }
+            order.setBalance(order.getTotalAmount().subtract(newAmount));
+            order.setReceivedAmount(newAmount);
         }
+
+        var saved_order = this.orderRepository.save(order);
 
         if(order.getPaymentStatus() != null){
             PaymentStatus paymentStatus = order.getPaymentStatus();
 
             switch (paymentStatus) {
                 case PAID ->
-                        createPaidTransaction(order);
+                        createPaidTransaction(saved_order);
                 case CANCELED ->
-                    createCanceledTransaction(order);
-                case PENDING -> createPendingTransaction(order);
+                    createCanceledTransaction(saved_order);
+                case PENDING -> createTransaction(order, TransactionStatus.PENDING, saved_order.getReceivedAmount(), TransactionType.INCOME);
             }
             order.setPaymentStatus(paymentStatus);
         }
@@ -209,6 +225,22 @@ public class OrderServiceImpl implements OrderService {
         order.getProductOrders()
                 .forEach(p -> addWithdrawsProductFromStock(p.getQuantity(), p.getProduct()));
 
+    }
+
+    private void createTransaction(Order order, TransactionStatus status, BigDecimal amout, TransactionType type) {
+        var amountPending = order.getBalance();
+        var description = "Quantia paga R$ " + amout + ", Quantia pendente R$" + amountPending;
+        var user = this.userService.getLoggedUser();
+        var t = new Transaction(
+                status,
+                amout,
+                type,
+                description,
+                user,
+                order,
+                null
+        );
+        this.transactionRepository.save(t);
     }
 
     private void createPendingTransaction(Order order) {

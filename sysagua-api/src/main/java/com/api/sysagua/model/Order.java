@@ -68,6 +68,7 @@ public class Order {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
+
     public ViewOrderDto toView() {
         return new ViewOrderDto(
                 getId(),
