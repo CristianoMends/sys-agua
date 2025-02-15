@@ -1,9 +1,6 @@
 package com.api.sysagua.service.impl;
 
-import com.api.sysagua.dto.order.CreateOrderDto;
-import com.api.sysagua.dto.order.CreateProductOrderDto;
-import com.api.sysagua.dto.order.UpdateOrderDto;
-import com.api.sysagua.dto.order.ViewOrderDto;
+import com.api.sysagua.dto.order.*;
 import com.api.sysagua.enumeration.*;
 import com.api.sysagua.exception.BusinessException;
 import com.api.sysagua.model.*;
@@ -52,7 +49,13 @@ public class OrderServiceImpl implements OrderService {
         order.setProductOrders(createListProductOrder(order, dto.getProductOrders()));
         order.setDeliveryStatus(DeliveryStatus.PENDING);
         order.setReceivedAmount(dto.getReceivedAmount());
-        order.setTotalAmount(dto.getTotalAmount());
+
+        BigDecimal totalAmount = dto.getProductOrders().stream()
+                .map(product -> product.getUnitPrice().multiply(BigDecimal.valueOf(product.getQuantity())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        order.setTotalAmount(totalAmount);
+
+        order.setBalance(order.getTotalAmount().subtract(dto.getReceivedAmount()));
         order.setPaymentMethod(dto.getPaymentMethod());
         order.setDescription(dto.getDescription());
 
@@ -83,7 +86,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<ViewOrderDto> list(Long id, Long customerId, Long deliveryPersonId, Long productOrderId, DeliveryStatus status, BigDecimal receivedAmountStart, BigDecimal receivedAmountEnd, BigDecimal totalAmountStart, BigDecimal totalAmountEnd, PaymentMethod paymentMethod, LocalDateTime createdAtStart, LocalDateTime createdAtEnd, LocalDateTime finishedAtStart, LocalDateTime finishedAtEnd, PaymentStatus paymentStatus) {
+    public List<ViewOrderDto> list(Long id, Long customerId, Long deliveryPersonId, Long productOrderId, DeliveryStatus status, BigDecimal receivedAmountStart, BigDecimal receivedAmountEnd, BigDecimal totalAmountStart, BigDecimal totalAmountEnd, BigDecimal balanceStart, BigDecimal balanceEnd, PaymentMethod paymentMethod, LocalDateTime createdAtStart, LocalDateTime createdAtEnd, LocalDateTime finishedAtStart, LocalDateTime finishedAtEnd, PaymentStatus paymentStatus) {
         return this.orderRepository.list(
                 id,
                 customerId,
@@ -94,6 +97,8 @@ public class OrderServiceImpl implements OrderService {
                 receivedAmountEnd,
                 totalAmountStart,
                 totalAmountEnd,
+                balanceStart,
+                balanceEnd,
                 paymentMethod,
                 createdAtStart,
                 createdAtEnd,
@@ -103,52 +108,77 @@ public class OrderServiceImpl implements OrderService {
         ).stream().map(Order::toView).toList();
     }
 
+
+
     @Override
     public void update(Long id, UpdateOrderDto dto) {
         var order = this.orderRepository.findById(id).orElseThrow(
                 () -> new BusinessException("Order not found", HttpStatus.NOT_FOUND)
         );
 
-        var customer = this.customerRepository.findById(id).orElseThrow(
-                () -> new BusinessException("Customer not found", HttpStatus.NOT_FOUND)
-        );
 
-        List<Long> productIds = dto.getProductOrder().stream()
-                .map(CreateProductOrderDto::getProductId)
-                .toList();
+        if(dto.getStatus() != null){
+            DeliveryStatus newStatus = dto.getStatus();
 
-        List<Product> products = this.productRepository.findAllById(productIds);
+            if(newStatus == DeliveryStatus.CANCELED && order.getDeliveryStatus() == DeliveryStatus.PENDING){
+                order.setCanceledAt(LocalDateTime.now());
+                order.setPaymentStatus(PaymentStatus.CANCELED);
+            }
 
-        if (products.isEmpty()) {
-            throw new BusinessException("No products found for the provided IDs", HttpStatus.NOT_FOUND);
+            if(newStatus == DeliveryStatus.FINISHED && order.getDeliveryStatus() == DeliveryStatus.PENDING){
+                processOrderProducts(order);
+                order.setFinishedAt(LocalDateTime.now());
+            }
+
+
+            order.setDeliveryStatus(newStatus);
         }
 
-        List<ProductOrder> productOrders = dto.getProductOrder().stream()
-                .map(dtoItem -> {
-                    Product product = products.stream()
-                            .filter(p -> p.getId().equals(dtoItem.getProductId()))
-                            .findFirst()
-                            .orElseThrow(() -> new BusinessException("Product not found", HttpStatus.NOT_FOUND));
+        if(dto.getReceivedAmount() != null) {
+            BigDecimal previousAmount = order.getReceivedAmount();
+            BigDecimal newAmount = previousAmount.add(dto.getReceivedAmount());
 
-                    return new ProductOrder(order, product, dtoItem.getQuantity(), dtoItem.getUnitPrice());
-                })
-                .toList();
+            if(newAmount.compareTo(order.getTotalAmount()) == 0){
+                newAmount = order.getTotalAmount();
+                order.setPaymentStatus(PaymentStatus.PAID);
+            }
 
+            switch (checkPaymentStatus(order)) {
+                case PAID -> {
+                    order.setPaymentStatus(PaymentStatus.PAID);
+                    order.setFinishedAt(LocalDateTime.now());
+                }
+                case CANCELED -> {
+                    order.setCanceledAt(LocalDateTime.now());
+                    order.setPaymentStatus(PaymentStatus.CANCELED);
+                }
+                case PENDING -> order.setPaymentStatus(PaymentStatus.PENDING);
 
-        var deliveryPerson = this.deliveryPersonRepository.findById(id).orElseThrow(
-                () -> new BusinessException("Delivery person not found", HttpStatus.NOT_FOUND)
-        );
-
-        if (order.getDeliveryStatus().equals(DeliveryStatus.FINISHED)) processOrderProducts(order);
-
-        switch (order.getPaymentStatus()) {
-            case PAID -> createPaidTransaction(order);
-            case CANCELED -> createCanceledTransaction(order);
-            case PENDING -> createPendingTransaction(order);
+            }
+            order.setBalance(order.getTotalAmount().subtract(newAmount));
+            if(newAmount.equals(order.getTotalAmount())){
+                order.setPaymentStatus(PaymentStatus.PAID);
+            }else if(newAmount.compareTo(order.getTotalAmount()) < 0){
+                order.setReceivedAmount(newAmount);
+            }else if(newAmount.compareTo(order.getTotalAmount()) > 0){
+                throw new BusinessException("Order received value overtakes total value.");
+            }
         }
-        order.setCustomer(customer);
-        order.setProductOrders(productOrders);
-        order.setDeliveryPerson(deliveryPerson);
+
+        var saved_order = this.orderRepository.save(order);
+
+        if(order.getPaymentStatus() != null){
+            PaymentStatus paymentStatus = order.getPaymentStatus();
+
+            switch (paymentStatus) {
+                case PAID ->
+                        createPaidTransaction(saved_order);
+                case CANCELED ->
+                    createCanceledTransaction(saved_order);
+                case PENDING -> createTransaction(order, TransactionStatus.PENDING, saved_order.getReceivedAmount(), TransactionType.INCOME);
+            }
+            order.setPaymentStatus(paymentStatus);
+        }
         this.orderRepository.save(order);
     }
 
@@ -203,10 +233,25 @@ public class OrderServiceImpl implements OrderService {
 
     }
 
+    private void createTransaction(Order order, TransactionStatus status, BigDecimal amout, TransactionType type) {
+        var amountPending = order.getBalance();
+        var description = "Quantia paga R$ " + amout + ", Quantia pendente R$" + amountPending;
+        var user = this.userService.getLoggedUser();
+        var t = new Transaction(
+                status,
+                amout,
+                type,
+                description,
+                user,
+                order,
+                null
+        );
+        this.transactionRepository.save(t);
+    }
+
     private void createPendingTransaction(Order order) {
         var user = this.userService.getLoggedUser();
         var t = new Transaction(
-                TransactionStatus.PENDING,
                 order.getReceivedAmount(),
                 TransactionType.INCOME,
                 "Pedido aguardando pagamento - Restante a ser pago: R$" + order.getTotalAmount().subtract(order.getReceivedAmount()),
@@ -220,7 +265,6 @@ public class OrderServiceImpl implements OrderService {
     private void createPaidTransaction(Order order) {
         var user = this.userService.getLoggedUser();
         var t = new Transaction(
-                TransactionStatus.PAID,
                 order.getReceivedAmount(),
                 TransactionType.INCOME,
                 String.format("Pagamento confirmado! O pedido foi pago com sucesso. Valor total: R$ %.2f, valor recebido: R$ %.2f. A transação foi concluída e o pedido está finalizado.",
@@ -235,7 +279,6 @@ public class OrderServiceImpl implements OrderService {
     private void createCanceledTransaction(Order order) {
         var user = this.userService.getLoggedUser();
         var t = new Transaction(
-                TransactionStatus.CANCELED,
                 order.getReceivedAmount(),
                 TransactionType.EXPENSE,
                 "Pedido cancelado. O valor foi registrado como despesa.",

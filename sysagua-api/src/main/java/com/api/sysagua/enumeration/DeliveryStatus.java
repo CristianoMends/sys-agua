@@ -9,7 +9,6 @@ public enum DeliveryStatus {
 
     PENDING("Pendente"),
     FINISHED("Finalizado"),
-    LATE("Atrasado"),
     CANCELED("Cancelado");
 
     private final String description;

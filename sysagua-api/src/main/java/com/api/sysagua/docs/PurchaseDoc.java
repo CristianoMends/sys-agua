@@ -2,8 +2,8 @@ package com.api.sysagua.docs;
 
 
 import com.api.sysagua.dto.purchase.CreatePurchaseDto;
-import com.api.sysagua.dto.purchase.UpdatePurchaseDto;
 import com.api.sysagua.dto.purchase.ViewPurchaseDto;
+import com.api.sysagua.dto.transaction.CreateTransactionDto;
 import com.api.sysagua.enumeration.PaymentMethod;
 import com.api.sysagua.enumeration.PaymentStatus;
 import io.swagger.v3.oas.annotations.Operation;
@@ -71,30 +71,19 @@ public interface PurchaseDoc {
             PaymentStatus paymentStatus
     );
 
-    @Operation(summary = "Atualiza uma compra",
-            description = "Atualiza os dados de uma compra existente com base no ID.")
+    @Operation(summary = "Adiciona uma transação de pagamento para um pedido pendente",
+            description = "Recebe os dados necessários para registrar uma nova transação de pagamento para compra pendente.")
     @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "sucesso.", content = @Content()),
+            @ApiResponse(responseCode = "201", description = "sucesso.", content = @Content()),
             @ApiResponse(responseCode = "400", description = "Parâmetros inválidos.", content = @Content()),
             @ApiResponse(responseCode = "404", description = "Não encontrado", content = @Content()),
             @ApiResponse(responseCode = "403", description = "Não autorizado.", content = @Content()),
             @ApiResponse(responseCode = "500", description = "Erro interno no servidor.", content = @Content())
     })
-    @PutMapping("{id}")
+    @PostMapping
     @CrossOrigin
-    ResponseEntity<Void> update(
-            @Parameter(description = "Identificador único da compra") @PathVariable Long id,
-            @RequestBody @Parameter(description = "Dados para atualizar a compra") @Valid UpdatePurchaseDto update);
+    ResponseEntity<Void> addPayment(Long id,@Valid CreateTransactionDto dto);
 
-    @Operation(summary = "Deleta uma compra",
-            description = "Remove uma compra do sistema com base no ID informado.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "sucesso.", content = @Content()),
-            @ApiResponse(responseCode = "400", description = "Parâmetros inválidos.", content = @Content()),
-            @ApiResponse(responseCode = "404", description = "Não encontrado", content = @Content()),
-            @ApiResponse(responseCode = "403", description = "Não autorizado.", content = @Content()),
-            @ApiResponse(responseCode = "500", description = "Erro interno no servidor.", content = @Content())
-    })
     @DeleteMapping("{id}")
     @CrossOrigin
     ResponseEntity<Void> delete(

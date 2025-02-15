@@ -22,9 +22,6 @@ public class ViewTransactionDto {
     @Schema(description = "Identificador único da transação", example = "1")
     private Long id;
 
-    @Schema(description = "Status da transação", example = "PENDING")
-    private TransactionStatus status;
-
     @Schema(description = "Data e hora em que a transação foi criada", example = "2024-02-04T12:30:45")
     private LocalDateTime createdAt;
 

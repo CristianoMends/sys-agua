@@ -39,6 +39,7 @@ public class Order {
 
     private BigDecimal receivedAmount;
     private BigDecimal totalAmount;
+    private BigDecimal balance;
 
     @Enumerated(EnumType.STRING)
     private PaymentMethod paymentMethod;
@@ -67,6 +68,7 @@ public class Order {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
+
     public ViewOrderDto toView() {
         return new ViewOrderDto(
                 getId(),
@@ -74,6 +76,7 @@ public class Order {
                 getPaymentStatus(),
                 getReceivedAmount(),
                 getTotalAmount(),
+                getBalance(),
                 getPaymentMethod(),
                 getCreatedAt(),
                 getFinishedAt(),

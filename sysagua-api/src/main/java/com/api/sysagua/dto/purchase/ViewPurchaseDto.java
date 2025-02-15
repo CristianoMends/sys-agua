@@ -30,6 +30,9 @@ public class ViewPurchaseDto {
     @Schema(description = "Quantia total da compra", example = "549.99")
     private BigDecimal totalAmount;
 
+    @Schema(description = "Valor pendente da compra", example = "300.00")
+    private BigDecimal balance;
+
     @Schema(description = "Data e hora da criação da compra", example = "2025-01-14T10:00:00Z")
     private LocalDateTime createdAt;
 

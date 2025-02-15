@@ -20,6 +20,7 @@ public interface StockHistoryRepository extends JpaRepository<StockHistory, Long
             and (:description is null or s.description like concat('%', :description, '%') ) 
             and (:responsibleUserId is null or s.responsibleUser.id = :responsibleUserId ) 
             and (:stockId is null or s.stock.id = :stockId )
+            and (:productId is null or s.stock.product.id = :productId )
             order by s.date""")
     List<StockHistory> list(
             @Param("id") Long id,
@@ -30,7 +31,8 @@ public interface StockHistoryRepository extends JpaRepository<StockHistory, Long
             @Param("dateEnd") LocalDateTime dateEnd,
             @Param("description") String description,
             @Param("responsibleUserId") UUID responsibleUserId,
-            @Param("stockId") Long stockId
+            @Param("stockId") Long stockId,
+            @Param("productId") Long productId
     );
 
 

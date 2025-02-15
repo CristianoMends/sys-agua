@@ -32,7 +32,8 @@ public class StockHistoryController implements StockHistoryDoc {
             @RequestParam(required = false) LocalDateTime dateEnd,
             @RequestParam(required = false) String description,
             @RequestParam(required = false) UUID responsibleUserId,
-            @RequestParam(required = false) Long stockId
+            @RequestParam(required = false) Long stockId,
+            @RequestParam(required = false) Long productId
     ) {
         List<StockHistory> list = this.stockHistoryRepository.list(
                 id,
@@ -43,7 +44,8 @@ public class StockHistoryController implements StockHistoryDoc {
                 dateEnd,
                 description,
                 responsibleUserId,
-                stockId
+                stockId,
+                productId
         );
 
         return ResponseEntity.ok(list.stream().map(StockHistory::toView).toList());
