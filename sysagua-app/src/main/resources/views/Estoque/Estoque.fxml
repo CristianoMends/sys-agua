@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.text.Font?>
+<?import javafx.geometry.Insets?>
+
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<StackPane fx:id="rootPane"
+           prefHeight="600.0"
+           prefWidth="900.0"
+           style="-fx-background-color: white;"
+           stylesheets="@../../styles/estoque.css"
+           xmlns="http://javafx.com/javafx/23.0.1"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="edu.pies.sysaguaapp.controllers.estoque.EstoqueController">
+    <children>
+        <VBox fx:id="listProductView" prefHeight="200.0" prefWidth="100.0">
+            <children>
+                <StackPane prefHeight="90.0">
+                    <children>
+                        <Label fx:id="successMessage" alignment="CENTER" minHeight="50.0" style="-fx-text-fill: white; -fx-background-color: green; -fx-font-size: 18px; -fx-border-color: transparent; -fx-border-width: 1; -fx-border-radius: 5;" styleClass="success-Message" text="Cadastro realizado com sucesso!" visible="false" StackPane.alignment="CENTER_RIGHT">
+                            <font>
+                                <Font size="18.0" />
+                            </font>
+                        </Label>
+                        <HBox alignment="CENTER_LEFT"
+                              prefHeight="90.0"
+                              spacing="10"
+                              style="-fx-padding: 10; -fx-border-color: #C8CBD9; -fx-border-width: 0 0 1px 0;">
+                            <children>
+                                <Label text="Todos os produtos" />
+                                <Region HBox.hgrow="ALWAYS" />
+
+                                    <Button fx:id="btnAjustarEstoque" mnemonicParsing="false" onAction="#handleAjustarEstoque" styleClass="menu-button" text="Ajuste de estoque" />
+                                    <Button fx:id="btnMovimentacoes" mnemonicParsing="false" onAction="#handleMovimentacoes" styleClass="menu-button" text="Movimentações" />
+                                    <Button fx:id="btnConfiguracoes" mnemonicParsing="false" onAction="#handleConfiguracoes" styleClass="menuIcon-button">
+                                        <graphic>
+                                            <ImageView fitHeight="16" fitWidth="16" pickOnBounds="true" preserveRatio="true">
+                                                <Image url="@../../icons/estoque/config.png" />
+                                            </ImageView>
+                                        </graphic>
+                                    </Button>
+
+                            </children>
+                        </HBox>
+                    </children>
+                    <padding>
+                        <Insets right="20.0" />
+                    </padding>
+                </StackPane>
+                <StackPane fx:id="tableContainer" prefHeight="472.0" prefWidth="917.0">
+                    <children>
+                        <TableView fx:id="tabelaEstoque" prefHeight="484.0">
+                            <columnResizePolicy>
+                                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                            </columnResizePolicy></TableView>
+                    </children>
+                </StackPane>
+                <!--              <Pagination pageCount="10" prefHeight="78.0" prefWidth="900.0" styleClass="pagination"/>-->
+                <!-- Paginação -->
+                <HBox fx:id="paginationContainer" alignment="CENTER" minHeight="50" minWidth="365.0" spacing="10">
+                    <children>
+                        <Button fx:id="btnAnterior" onAction="#handlePaginaAnterior" text="Anterior" />
+                        <Button fx:id="btnProximo" onAction="#handleProximaPagina" text="Próximo" />
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
+    </children>
+</StackPane>

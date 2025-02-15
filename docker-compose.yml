@@ -1,0 +1,48 @@
+services:
+  # Serviço do banco de dados PostgreSQL
+  db:
+    image: postgres:16  # Usa a imagem oficial do PostgreSQL na versão 16
+    container_name: postgres-db  # Nome do container do banco de dados
+    environment:
+      POSTGRES_DB: sysagua_db  # Nome do banco de dados a ser criado
+      POSTGRES_USER: postgres  # Usuário padrão do banco de dados
+      POSTGRES_PASSWORD: ${DB_PASSWORD}  # Senha do banco de dados (definida como variável de ambiente)
+    ports:
+      - "5434:5432"  # Mapeia a porta 5432 do container para a porta 5434 do host
+    volumes:
+      - db-data:/var/lib/postgresql/data  # Armazena os dados do banco de forma persistente em um volume
+    networks:
+      - sysagua-network # Adicionado à rede personalizada
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      retries: 5
+
+  # Serviço da API SysAgua
+  sysagua-api:
+    build:
+      context: ./sysagua-api  # Define o diretório do código-fonte da API para o build do Docker
+    container_name: sysagua-api  # Nome do container da API
+    environment:
+      SPRING_PROFILES_ACTIVE: test      # Perfil ativo do Spring
+      DB_URL: jdbc:postgresql://db:5432/sysagua_db  # URL de conexão com o banco de dados
+      DB_USERNAME: postgres               # Nome de usuário do banco de dados
+      DB_PASSWORD: ${DB_PASSWORD}                 # Senha padrão para autenticação
+      DEFAULT_EMAIL: ${DEFAULT_EMAIL}  # E-mail padrão para autenticação
+      DEFAULT_PASSWORD: ${DEFAULT_PASSWORD}  # Senha padrão para autenticação
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}  # Chave secreta para geração de tokens JWT
+    depends_on:
+      - db  # Dependência do serviço da API com o banco de dados
+    ports:
+      - "8080:8080"  # Mapeia a porta 8080 do container para a porta 8080 do host
+    networks:
+      - sysagua-network # Adicionado à rede personalizada
+
+
+networks:
+  sysagua-network: # Definição da rede personalizada
+    driver: bridge
+
+# Volumes persistentes
+volumes:
+  db-data:  # Volume para armazenamento persistente dos dados do banco de dados
