@@ -22,7 +22,8 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             and (:productOrderId is null or productOrders.id = :productOrderId) 
             and (:deliveryStatus is null or o.deliveryStatus = :deliveryStatus) 
             and ((:receivedAmountStart is null or :receivedAmountEnd is null) or o.receivedAmount between :receivedAmountStart and :receivedAmountEnd) 
-            and ((:totalAmountStart is null or :totalAmountEnd is null) or o.totalAmount between :totalAmountStart and :totalAmountEnd) 
+            and ((:totalAmountStart is null or :totalAmountEnd is null) or o.totalAmount between :totalAmountStart and :totalAmountEnd)
+            and ((:balanceStart is null or :balanceEnd is null) or o.balance between :balanceStart and :balanceEnd) 
             and (:paymentMethod is null or o.paymentMethod = :paymentMethod) 
             and (:paymentStatus is null or o.paymentStatus = :paymentStatus)
             and ((CAST(:createdAtStart as TIMESTAMP) is null or CAST(:createdAtEnd as TIMESTAMP) is null) or o.createdAt between :createdAtStart and :createdAtEnd) 
@@ -39,6 +40,8 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             @Param("receivedAmountEnd") BigDecimal receivedAmountEnd,
             @Param("totalAmountStart") BigDecimal totalAmountStart,
             @Param("totalAmountEnd") BigDecimal totalAmountEnd,
+            @Param("balanceStart") BigDecimal balanceStart,
+            @Param("balanceEnd") BigDecimal balanceEnd,
             @Param("paymentMethod") PaymentMethod paymentMethod,
             @Param("createdAtStart") LocalDateTime createdAtStart,
             @Param("createdAtEnd") LocalDateTime createdAtEnd,

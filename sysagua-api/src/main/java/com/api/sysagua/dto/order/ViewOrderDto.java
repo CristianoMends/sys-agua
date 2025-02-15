@@ -37,6 +37,9 @@ public class ViewOrderDto {
     @Schema(description = "Valor total do pedido", example = "80.00")
     private BigDecimal totalAmount;
 
+    @Schema(description = "Saldo restante do pedido", example = "53.47")
+    private BigDecimal balance;
+
     @Schema(description = "Método de pagamento utilizado", example = "PIX")
     private PaymentMethod paymentMethod;
 
