@@ -2,6 +2,8 @@ package edu.pies.sysaguaapp.services;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import edu.pies.sysaguaapp.models.Pedido.Pedido;
 import java.io.IOException;
 import java.net.URI;
@@ -18,6 +20,8 @@ public class PedidoService {
     public PedidoService() {
         this.httpClient = HttpClient.newHttpClient();
         this.objectMapper = new ObjectMapper();
+        this.objectMapper.registerModule(new JavaTimeModule());
+        this.objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     }
     public List<Pedido> buscarPedidos(String token) throws Exception {
         HttpRequest request = HttpRequest.newBuilder()
@@ -68,33 +72,8 @@ public class PedidoService {
             throw new Exception("Erro ao criar pedido: ");
         }
     }
-    public static Pedido editarPedido(Pedido pedido, String token) throws Exception {
-        String pedidoJson = objectMapper.writeValueAsString(pedido);
-        String urlComId = BASE_URL + "/" + pedido.getId();
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(urlComId))
-                .PUT(HttpRequest.BodyPublishers.ofString(pedidoJson))
-                .header("Content-Type", "application/json")
-                .header("Authorization", "Bearer " + token)
-                .build();
 
-        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-
-        if (response.statusCode() == 200 || response.statusCode() == 204) {
-            if (response.body().isEmpty()) {
-                return pedido;
-            } else {
-                try {
-                    return objectMapper.readValue(response.body(), Pedido.class);
-                } catch (IOException e) {
-                    throw new Exception("Erro ao processar a resposta do servidor: ");
-                }
-            }
-        } else {
-            throw new Exception("Erro ao editar pedido: ");
-        }
-    }
-    public static Pedido inativarPedido(Pedido pedido, String token) throws Exception {
+    public static Pedido cancelarPedido(Pedido pedido, String token) throws Exception {
         pedido.setActive(false);
 
         String pedidoJson = objectMapper.writeValueAsString(pedido);
