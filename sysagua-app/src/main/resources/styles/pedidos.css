@@ -1,38 +1,34 @@
-.table-view {
-    -fx-border-color: transparent; /* Remove a cor das bordas externas */
-    -fx-background-color: transparent; /* Remove o fundo */
-}
-
-.table-view .column-header-background {
-    -fx-border-color: #C8CBD9; /* Remove bordas dos cabeçalhos */
+.tree-table-view {
+    -fx-border-color: #C8CBD9;
     -fx-border-width: 0 0 1px 0;
-    -fx-background-color: transparent; /* Torna o fundo do cabeçalho transparente */
+    -fx-background-color: transparent;
 }
 
-.table-view .column-header .label{
+/* Estilização do fundo e bordas dos cabeçalhos */
+.tree-table-view .column-header-background {
+    -fx-border-color: #C8CBD9;
+    -fx-border-width: 0 0 1px 0;
+    -fx-background-color: transparent;
+}
+
+/* Estilização dos rótulos no cabeçalho da coluna */
+.tree-table-view .column-header .label {
     -fx-text-fill: Black;
     -fx-background-color: white;
 }
 
+/* Estilização da seta de ordenação nas colunas */
+.tree-table-view .column-header {
+    -fx-background-color: transparent; /* Torna o fundo transparente */
+}
+
+
 .menu-button{
     -fx-text-fill: white;
-    -fx-padding: 5px 15px;
+    -fx-padding: 5px;
     -fx-alignment: center;
     -fx-border-radius: 5px;
     -fx-background-color: #3498db;
-}
-
-#scrollFormCadastro {
-    -fx-background-color: #f0f0f0;
-    -fx-border-color: #dcdcdc;
-    -fx-border-radius: 5px;
-    -fx-padding: 10px;
-}
-
-#scrollClientes {
-    -fx-background-color: #f9f9f9;
-    -fx-border-color: #dcdcdc;
-    -fx-border-radius: 5px;
 }
 
 .button-page{
@@ -40,11 +36,6 @@
     -fx-background-color: #DDE4F0;
 }
 
-/* Remove ou estiliza a seta de ordenação */
-.table-view .column-header {
-    -fx-background-color: transparent; /* Torna o fundo transparente */
-
-}
 
 .switchDetails{
     -fx-background-color: transparent;
@@ -71,4 +62,69 @@
 .success-Message{
     -fx-border-color: green;
     -fx-border-radius: 5px;
+}
+
+.combo-box {
+    -fx-border-color: transparent;
+    -fx-background-color: #F1F2F7;
+    -fx-border-radius: 2px;
+}
+
+.combo-box:focused {
+    -fx-border-color: #8EB3FF;
+    -fx-border-radius: 2px;
+    -fx-background-color: white;
+}
+
+.combo-box .list-cell {
+    -fx-background-color: white;
+    -fx-text-fill: #737B8B;
+}
+
+.combo-box .list-cell:filled:selected, .combo-box .list-cell:filled:hover {
+    -fx-background-color: #f1f2f7;
+}
+
+.table-view {
+    -fx-border-color: transparent; /* Remove a cor das bordas externas */
+    -fx-background-color: transparent; /* Remove o fundo */
+}
+
+.table-view .column-header-background {
+    -fx-border-color: #C8CBD9; /* Remove bordas dos cabeçalhos */
+    -fx-border-width: 0 0 1px 0;
+    -fx-background-color: transparent; /* Torna o fundo do cabeçalho transparente */
+}
+
+.table-view .column-header .label{
+    -fx-text-fill: Black;
+    -fx-background-color: white;
+}
+
+.table-view .column-header {
+    -fx-background-color: transparent; /* Torna o fundo transparente */
+
+}
+
+.date-picker {
+    -fx-border-color: transparent;
+    -fx-background-color: #F1F2F7;
+    -fx-border-radius: 2px;
+}
+
+.date-picker:focused {
+    -fx-border-color: #8EB3FF;
+    -fx-border-radius: 2px;
+    -fx-background-color: white;
+}
+
+.date-picker .text-field {
+    -fx-background-color: transparent;
+    -fx-border-width: 0;
+}
+
+/*---------- pagination ----------*/
+
+#tabelaCompra .agrupamento {
+    -fx-background-color: red; /* Cor de fundo do agrupamento */
 }

@@ -4,6 +4,7 @@ module edu.pies.sysaguaapp {
 
     requires org.controlsfx.controls;
     requires com.dlsc.formsfx;
+
     requires org.kordamp.bootstrapfx.core;
     requires java.net.http;
     requires java.xml.crypto;
@@ -28,5 +29,11 @@ module edu.pies.sysaguaapp {
     opens edu.pies.sysaguaapp.dtos.compra to com.fasterxml.jackson.databind;
     exports edu.pies.sysaguaapp.enumeration;
     opens edu.pies.sysaguaapp.controllers.Clientes to javafx.fxml;
+    exports edu.pies.sysaguaapp.controllers.Pedidos to com.fasterxml.jackson.databind;
+    opens edu.pies.sysaguaapp.controllers.Pedidos to javafx.fxml;
 
+    exports edu.pies.sysaguaapp.models.Pedido to com.fasterxml.jackson.databind;
+    opens edu.pies.sysaguaapp.models.Pedido to com.fasterxml.jackson.databind;
+    exports edu.pies.sysaguaapp.enumeration.Pedidos to com.fasterxml.jackson.databind;
+    opens edu.pies.sysaguaapp.enumeration.Pedidos to com.fasterxml.jackson.databind;
 }
