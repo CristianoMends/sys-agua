@@ -156,7 +156,13 @@ public class OrderServiceImpl implements OrderService {
 
             }
             order.setBalance(order.getTotalAmount().subtract(newAmount));
-            order.setReceivedAmount(newAmount);
+            if(newAmount.equals(order.getTotalAmount())){
+                order.setPaymentStatus(PaymentStatus.PAID);
+            }else if(newAmount.compareTo(order.getTotalAmount()) < 0){
+                order.setReceivedAmount(newAmount);
+            }else if(newAmount.compareTo(order.getTotalAmount()) > 0){
+                throw new BusinessException("Order received value overtakes total value.");
+            }
         }
 
         var saved_order = this.orderRepository.save(order);
