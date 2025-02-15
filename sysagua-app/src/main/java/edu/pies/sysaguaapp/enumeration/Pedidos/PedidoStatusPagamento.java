@@ -1,4 +1,4 @@
-package edu.pies.sysaguaapp.models.Pedido;
+package edu.pies.sysaguaapp.enumeration.Pedidos;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -6,11 +6,9 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum PedidoStatusPagamento {
-    PENDING("Pendente"),
-    CONCLUDED("Concluido"),
-    LATE("Atrasado"),
+    PAID("Pago"),
     CANCELED("Cancelado"),
-    WAITING("Aguardando");
+    PENDING("Pendente");
 
     private final String descricao;
 }
