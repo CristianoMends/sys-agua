@@ -2,12 +2,12 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.chart.BarChart?>
-<?import javafx.scene.chart.BubbleChart?>
 <?import javafx.scene.chart.CategoryAxis?>
 <?import javafx.scene.chart.LineChart?>
 <?import javafx.scene.chart.NumberAxis?>
 <?import javafx.scene.chart.PieChart?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.Separator?>
@@ -22,27 +22,38 @@
    <children>
       <BorderPane prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: white">
          <top>
-            <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+            <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" spacing="20.0" BorderPane.alignment="CENTER">
                <children>
-                  <Label text="DASHBOARD" />
+                  <Label text="DASHBOARD">
+                     <font>
+                        <Font name="System Bold" size="16.0" />
+                     </font></Label>
+                  <Region HBox.hgrow="SOMETIMES" />
+                  <Label text="Filtrar por intervalo">
+                     <font>
+                        <Font size="14.0" />
+                     </font></Label>
+                  <DatePicker fx:id="dateInicio" maxWidth="100.0" promptText="Inicio" />
+                  <DatePicker fx:id="dateFim" maxWidth="100.0" promptText="Fim" />
+                  <Button mnemonicParsing="false" onAction="#handleInitialize" styleClass="menu-button" text="Recarragar" />
                </children>
                <BorderPane.margin>
-                  <Insets left="20.0" />
+                  <Insets left="20.0" right="20.0" />
                </BorderPane.margin>
             </HBox>
          </top>
          <center>
             <VBox fx:id="graphicArea" alignment="TOP_CENTER" BorderPane.alignment="CENTER">
                <children>
-                  <HBox prefHeight="200.0" spacing="20.0">
+                  <HBox fx:id="firstLineGraph" prefHeight="200.0" spacing="20.0">
                      <children>
-                        <VBox fx:id="chartVendasDia">
+                        <VBox fx:id="firstGraph">
                            <children>
                               <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
                                  <children>
                                     <Label text="Vendas do mês" />
                                     <Region HBox.hgrow="SOMETIMES" />
-                                    <Button mnemonicParsing="false" text="Ampliar" />
+                                    <Button fx:id="btnAmpliarFirstGraph" mnemonicParsing="false" onAction="#handlePedidosDiaChartMax" styleClass="maximize-button" text="Ampliar" />
                                  </children>
                                  <padding>
                                     <Insets left="20.0" right="10.0" />
@@ -65,74 +76,78 @@
                                     <Insets left="20.0" right="10.0" />
                                  </padding>
                               </HBox>
-                              <BarChart title="Vendas por dia">
+                              <BarChart fx:id="chartVendasDia" styleClass="chartPedidoDia">
                                 <xAxis>
                                   <CategoryAxis side="BOTTOM" />
                                 </xAxis>
                                 <yAxis>
-                                  <NumberAxis side="LEFT" />
+                                  <NumberAxis disable="true" minorTickVisible="false" side="LEFT" tickLabelsVisible="false" tickMarkVisible="false" />
                                 </yAxis>
                               </BarChart>
                            </children>
                         </VBox>
                         <Separator orientation="VERTICAL" prefHeight="200.0" />
-                        <VBox fx:id="chartVendasLinha">
+                        <VBox fx:id="secondGraph">
                            <children>
                               <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
                                  <children>
                                     <Label text="Vendas por Linha de Produtos" />
                                     <Region HBox.hgrow="SOMETIMES" />
-                                    <Button mnemonicParsing="false" text="Ampliar" />
+                                    <Button fx:id="btnAmpliarSecondGraph" mnemonicParsing="false" styleClass="maximize-button" text="Ampliar" />
                                  </children>
                                  <padding>
                                     <Insets left="20.0" right="10.0" />
                                  </padding>
                               </HBox>
-                              <PieChart title="Linhas de produtos (Mês atual)" />
+                              <PieChart fx:id="chartVendasLinha" styleClass="dashboardChart" />
                            </children>
                         </VBox>
                      </children>
                   </HBox>
                   <Separator prefWidth="200.0" />
-                  <HBox spacing="10.0">
+                  <HBox fx:id="secondLineGraph" spacing="10.0">
                      <children>
-                        <VBox>
+                        <VBox fx:id="thirdGraph" HBox.hgrow="ALWAYS">
                            <children>
-                              <BubbleChart fx:id="chartProdutosVendidos" title="Produtos mais vendidos">
-                                <xAxis>
-                                  <NumberAxis side="BOTTOM" />
-                                </xAxis>
-                                <yAxis>
-                                  <NumberAxis side="LEFT" />
-                                </yAxis>
-                              </BubbleChart>
+                              <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                 <children>
+                                    <Label text="Produtos mais vendidos" />
+                                    <Region HBox.hgrow="SOMETIMES" />
+                                    <Button fx:id="btnAmpliarThirdGraph" mnemonicParsing="false" onAction="#handleProdutosChartMaximization" styleClass="maximize-button" text="Ampliar" />
+                                 </children>
+                                 <padding>
+                                    <Insets left="20.0" right="10.0" />
+                                 </padding>
+                              </HBox>
+                              <PieChart fx:id="chartComprasBubble" styleClass="dashboardChart" />
+
                            </children>
                         </VBox>
                         <Separator orientation="VERTICAL" prefHeight="200.0" />
-                        <VBox minWidth="200.0">
+                        <VBox fx:id="fourthGraph" HBox.hgrow="ALWAYS">
                            <children>
                               <Label text="Principais Clientes">
                                  <font>
                                     <Font size="14.0" />
                                  </font>
                               </Label>
-                              <ListView fx:id="listPrincipaisClientes" prefHeight="200.0" prefWidth="200.0" />
+                              <ListView fx:id="listPrincipaisClientes" VBox.vgrow="SOMETIMES" />
                            </children>
                         </VBox>
                         <Separator orientation="VERTICAL" prefHeight="200.0" />
-                        <VBox>
+                        <VBox fx:id="fifthGraph" HBox.hgrow="ALWAYS">
                            <children>
                               <HBox alignment="CENTER_LEFT" spacing="10.0">
                                  <children>
                                     <Label text="Compras do mês" />
                                     <Region HBox.hgrow="SOMETIMES" />
-                                    <Button fx:id="btnMaximizeComprasChart" onAction="#handleComprasChartMaximization" mnemonicParsing="false" text="Ampliar" />
+                                    <Button fx:id="btnAmpliarFifthGraph" mnemonicParsing="false" onAction="#handleComprasChartMaximization" styleClass="maximize-button" text="Ampliar" />
                                  </children>
                                  <padding>
                                     <Insets left="20.0" right="10.0" />
                                  </padding>
                               </HBox>
-                              <LineChart fx:id="chartComprasDia" style="-fx-background-color: white;" title="Compras do mês">
+                              <LineChart fx:id="chartComprasDia" style="-fx-background-color: white;" styleClass="dashboardChart">
                                 <xAxis>
                                   <CategoryAxis side="BOTTOM" />
                                 </xAxis>
