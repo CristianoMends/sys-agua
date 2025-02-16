@@ -16,12 +16,16 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Cursor;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.util.StringConverter;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -186,20 +190,32 @@ public class CompraController {
                     super.updateItem(item, empty);
 
                     if (item != null && getTreeItem() != null) {
-
                         if (getTreeItem().getParent() == null) {
-
+                            // Linha de agrupamento (Ignorar no clique)
                             setStyle("-fx-background-color: red");
                             getStyleClass().add("agrupamento");
                         } else {
+                            // Linha normal (clicável)
                             setStyle("-fx-border-color: #dcdcdc; -fx-border-width: 0 0 1px 0;");
                         }
                     } else {
-                        // Caso a linha esteja vazia
+                        // Linha vazia
                         setStyle("-fx-background-color: transparent;");
                     }
                 }
             };
+
+            // Adiciona evento de duplo clique para abrir os detalhes da compra
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && !row.isEmpty()) {
+                    Compra compraSelecionada = row.getItem();
+
+                    if (compraSelecionada != null && row.getTreeItem().getParent() != null) {
+                        abrirDetalhesCompra(compraSelecionada);
+                    }
+                }
+            });
+
             return row;
         });
 
@@ -411,6 +427,25 @@ public class CompraController {
 
         return date.format(outputFormatter);
     }
+
+    private void abrirDetalhesCompra(Compra compra) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/compras/CompraDetalhes.fxml"));
+            CompraDetalhesController controller = new CompraDetalhesController(compraService, token, compra);
+            loader.setController(controller);
+
+            Parent root = loader.load();
+            Stage stage = new Stage();
+            stage.setTitle("Detalhes da Compra");
+            stage.setScene(new Scene(root, 800, 600));
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println("Erro ao abrir detalhes: " + e.getMessage());
+        }
+    }
+
 
     /*------------------------ mensagens ---------------*/
 
