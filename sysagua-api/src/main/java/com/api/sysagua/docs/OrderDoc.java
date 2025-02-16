@@ -53,6 +53,8 @@ public interface OrderDoc {
             BigDecimal receivedAmountEnd,
             BigDecimal totalAmountStart,
             BigDecimal totalAmountEnd,
+            BigDecimal balanceStart,
+            BigDecimal balanceEnd,
             PaymentMethod paymentMethod,
             LocalDateTime createdAtStart,
             LocalDateTime createdAtEnd,

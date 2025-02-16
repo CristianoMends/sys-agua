@@ -66,6 +66,20 @@ public class StockServiceImpl implements StockService {
     }
 
     @Override
+    public void removeProduct(AddProductDto dto) {
+
+        var stock = this.stockRepository.findProduct(dto.getProductId());
+
+        if (stock.isPresent()) {
+            stock.get().setTotalEntries(stock.get().getTotalEntries() - dto.getQuantity());
+            stock.get().setUpdatedAt(LocalDateTime.now().atZone(ZoneId.of("America/Sao_Paulo")).toLocalDateTime());
+            var saved = this.stockRepository.save(stock.get());
+
+            saveStockHistory(saved, MovementType.WITHDRAWAL, dto.getQuantity(), "Estorno de produto");
+        }
+    }
+
+    @Override
     public List<Stock> getStock(Long id,
                                 Integer initialQuantityStart,
                                 Integer initialQuantityEnd,

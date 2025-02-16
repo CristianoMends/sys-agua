@@ -26,7 +26,6 @@ public class TransactionController implements TransactionDoc {
     @CrossOrigin
     public ResponseEntity<List<ViewTransactionDto>> listTransactions(
             @RequestParam(required = false) Long id,
-            @RequestParam(required = false) TransactionStatus status,
             @RequestParam(required = false) BigDecimal amountStart,
             @RequestParam(required = false) BigDecimal amountEnd,
             @RequestParam(required = false) TransactionType type,
@@ -40,7 +39,6 @@ public class TransactionController implements TransactionDoc {
 
         List<ViewTransactionDto> transactions = transactionRepository.list(
                 id,
-                status,
                 amountStart,
                 amountEnd,
                 type,

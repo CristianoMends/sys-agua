@@ -11,6 +11,8 @@ public interface StockService {
 
     void addProduct(AddProductDto dto);
 
+    void removeProduct(AddProductDto dto);
+
     List<Stock> getStock(Long id,
                          Integer initialQuantityStart,
                          Integer initialQuantityEnd,

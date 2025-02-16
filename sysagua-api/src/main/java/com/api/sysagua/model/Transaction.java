@@ -27,9 +27,6 @@ public class Transaction {
     @Column(nullable = false)
     private Long id;
 
-    @Enumerated(EnumType.STRING)
-    private TransactionStatus status;
-
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -56,8 +53,7 @@ public class Transaction {
     @JoinColumn(name = "purchase_id")
     private Purchase purchase;
 
-    public Transaction(TransactionStatus status, BigDecimal amount, TransactionType type, String description, User responsibleUser, Order order, Purchase purchase) {
-        this.status = status;
+    public Transaction(BigDecimal amount, TransactionType type, String description, User responsibleUser, Order order, Purchase purchase) {
         this.amount = amount;
         this.type = type;
         this.description = description;
@@ -74,7 +70,6 @@ public class Transaction {
     public ViewTransactionDto toView() {
         return new ViewTransactionDto(
                 getId(),
-                getStatus(),
                 getCreatedAt(),
                 getAmount(),
                 getType(),

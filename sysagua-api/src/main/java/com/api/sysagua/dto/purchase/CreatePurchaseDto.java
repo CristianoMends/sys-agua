@@ -24,11 +24,11 @@ public class CreatePurchaseDto {
     @Schema(description = "Lista de produtos com seus dados a serem adquiridos")
     private List<CreateProductPurchaseDto> items;
 
-    @Schema(description = "Quantia já paga do valor da compra", example = "249.99")
+    @Schema(description = "Quantia já paga do valor da compra", example = "100.00")
     @NotNull
     private BigDecimal paidAmount;
 
-    @Schema(description = "Quantia total da compra, caso não informado, é calculado automaticamente", example = "549.99")
+    @Schema(description = "Quantia total da compra, caso não informado, é calculado automaticamente", example = "300.00")
     private BigDecimal totalAmount;
 
     @NotNull(message = "Supplier ID cannot be null.")
@@ -39,7 +39,6 @@ public class CreatePurchaseDto {
     private String description;
 
     @Schema(description = "metodo de pagamento", example = "PIX")
-    @NotNull
     private PaymentMethod paymentMethod;
 
     @Schema(description = "Data e hora da entrada da compra", example = "2025-01-14T10:00:00Z")

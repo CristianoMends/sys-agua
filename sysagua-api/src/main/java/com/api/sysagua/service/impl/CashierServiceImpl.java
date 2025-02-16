@@ -1,7 +1,6 @@
 package com.api.sysagua.service.impl;
 
 import com.api.sysagua.dto.cashier.ViewCashierDto;
-import com.api.sysagua.enumeration.PaymentStatus;
 import com.api.sysagua.enumeration.TransactionStatus;
 import com.api.sysagua.enumeration.TransactionType;
 import com.api.sysagua.model.Cashier;
@@ -61,7 +60,6 @@ public class CashierServiceImpl implements CashierService {
     ) {
         var transactions = this.transactionRepository.list(
                 transactionId,
-                transactionStatus,
                 amountStart,
                 amountEnd,
                 type,
@@ -80,7 +78,6 @@ public class CashierServiceImpl implements CashierService {
     private void createAddBalanceTransaction(BigDecimal balance) {
         var user = this.userService.getLoggedUser();
         var t = new Transaction(
-                TransactionStatus.PAID,
                 balance,
                 TransactionType.INCOME,
                 "Incremento de saldo por usuário",
@@ -92,29 +89,7 @@ public class CashierServiceImpl implements CashierService {
     }
 
     private void calculateBalance() {
-        BigDecimal balance = BigDecimal.ZERO;
-
-        for (var order : orderRepository.findAll()) {
-            if (order.getPaymentStatus() == PaymentStatus.CANCELED) continue;
-
-            var income = this.transactionRepository.countReceivedAmountForOrder(TransactionType.INCOME, order.getId());
-            var expense = this.transactionRepository.countReceivedAmountForOrder(TransactionType.EXPENSE, order.getId());
-
-            if (income.isPresent()) balance = balance.add(income.get());
-            if (expense.isPresent()) balance = balance.subtract(expense.get());
-        }
-
-        for (var purchase : purchaseRepository.findAll()) {
-            if (purchase.getPaymentStatus() == PaymentStatus.CANCELED) continue;
-
-            var income = this.transactionRepository.countReceivedAmountForPurchase(TransactionType.INCOME, purchase.getId());
-            var expense = this.transactionRepository.countReceivedAmountForPurchase(TransactionType.EXPENSE, purchase.getId());
-
-
-            if (income.isPresent()) balance = balance.add(income.get());
-            if (expense.isPresent()) balance = balance.subtract(expense.get());
-        }
-
+        BigDecimal balance = this.transactionRepository.sumBalance().orElse(BigDecimal.ZERO);
         this.cashier.setBalance(balance);
     }
 

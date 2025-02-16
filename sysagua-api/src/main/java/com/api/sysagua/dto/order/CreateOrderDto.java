@@ -38,6 +38,9 @@ public class CreateOrderDto {
     @Schema(description = "Valor total, caso não informado, é calculado automatico", example = "14.00")
     private BigDecimal totalAmount;
 
+    @Schema(description = "Saldo do cliente no pedido", example = "4.50")
+    private BigDecimal balance;
+
     @Schema(description = "Metodo de pagamento", example = "PIX")
     @NotNull(message = "PaymentMethod is mandatory")
     private PaymentMethod paymentMethod;

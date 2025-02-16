@@ -1,7 +1,6 @@
 CREATE TABLE IF NOT EXISTS transactions (
     id BIGINT NOT NULL,
     amount DECIMAL(10,2) NOT NULL,
-    status VARCHAR(20) NOT NULL,
     type VARCHAR(20) NOT NULL,
     description VARCHAR(255) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
