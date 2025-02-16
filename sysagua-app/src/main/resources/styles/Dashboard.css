@@ -98,6 +98,50 @@
     -fx-background-color: transparent; /* Fundo da legenda */
 }
 
+.tooltip {
+    -fx-background-color: #2a9fd6;
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+}
+
+.dashboardChart{
+    -fx-background-color: transparent;
+}
+
+.chartPedidoDia{
+    -fx-background-color: transparent;
+}
+
+.chartPedidoDia .default-color0.chart-bar {
+    -fx-bar-fill: #5A6ACF;
+}
+
+
+.maximize-button{
+    -fx-text-fill: #5A6ACF;
+    -fx-padding: 5px;
+    -fx-alignment: center;
+    -fx-border-radius: 5px;
+    -fx-background-color: #FBFCFE;
+}
+
+.date-picker {
+    -fx-border-color: transparent;
+    -fx-background-color: #F1F2F7;
+    -fx-border-radius: 2px;
+}
+
+.date-picker:focused {
+    -fx-border-color: #8EB3FF;
+    -fx-border-radius: 2px;
+    -fx-background-color: white;
+}
+
+.date-picker .text-field {
+    -fx-background-color: transparent;
+    -fx-border-width: 0;
+}
+
 
 /*---------- pagination ----------*/
 
