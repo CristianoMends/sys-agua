@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import edu.pies.sysaguaapp.dtos.pedido.SendPedidoDto;
 import edu.pies.sysaguaapp.models.Pedido.Pedido;
 import java.io.IOException;
 import java.net.URI;
@@ -41,7 +42,7 @@ public class PedidoService {
         }
     }
 
-    public static Pedido criarPedido(Pedido pedidos, String token) throws Exception {
+    public Pedido criarPedido(SendPedidoDto pedidos, String token) throws Exception {
         String pedidoJson = objectMapper.writeValueAsString(pedidos);
 
         HttpRequest request = HttpRequest.newBuilder()
@@ -53,23 +54,10 @@ public class PedidoService {
 
         // Enviar a requisição
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-
-        // Verificar a resposta
         if (response.statusCode() == 201) {
-            if (response.body() != null && !response.body().isEmpty()) {
-                // Se o corpo não estiver vazio, desserializar e retornar o cliente
-                return objectMapper.readValue(response.body(), Pedido.class);
-            } else {
-                // Se o corpo estiver vazio, apenas retornar o cliente que foi enviado
-                System.out.println("pedido criado com sucesso, mas sem dados retornados.");
-                return pedidos;
-            }
-        } else if (response.statusCode() == 400) {
-            System.out.println("Erro ao criar pedido: " + response.body());
-            throw new Exception("Erro ao criar pedido: ");
+            return null;
         } else {
-            System.out.println("Server response: " + response.body());
-            throw new Exception("Erro ao criar pedido: ");
+            throw new Exception("Erro ao cadastrar: " + response.body());
         }
     }
 
