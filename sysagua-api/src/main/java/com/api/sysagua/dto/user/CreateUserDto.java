@@ -46,28 +46,4 @@ public class CreateUserDto {
     @Schema(description = "Tipo de acesso do usuário", example = "OWNER")
     private UserAccess access;
 
-    @JsonIgnore
-    private boolean isAccessValid() {
-        if (access == null) {
-            return false;
-        }
-        return access == UserAccess.OWNER || access == UserAccess.EMPLOYEE ||
-                access == UserAccess.DEVELOPER || access == UserAccess.MANAGER;
-    }
-
-    public User toModel(){
-        if (!isAccessValid()) {
-            throw new BusinessException("Access must be one of: OWNER, EMPLOYEE, DEVELOPER, MANAGER");
-        }
-        return new User(
-                getName(),
-                getSurname(),
-                getPhone(),
-                getEmail(),
-                getPassword(),
-                UserStatus.ACTIVE,
-                getAccess()
-        );
-    }
-
 }
