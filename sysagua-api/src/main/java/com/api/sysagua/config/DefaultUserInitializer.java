@@ -29,15 +29,13 @@ public class DefaultUserInitializer implements CommandLineRunner {
 
         if (userRepository.findByEmail(defaultEmail).isEmpty()) {
 
-            User defaultUser = new User(
-                    "Desenvolvedor",
-                    null,
-                    null,
-                    defaultEmail,
-                    passwordEncoder.encode(defaultPassword),
-                    UserStatus.ACTIVE,
-                    UserAccess.DEVELOPER
-            );
+            User defaultUser = new User.Builder()
+                    .withName("Desenvolvedor")
+                    .withEmail(defaultEmail)
+                    .withPassword(defaultPassword)
+                    .withStatus(UserStatus.ACTIVE)
+                    .withAccess(UserAccess.DEVELOPER)
+                    .build();
 
             userRepository.save(defaultUser);
             System.out.println("Default User created successfully!");
