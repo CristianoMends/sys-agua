@@ -29,6 +29,7 @@ import javafx.util.StringConverter;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalDateTime.*;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -385,7 +386,9 @@ public class PedidoController {
         Map<LocalDate, TreeItem<Pedido>> gruposPorData = new LinkedHashMap<>();
 
         for (Pedido pedido : listaPedidos) {
-            LocalDate data = pedido.getDataPedido().toLocalDate();
+            LocalDate data = (pedido.getDataPedido() != null)
+                    ? pedido.getDataPedido().toLocalDate()
+                    : LocalDate.now();
 
             gruposPorData.putIfAbsent(data, new TreeItem<>(new Pedido(data.atStartOfDay())));
 
