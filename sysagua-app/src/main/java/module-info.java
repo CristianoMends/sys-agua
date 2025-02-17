@@ -36,4 +36,5 @@ module edu.pies.sysaguaapp {
     opens edu.pies.sysaguaapp.models.Pedido to com.fasterxml.jackson.databind;
     exports edu.pies.sysaguaapp.enumeration.Pedidos to com.fasterxml.jackson.databind;
     opens edu.pies.sysaguaapp.enumeration.Pedidos to com.fasterxml.jackson.databind;
+    exports edu.pies.sysaguaapp.dtos.pedido to com.fasterxml.jackson.databind;
 }
