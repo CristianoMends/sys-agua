@@ -1,16 +1,16 @@
-package edu.pies.sysaguaapp.controllers.Pedidos.AddPedidoController;
+package edu.pies.sysaguaapp.controllers.Pedidos;
 
-import edu.pies.sysaguaapp.controllers.produto.AddProdutoController;
-import edu.pies.sysaguaapp.dtos.compra.ItemCompraDto;
-import edu.pies.sysaguaapp.dtos.compra.SendCompraDto;
+
+import edu.pies.sysaguaapp.dtos.pedido.ItemPedidoDto;
+import edu.pies.sysaguaapp.dtos.pedido.SendPedidoDto;
 import edu.pies.sysaguaapp.enumeration.PaymentMethod;
-import edu.pies.sysaguaapp.enumeration.PaymentStatus;
+import edu.pies.sysaguaapp.enumeration.Pedidos.PedidoStatus;
 import edu.pies.sysaguaapp.models.Clientes;
-import edu.pies.sysaguaapp.models.Fornecedor;
+import edu.pies.sysaguaapp.models.Entregador;
+import edu.pies.sysaguaapp.models.Estoque;
+import edu.pies.sysaguaapp.models.Pedido.ItemPedido;
 import edu.pies.sysaguaapp.models.Produto;
-import edu.pies.sysaguaapp.models.compras.ItemCompra;
 import edu.pies.sysaguaapp.services.*;
-import edu.pies.sysaguaapp.services.produto.ProdutoService;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -20,36 +20,38 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Cursor;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.StackPane;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
 import javafx.util.StringConverter;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class AddPedidoController {
 
     private final PedidoService pedidoService;
-    private final ProdutoService produtoService;
     private final ClientesService clientesService;
+
+    private final EntregadorService entregadorService;
+
+    private final EstoqueService estoqueService;
     private final String token;
 
     @FXML
     private StackPane rootPane;
 
     @FXML
-    private DatePicker dataEntrada;
+    private DatePicker dataPedido;
 
     @FXML
-    private TextField valorRecebidoField;
+    private TextField valorRecebidoField, precoField, quantidadeField;
+
+    @FXML
+    private Label valorRecebidoErrorLabel;
 
     @FXML
     private ComboBox<Clientes> clientesComboBox;
@@ -58,38 +60,42 @@ public class AddPedidoController {
     private ComboBox<Produto> produtoComboBox;
 
     @FXML
+    private ComboBox<Entregador> entregadorComboBox;
+
+    @FXML
     private ComboBox<PaymentMethod> metodoPagamento;
 
+    @FXML
+    private ObservableList<ItemPedido> produtosAddList;
 
     @FXML
-    private TextArea descricao;
+    private TableColumn<ItemPedido, String> produtoColumn, precoColumn, codigoColumn;
 
     @FXML
-    private ObservableList<ItemCompra> produtosAddList;
+    private TableColumn<ItemPedido, Integer> quantidadeColumn;
 
     @FXML
-    private TableColumn<ItemCompra, String> produtoColumn, precoColumn, codigoColumn;
+    private Label dataErrorLabel, fornecedorErrorLabel, precoErrorLabel, statusErrorLabel, produtoErrorLabel,clientesErrorLabel, quantidadeErrorLabel, entregadorErrorLabel;
 
     @FXML
-    private TableColumn<ItemCompra, Integer> quantidadeColumn;
-
-    @FXML
-    private Label dataErrorLabel, fornecedorErrorLabel, produtoErrorLabel, precoErrorLabel, quantidadeErrorLabel, nfeErrorLabel;
+    private TableView<ItemPedido> adicionadosTableView;
 
     @FXML
     private Label totalLabel, totalItensLabel, saveErrorLabel, duplicadoErrorLabel;
 
     @FXML
-    private Button btnSalvar, btnCancelar, btnNovoProduto, btnInserir;
+    private Button btnSalvar, btnCancelar,  btnInserir;
+
+    private ItemPedido itemEditando = null;
 
     private final ContextMenu contextMenu = new ContextMenu();
-    private ItemCompra itemEditando = null;
 
 
     public AddPedidoController() {
-        compraService = new CompraService();
-        produtoService = new ProdutoService();
-        fornecedorService = new FornecedorService();
+        entregadorService = new EntregadorService();
+        estoqueService = new EstoqueService();
+        pedidoService = new PedidoService();
+        clientesService = new ClientesService();
         produtosAddList = FXCollections.observableArrayList();
         token = TokenManager.getInstance().getToken();
     }
@@ -98,10 +104,11 @@ public class AddPedidoController {
     public void initialize() {
         validarCampos();
         carregarListaProdutos();
-        carregarListaFornecedores();
+        carregarListaClientes();
+        carregarListaEntregadores();
+
         btnSalvar.setCursor(Cursor.HAND);
         btnInserir.setCursor(Cursor.HAND);
-        btnNovoProduto.setCursor(Cursor.HAND);
         btnCancelar.setCursor(Cursor.HAND);
 
         adicionadosTableView.setItems(produtosAddList);
@@ -113,7 +120,7 @@ public class AddPedidoController {
             return new SimpleStringProperty(preco != null ? "R$ " + preco.setScale(2, RoundingMode.HALF_UP).toString().replace(".", ",") : "");
         });
 
-        produtosAddList.addListener((ListChangeListener.Change<? extends ItemCompra> change) -> {
+        produtosAddList.addListener((ListChangeListener.Change<? extends ItemPedido> change) -> {
             atualizarTotais();
         });
 
@@ -133,26 +140,24 @@ public class AddPedidoController {
                 return null;
             }
         });
-
         atualizarTotais();
         showMenuContext();
-
     }
 
     @FXML
     private void handleInserir() {
         if (validarFormItem()) {
-            ItemCompra novoItemCompra = criarItemCompra();
+            ItemPedido novoItemPedido = criarItemPedido();
 
-            if (novoItemCompra != null && novoItemCompra.getProduct() != null) {
+            if (novoItemPedido != null && novoItemPedido.getProduct() != null) {
                 if (itemEditando != null) {
                     int index = produtosAddList.indexOf(itemEditando);
                     if (index != -1) {
-                        produtosAddList.set(index, novoItemCompra); // Substitui o item
+                        produtosAddList.set(index, novoItemPedido); // Substitui o item
                     }
                     itemEditando = null;
                 } else {
-                    produtosAddList.add(novoItemCompra);
+                    produtosAddList.add(novoItemPedido);
                 }
                 clearProdutoForm();
             }
@@ -160,39 +165,38 @@ public class AddPedidoController {
     }
 
 
-    private ItemCompra criarItemCompra() {
+    private ItemPedido criarItemPedido() {
         Produto produtoSelecionado = produtoComboBox.getValue();
         BigDecimal preco = new BigDecimal(precoField.getText().replace(",", "."));
         int quantidade = Integer.parseInt(quantidadeField.getText());
 
-        ItemCompra novoItemCompra = new ItemCompra();
+        ItemPedido novoItemPedido = new ItemPedido();
 
         if (produtoSelecionado != null) {
-            novoItemCompra.setProduct(produtoSelecionado);
-            novoItemCompra.setQuantity(quantidade);
-            novoItemCompra.setPurchasePrice(preco);
+            novoItemPedido.setProduct(produtoSelecionado);
+            novoItemPedido.setQuantity(quantidade);
+            novoItemPedido.setPurchasePrice(preco);
         }
 
-        return novoItemCompra;
+        return novoItemPedido;
     }
 
     @FXML
     private void handleSalvar() {
 
-        if (validarFormCompra()){
+        if (validarFormPedido()){
             try {
-                SendCompraDto novaCompra = new SendCompraDto();
-                novaCompra.setSupplierId(fornecedorComboBox.getValue().getId());
-                novaCompra.setNfe(numeroNfeField.getText());
-                novaCompra.setEntryAt(dataEntrada.getValue().atTime(LocalTime.now()));
-                novaCompra.setPaymentMethod(metodoPagamento.getValue());
-                novaCompra.setDescription(descricao.getText());
-                novaCompra.setPaidAmount(BigDecimal.ZERO);
-                novaCompra.setTotalAmount(BigDecimal.ZERO);
+                SendPedidoDto novoPedido = new SendPedidoDto();
+                novoPedido.setCustomerId(clientesComboBox.getValue().getId());
+                novoPedido.setDeliveryPersonId(entregadorComboBox.getValue().getId());
+                novoPedido.setReceivedAmount(BigDecimal.ZERO);
+                novoPedido.setTotalAmount(BigDecimal.ZERO);
+                novoPedido.setPaymentMethod(metodoPagamento.getValue());
+                novoPedido.setDescription("Sem descrição");
 
-                List<ItemCompraDto> itensDto = produtosAddList.stream()
+                List<ItemPedidoDto> itensDto = produtosAddList.stream()
                         .map(item -> {
-                            ItemCompraDto dto = new ItemCompraDto();
+                            ItemPedidoDto dto = new ItemPedidoDto();
                             dto.setProductId(item.getProduct().getId());
                             dto.setQuantity(item.getQuantity());
                             dto.setPurchasePrice(item.getPurchasePrice());
@@ -200,16 +204,16 @@ public class AddPedidoController {
                         })
                         .collect(Collectors.toList());
 
-                novaCompra.setItems(itensDto);
+                novoPedido.setProductOrders(itensDto);
 
-                compraService.cadastrarCompra(novaCompra, token);
+                pedidoService.criarPedido(novoPedido, token);
 
                 clearAllForm();
-                carregarTela("/views/Compras/Compras.fxml");
+                carregarTela("/views/Pedido/Pedido.fxml");
 
             } catch (Exception e) {
                 e.printStackTrace();
-                System.out.println("Erro ao cadastrar compra" + e.getMessage());
+                System.out.println("Erro ao cadastrar pedido" + e.getMessage());
             }
 
         }
@@ -218,29 +222,7 @@ public class AddPedidoController {
 
     @FXML
     private void handleCancelar() {
-        carregarTela("/views/Compras/Compras.fxml");
-    }
-
-    @FXML
-    private void handleNovoProduto() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/Produtos/AddProdutos.fxml"));
-            Parent addProduto = loader.load();
-
-            AddProdutoController controller = loader.getController();
-            controller.setFecharAoSair(true);
-            controller.setOnProdutoSalvo((v) -> carregarListaProdutos());
-
-            Stage stage = new Stage();
-            stage.setTitle("Cadastar Produto");
-            stage.setScene(new Scene(addProduto));
-            stage.initModality(Modality.APPLICATION_MODAL);
-            stage.show();
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("Erro ao carregar tela de cadastro de produto: " + e.getMessage());
-        }
-
+        carregarTela("/views/Pedidos/Pedido.fxml");
     }
 
     private void showMenuContext() {
@@ -254,7 +236,7 @@ public class AddPedidoController {
         }
 
         adicionadosTableView.setRowFactory(tv -> {
-            TableRow<ItemCompra> row = new TableRow<>();
+            TableRow<ItemPedido> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
                 if (event.getButton() == MouseButton.SECONDARY && !row.isEmpty()) {
                     contextMenu.show(row, event.getScreenX(), event.getScreenY());
@@ -267,21 +249,21 @@ public class AddPedidoController {
     }
 
     private void handleEditarLancamento() {
-        ItemCompra produtoSelecionado = adicionadosTableView.getSelectionModel().getSelectedItem();
+        ItemPedido produtoSelecionado = adicionadosTableView.getSelectionModel().getSelectedItem();
         if (produtoSelecionado != null) {
             itemEditando = produtoSelecionado;
             preencherCampos(produtoSelecionado);
         }
     }
 
-    private void preencherCampos(ItemCompra itemSelecionado) {
+    private void preencherCampos(ItemPedido itemSelecionado) {
         produtoComboBox.setValue(itemSelecionado.getProduct());
         precoField.setText(itemSelecionado.getPurchasePrice().toString().replace(".",","));
         quantidadeField.setText(itemSelecionado.getQuantity().toString());
     }
 
     private void handleRemoverLancamento(){
-        ItemCompra produtoSelecionado = adicionadosTableView.getSelectionModel().getSelectedItem();
+        ItemPedido produtoSelecionado = adicionadosTableView.getSelectionModel().getSelectedItem();
         if (produtoSelecionado != null) {
             produtosAddList.remove(produtoSelecionado);
         }
@@ -306,11 +288,15 @@ public class AddPedidoController {
     private void carregarListaProdutos(){
 
         try {
-            List<Produto> produtos = produtoService.buscarProdutos(token).stream()
-                    .filter(Produto::isActive)
+            List<Produto> produtos = estoqueService.buscarEstoque(token).stream()
+                    .map(Estoque::getProduct)
+                    .filter(produto -> produto != null && produto.isActive())
                     .sorted((p1, p2) -> Long.compare(p1.getId(), p2.getId()))
                     .collect(Collectors.toList());
-            produtoComboBox.setItems(FXCollections.observableArrayList(produtos));
+
+            ObservableList<Produto> observableProdutos = FXCollections.observableArrayList(produtos);
+
+            produtoComboBox.setItems(observableProdutos);
 
             produtoComboBox.setCellFactory(param -> new ListCell<>() {
                 @Override
@@ -343,34 +329,72 @@ public class AddPedidoController {
         }
     }
 
-    private void carregarListaFornecedores(){
+    private void carregarListaClientes(){
 
         try {
-            List<Fornecedor> fornecedores = fornecedorService.buscarFornecedores(token).stream()
-                    .filter(Fornecedor::isActive)
-                    .sorted((p1, p2) -> Long.compare(p1.getId(), p2.getId()))
+            List<Clientes> clientes = clientesService.buscarClientes(token).stream()
+                    .filter(Clientes::getActive)
+                    .sorted((c1, c2) -> Long.compare(c1.getId(), c2.getId()))
                     .collect(Collectors.toList());
-            fornecedorComboBox.setItems(FXCollections.observableArrayList(fornecedores));
+            clientesComboBox.setItems(FXCollections.observableArrayList(clientes));
 
-            fornecedorComboBox.setCellFactory(param -> new ListCell<>() {
+            clientesComboBox.setCellFactory(param -> new ListCell<Clientes>() {
                 @Override
-                protected void updateItem(Fornecedor item, boolean empty) {
+                protected void updateItem(Clientes item, boolean empty) {
                     super.updateItem(item, empty);
                     if (empty || item == null) {
                         setText(null);
                     } else {
-                        setText(item.getId() + " - " + item.getSocialReason());
+                        setText(item.getId() + " - " + item.getName());
                     }
                 }
             });
 
-            fornecedorComboBox.setButtonCell(new ListCell<Fornecedor>() {
-                protected void updateItem(Fornecedor item, boolean empty) {
+            clientesComboBox.setButtonCell(new ListCell<Clientes>() {
+                protected void updateItem(Clientes item, boolean empty) {
                     super.updateItem(item, empty);
                     if (empty || item == null) {
                         setText(null);
                     } else {
-                        setText(item.getId() + " - " + item.getSocialReason());
+                        setText(item.getId() + " - " + item.getName());
+                    }
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println(e.getMessage());
+        }
+
+    }
+
+    private void carregarListaEntregadores(){
+
+        try {
+            List<Entregador> entregadores = entregadorService.buscarEntregadores(token).stream()
+                    .filter(Entregador::getActive)
+                    .sorted((e1, e2) -> Long.compare(e1.getId(), e2.getId()))
+                    .collect(Collectors.toList());
+            entregadorComboBox.setItems(FXCollections.observableArrayList(entregadores));
+
+            entregadorComboBox.setCellFactory(param -> new ListCell<Entregador>() {
+                @Override
+                protected void updateItem(Entregador item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty || item == null) {
+                        setText(null);
+                    } else {
+                        setText(item.getId() + " - " + item.getName());
+                    }
+                }
+            });
+
+            entregadorComboBox.setButtonCell(new ListCell<Entregador>() {
+                protected void updateItem(Entregador item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty || item == null) {
+                        setText(null);
+                    } else {
+                        setText(item.getId() + " - " + item.getName());
                     }
                 }
             });
@@ -474,17 +498,17 @@ public class AddPedidoController {
                 .anyMatch(item -> item.getProduct().getId().equals(produto.getId()));
     }
 
-    private boolean validarFormCompra() {
+    private boolean validarFormPedido() {
         boolean isValid = true;
 
-        if (fornecedorComboBox.getValue() == null || fornecedorComboBox.getValue().toString().isEmpty()) {
-            fornecedorErrorLabel.setText("Fornecedor é obrigatório.");
-            fornecedorErrorLabel.setVisible(true);
-            fornecedorErrorLabel.setManaged(true);
+        if (clientesComboBox.getValue() == null) {
+            clientesErrorLabel.setText("Cliente é obrigatório.");
+            clientesErrorLabel.setVisible(true);
+            clientesErrorLabel.setManaged(true);
             isValid = false;
         } else {
-            fornecedorErrorLabel.setVisible(false);
-            fornecedorErrorLabel.setManaged(false);
+            clientesErrorLabel.setVisible(false);
+            clientesErrorLabel.setManaged(false);
         }
 
         if (produtosAddList.isEmpty()){
@@ -496,18 +520,23 @@ public class AddPedidoController {
             saveErrorLabel.setManaged(false);
         }
 
-        if (dataEntrada.getValue().toString().isEmpty()) {
-            dataErrorLabel.setText("Data é obrigatório");
+        if (entregadorComboBox.getValue() == null || entregadorComboBox.getValue().toString().isEmpty()) {
+            entregadorErrorLabel.setText("Entregador é obrigatório.");
+            entregadorErrorLabel.setVisible(true);
+            entregadorErrorLabel.setManaged(true);
+            isValid = false;
+        } else {
+            entregadorErrorLabel.setVisible(false);
+            entregadorErrorLabel.setManaged(false);
+        }
+
+        if (dataPedido.getValue() == null) {
+            dataErrorLabel.setText("Data é obrigatória.");
             dataErrorLabel.setVisible(true);
             dataErrorLabel.setManaged(true);
             isValid = false;
-        } else {
-            dataErrorLabel.setVisible(false);
-            dataErrorLabel.setManaged(false);
-        }
-
-        if (dataEntrada.getValue().isAfter(LocalDate.now())) {
-            dataErrorLabel.setText("Data de entrada não pode ser uma data futura.");
+        } else if (dataPedido.getValue().isAfter(LocalDate.now())) {
+            dataErrorLabel.setText("Data do Pedido não pode ser uma data futura.");
             dataErrorLabel.setVisible(true);
             dataErrorLabel.setManaged(true);
             isValid = false;
@@ -523,7 +552,6 @@ public class AddPedidoController {
         // Validar números
         configurarValidacaoDinheiro(precoField, precoErrorLabel);
         configurarValidacaoNumerica(quantidadeField, quantidadeErrorLabel);
-        configurarValidacaoNfe(numeroNfeField, nfeErrorLabel);
     }
 
 
@@ -542,20 +570,6 @@ public class AddPedidoController {
         textField.setTextFormatter(formatter);
     }
 
-
-    private void configurarValidacaoTexto(TextField textField, Label errorLabel) {
-        textField.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (!newValue.matches("[\\p{L}\\s\\d.,-]*")) { // Permite letras, espaços, números, '.', ',' e '-'
-                textField.setText(oldValue);
-                errorLabel.setVisible(true);
-                errorLabel.setManaged(true);
-            } else {
-                errorLabel.setVisible(false);
-                errorLabel.setManaged(false);
-            }
-        });
-    }
-
     private void configurarValidacaoDinheiro(TextField textField, Label errorLabel) {
         TextFormatter<String> formatter = new TextFormatter<>(change -> {
             String newText = change.getControlNewText();
@@ -570,27 +584,6 @@ public class AddPedidoController {
         });
         textField.setTextFormatter(formatter);
     }
-
-    private void configurarValidacaoNfe(TextField textField, Label errorLabel) {
-        textField.textProperty().addListener((observable, oldValue, newValue) -> {
-            String digits = newValue.replaceAll("[^\\d]", "");
-
-            if (digits.length() > 9) {
-                digits = digits.substring(0, 9);
-            }
-
-            textField.setText(digits);
-
-            if (digits.length() == 9) {
-                errorLabel.setVisible(false);
-                errorLabel.setManaged(false);
-            } else {
-                errorLabel.setVisible(true);
-                errorLabel.setManaged(true);
-            }
-        });
-    }
-
     private void clearProdutoForm(){
         produtoComboBox.getSelectionModel().clearSelection();
         precoField.clear();
@@ -598,9 +591,9 @@ public class AddPedidoController {
     }
 
     private void clearAllForm(){
-        fornecedorComboBox.getSelectionModel().clearSelection();
+        clientesComboBox.getSelectionModel().clearSelection();
         produtoComboBox.getSelectionModel().clearSelection();
-        numeroNfeField.clear();
+        entregadorComboBox.getSelectionModel().clearSelection();
         precoField.clear();
         quantidadeField.clear();
     }
