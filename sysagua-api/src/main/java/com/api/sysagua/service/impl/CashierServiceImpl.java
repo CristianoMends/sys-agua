@@ -76,21 +76,26 @@ public class CashierServiceImpl implements CashierService {
     }
 
     private void createAddBalanceTransaction(BigDecimal balance) {
-        var user = this.userService.getLoggedUser();
-        var t = new Transaction(
-                balance,
-                TransactionType.INCOME,
-                "Incremento de saldo por usuário",
-                user,
-                null,
-                null
-        );
-        this.transactionRepository.save(t);
+        createTransaction(balance, "Incremento de saldo por usuário");
     }
 
     private void calculateBalance() {
         BigDecimal balance = this.transactionRepository.sumBalance().orElse(BigDecimal.ZERO);
         this.cashier.setBalance(balance);
+    }
+
+    private void createTransaction(BigDecimal amount, String description) {
+
+        var user = this.userService.getLoggedUser();
+        var t = new Transaction(
+                amount,
+                TransactionType.EXPENSE,
+                description,
+                user,
+                null,
+                null
+        );
+        this.transactionRepository.save(t);
     }
 
 }
