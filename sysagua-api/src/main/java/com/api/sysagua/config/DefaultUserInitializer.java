@@ -5,7 +5,6 @@ import com.api.sysagua.enumeration.UserStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import com.api.sysagua.model.User;
 import com.api.sysagua.repository.UserRepository;
@@ -20,9 +19,6 @@ public class DefaultUserInitializer implements CommandLineRunner {
 
     @Autowired
     private UserRepository userRepository;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
 
     @Override
     public void run(String... args) throws Exception {
