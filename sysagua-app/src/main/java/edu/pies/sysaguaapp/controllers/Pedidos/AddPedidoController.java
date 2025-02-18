@@ -4,6 +4,7 @@ package edu.pies.sysaguaapp.controllers.Pedidos;
 import edu.pies.sysaguaapp.dtos.pedido.ItemPedidoDto;
 import edu.pies.sysaguaapp.dtos.pedido.SendPedidoDto;
 import edu.pies.sysaguaapp.enumeration.PaymentMethod;
+import edu.pies.sysaguaapp.enumeration.PaymentStatus;
 import edu.pies.sysaguaapp.enumeration.Pedidos.PedidoStatus;
 import edu.pies.sysaguaapp.models.Clientes;
 import edu.pies.sysaguaapp.models.Entregador;
@@ -64,6 +65,9 @@ public class AddPedidoController {
 
     @FXML
     private ComboBox<PaymentMethod> metodoPagamento;
+
+    @FXML
+    private ComboBox<PaymentStatus> statusPagamento;
 
     @FXML
     private ObservableList<ItemPedido> produtosAddList;
@@ -140,6 +144,22 @@ public class AddPedidoController {
                 return null;
             }
         });
+        statusPagamento.setItems(FXCollections.observableArrayList(PaymentStatus.values()));
+        statusPagamento.setConverter(new StringConverter<PaymentStatus>() {
+            @Override
+            public String toString(PaymentStatus metodo) {
+                return metodo != null ? metodo.getDescription() : "";
+            }
+            @Override
+            public PaymentStatus fromString(String string) {
+                for (PaymentStatus metodo : PaymentStatus.values()) {
+                    if (metodo.getDescription().equals(string)) {
+                        return metodo;
+                    }
+                }
+                return null;
+            }
+        });
         atualizarTotais();
         showMenuContext();
     }
@@ -187,20 +207,9 @@ public class AddPedidoController {
         if (validarFormPedido()){
             try {
                 SendPedidoDto novoPedido = new SendPedidoDto();
+                novoPedido.setDataPedido(dataPedido.getValue());
                 novoPedido.setCustomerId(clientesComboBox.getValue().getId());
                 novoPedido.setDeliveryPersonId(entregadorComboBox.getValue().getId());
-
-                BigDecimal valorRecebido = new BigDecimal(valorRecebidoField.getText().replace(",", "."));
-
-                novoPedido.setReceivedAmount(valorRecebido);
-
-                BigDecimal totalAmount = produtosAddList.stream()
-                        .map(item -> item.getPurchasePrice().multiply(BigDecimal.valueOf(item.getQuantity())))
-                        .reduce(BigDecimal.ZERO, BigDecimal::add);
-                novoPedido.setTotalAmount(totalAmount);
-                novoPedido.setPaymentMethod(metodoPagamento.getValue());
-                novoPedido.setDescription("Sem descrição");
-
                 List<ItemPedidoDto> itensDto = produtosAddList.stream()
                         .map(item -> {
                             ItemPedidoDto dto = new ItemPedidoDto();
@@ -210,14 +219,19 @@ public class AddPedidoController {
                             return dto;
                         })
                         .collect(Collectors.toList());
-
                 novoPedido.setProductOrders(itensDto);
 
+                BigDecimal valorRecebido = new BigDecimal(valorRecebidoField.getText().replace(",", "."));
+                novoPedido.setReceivedAmount(valorRecebido);
+                BigDecimal totalAmount = produtosAddList.stream()
+                        .map(item -> item.getPurchasePrice().multiply(BigDecimal.valueOf(item.getQuantity())))
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+                novoPedido.setTotalAmount(totalAmount);
+                novoPedido.setPaymentMethod(metodoPagamento.getValue());
+                novoPedido.setDescription("Sem descrição");
                 pedidoService.criarPedido(novoPedido, token);
-
                 clearAllForm();
-                carregarTela("/views/Pedido/Pedido.fxml");
-
+                carregarTela("/views/Pedidos/Pedido.fxml");
             } catch (Exception e) {
                 e.printStackTrace();
                 System.out.println("Erro ao cadastrar pedido" + e.getMessage());
