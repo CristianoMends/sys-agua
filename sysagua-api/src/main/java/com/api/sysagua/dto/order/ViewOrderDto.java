@@ -1,5 +1,6 @@
 package com.api.sysagua.dto.order;
 
+import com.api.sysagua.dto.transaction.ViewTransactableDto;
 import com.api.sysagua.enumeration.DeliveryStatus;
 import com.api.sysagua.enumeration.PaymentMethod;
 import com.api.sysagua.enumeration.PaymentStatus;
@@ -20,7 +21,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Schema(description = "DTO para visualização de um Pedido")
-public class ViewOrderDto {
+public class ViewOrderDto extends ViewTransactableDto {
 
     @Schema(description = "ID do pedido", example = "1")
     private Long id;
