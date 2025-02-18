@@ -43,7 +43,6 @@ public class PedidoService {
 
     public Pedido criarPedido(SendPedidoDto pedidos, String token) throws Exception {
         String pedidoJson = objectMapper.writeValueAsString(pedidos);
-        System.out.println(pedidoJson);
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(BASE_URL))
