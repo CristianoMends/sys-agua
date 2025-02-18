@@ -2,6 +2,7 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TableColumn?>
@@ -78,10 +79,10 @@
                                     <HBox alignment="CENTER_LEFT">
                                        <children>
                                           <Label minWidth="80.0" text="Forma de pagamento" />
-                                          <TextField minWidth="100.0" />
+                                          <ComboBox fx:id="metodoPagamento" prefWidth="150.0" />
                                        </children>
                                     </HBox>
-                                    <Label fx:id="pagamentoErrorLabel" text="Campo inválido" visible="false" />
+                                    <Label fx:id="pagamentoErrorLabel" text="Campo inválido" visible="false" managed="false" />
                                  </children>
                               </VBox>
                               <VBox>
@@ -89,13 +90,13 @@
                                     <HBox alignment="CENTER_LEFT">
                                        <children>
                                           <Label minWidth="40.0" text="Valor" />
-                                          <TextField minWidth="80.0" />
+                                          <TextField fx:id="valorField" minWidth="80.0" />
                                        </children>
                                     </HBox>
-                                    <Label fx:id="valorErrorLabel" text="Campo inválido" visible="false" />
+                                    <Label fx:id="valorErrorLabel" text="Campo inválido" visible="false" managed="false" />
                                  </children>
                               </VBox>
-                              <Button onAction="#handleInserirPagamento" minWidth="70.0" mnemonicParsing="false" styleClass="menu-button" text="Adicionar" />
+                              <Button minWidth="70.0" mnemonicParsing="false" onAction="#handleInserirPagamento" styleClass="menu-button" text="Adicionar" />
                            </children>
                         </HBox>
                         <TableView fx:id="pagamentosTableView">
