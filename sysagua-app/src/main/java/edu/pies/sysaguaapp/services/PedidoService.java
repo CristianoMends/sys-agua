@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import edu.pies.sysaguaapp.dtos.pedido.SendPedidoDto;
+import edu.pies.sysaguaapp.enumeration.Pedidos.PedidoStatus;
 import edu.pies.sysaguaapp.models.Pedido.Pedido;
 import java.io.IOException;
 import java.net.URI;
@@ -64,11 +65,28 @@ public class PedidoService {
     }
 
     public static Pedido cancelarPedido(Pedido pedido, String token) throws Exception {
+
+        if (pedido.getReceivedAmount().compareTo(pedido.getTotalAmount()) > 0 ) {
+            throw new Exception("O valor recebido ultrapassa o valor total do pedido.");
+        }
+
+        if (pedido.getDeliveryStatus() == PedidoStatus.CANCELED) {
+            throw new Exception("O pedido já foi cancelado.");
+        }
+
+        pedido.setDeliveryStatus(PedidoStatus.CANCELED);
+        ObjectMapper mapper = new ObjectMapper();
+
+
+        mapper.registerModule(new JavaTimeModule());
+        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
+        String jsonBody = mapper.writeValueAsString(pedido);
         String urlComId = BASE_URL + "/" + pedido.getId();
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(urlComId))
-                .DELETE()
+                .PUT(HttpRequest.BodyPublishers.ofString(jsonBody))
                 .header("Content-Type", "application/json")
                 .header("Authorization", "Bearer " + token)
                 .build();
@@ -76,7 +94,7 @@ public class PedidoService {
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
         if (response.statusCode() == 204) {
-            return null;
+            return pedido;
         } else {
             throw new Exception("Erro ao cancelar: " + response.body());
         }
