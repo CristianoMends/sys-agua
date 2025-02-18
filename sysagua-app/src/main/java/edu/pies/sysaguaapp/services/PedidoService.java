@@ -2,6 +2,10 @@ package edu.pies.sysaguaapp.services;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import edu.pies.sysaguaapp.dtos.pedido.SendPedidoDto;
+import edu.pies.sysaguaapp.enumeration.Pedidos.PedidoStatus;
 import edu.pies.sysaguaapp.models.Pedido.Pedido;
 import java.io.IOException;
 import java.net.URI;
@@ -18,6 +22,7 @@ public class PedidoService {
     public PedidoService() {
         this.httpClient = HttpClient.newHttpClient();
         this.objectMapper = new ObjectMapper();
+        this.objectMapper.registerModule(new JavaTimeModule());
     }
     public List<Pedido> buscarPedidos(String token) throws Exception {
         HttpRequest request = HttpRequest.newBuilder()
@@ -37,7 +42,7 @@ public class PedidoService {
         }
     }
 
-    public static Pedido criarPedido(Pedido pedidos, String token) throws Exception {
+    public Pedido criarPedido(SendPedidoDto pedidos, String token) throws Exception {
         String pedidoJson = objectMapper.writeValueAsString(pedidos);
 
         HttpRequest request = HttpRequest.newBuilder()
@@ -49,78 +54,49 @@ public class PedidoService {
 
         // Enviar a requisição
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-
-        // Verificar a resposta
         if (response.statusCode() == 201) {
-            if (response.body() != null && !response.body().isEmpty()) {
-                // Se o corpo não estiver vazio, desserializar e retornar o cliente
-                return objectMapper.readValue(response.body(), Pedido.class);
-            } else {
-                // Se o corpo estiver vazio, apenas retornar o cliente que foi enviado
-                System.out.println("pedido criado com sucesso, mas sem dados retornados.");
-                return pedidos;
-            }
-        } else if (response.statusCode() == 400) {
-            System.out.println("Erro ao criar pedido: " + response.body());
-            throw new Exception("Erro ao criar pedido: ");
+            return null;
         } else {
-            System.out.println("Server response: " + response.body());
-            throw new Exception("Erro ao criar pedido: ");
+            throw new Exception("Erro ao cadastrar: " + response.body());
         }
+
+
+
     }
-    public static Pedido editarPedido(Pedido pedido, String token) throws Exception {
-        String pedidoJson = objectMapper.writeValueAsString(pedido);
+
+    public static Pedido cancelarPedido(Pedido pedido, String token) throws Exception {
+
+        if (pedido.getReceivedAmount().compareTo(pedido.getTotalAmount()) > 0 ) {
+            throw new Exception("O valor recebido ultrapassa o valor total do pedido.");
+        }
+
+        if (pedido.getDeliveryStatus() == PedidoStatus.CANCELED) {
+            throw new Exception("O pedido já foi cancelado.");
+        }
+
+        pedido.setDeliveryStatus(PedidoStatus.CANCELED);
+        ObjectMapper mapper = new ObjectMapper();
+
+
+        mapper.registerModule(new JavaTimeModule());
+        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
+        String jsonBody = mapper.writeValueAsString(pedido);
         String urlComId = BASE_URL + "/" + pedido.getId();
+
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(urlComId))
-                .PUT(HttpRequest.BodyPublishers.ofString(pedidoJson))
+                .PUT(HttpRequest.BodyPublishers.ofString(jsonBody))
                 .header("Content-Type", "application/json")
                 .header("Authorization", "Bearer " + token)
                 .build();
 
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
-        if (response.statusCode() == 200 || response.statusCode() == 204) {
-            if (response.body().isEmpty()) {
-                return pedido;
-            } else {
-                try {
-                    return objectMapper.readValue(response.body(), Pedido.class);
-                } catch (IOException e) {
-                    throw new Exception("Erro ao processar a resposta do servidor: ");
-                }
-            }
+        if (response.statusCode() == 204) {
+            return pedido;
         } else {
-            throw new Exception("Erro ao editar pedido: ");
-        }
-    }
-    public static Pedido inativarPedido(Pedido pedido, String token) throws Exception {
-        pedido.setActive(false);
-
-        String pedidoJson = objectMapper.writeValueAsString(pedido);
-        String urlComId = BASE_URL + "/" + pedido.getId();
-
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(urlComId))
-                .PUT(HttpRequest.BodyPublishers.ofString(pedidoJson))
-                .header("Content-Type", "application/json")
-                .header("Authorization", "Bearer " + token)
-                .build();
-
-        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-
-        if (response.statusCode() == 200 || response.statusCode() == 204) {
-            if (response.body().isEmpty()) {
-                return pedido;
-            } else {
-                try {
-                    return objectMapper.readValue(response.body(), Pedido.class);
-                } catch (IOException e) {
-                    throw new Exception("Erro ao processar a resposta do servidor: ");
-                }
-            }
-        } else {
-            throw new Exception("Erro ao inativar pedido: ");
+            throw new Exception("Erro ao cancelar: " + response.body());
         }
     }
 

@@ -9,7 +9,7 @@
 
     <!-- Mensagem de boas-vindas no topo -->
     <top>
-        <Label text="Seja Bem Vindo a SysAgua" styleClass="header-label" BorderPane.alignment="CENTER"/>
+        <Label text="Seja Bem-Vindo a SysAgua" styleClass="header-label" BorderPane.alignment="CENTER"/>
     </top>
 
     <!-- Área principal com os campos de login -->
