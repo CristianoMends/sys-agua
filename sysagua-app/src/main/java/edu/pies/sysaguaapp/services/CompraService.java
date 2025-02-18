@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import edu.pies.sysaguaapp.dtos.compra.SendCompraDto;
 import edu.pies.sysaguaapp.dtos.compra.SendPgtoCompraDto;
-import edu.pies.sysaguaapp.models.CompraTransaction;
 import edu.pies.sysaguaapp.models.compras.Compra;
 
 
@@ -105,7 +104,7 @@ public class CompraService {
             }
             return null;
         } else {
-            throw new Exception("Erro ao buscar fornecedor: " + response.body());
+            throw new Exception("Erro ao buscar compra: " + response.body());
         }
     }
 
@@ -128,9 +127,9 @@ public class CompraService {
         }
     }
 
-    public Compra cadastrarPagamento(SendPgtoCompraDto pagamento, String token) throws Exception {
+    public Compra cadastrarPagamento(SendPgtoCompraDto pagamento,Long idCompra, String token) throws Exception {
         String compraJson = objectMapper.writeValueAsString(pagamento);
-        String urlPagamento = BASE_URL + "/payment?id=" + pagamento.getIdCompra();
+        String urlPagamento = BASE_URL + "/payment/" + idCompra;
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(urlPagamento))
