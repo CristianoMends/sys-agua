@@ -145,7 +145,16 @@ public class PedidoController {
         Pedido pedidoSelecionado = tabelaPedido.getSelectionModel().getSelectedItem().getValue();
         if (pedidoSelecionado != null) {
             try {
+                String token = TokenManager.getInstance().getToken();
                 pedidoService.cancelarPedido(pedidoSelecionado, token);
+                TreeItem<Pedido> treeItemSelecionado = tabelaPedido.getSelectionModel().getSelectedItem();
+                TreeItem<Pedido> parent = treeItemSelecionado.getParent();
+                if (parent != null) {
+                    parent.getChildren().remove(treeItemSelecionado);
+                } else {
+                    tabelaPedido.getRoot().getChildren().remove(treeItemSelecionado);
+                }
+                tabelaPedido.refresh();
             } catch (Exception e) {
                 e.printStackTrace();
                 System.out.println("Erro ao cancelar pedido " + e.getMessage());
@@ -171,34 +180,44 @@ public class PedidoController {
         colunaNomeCliente.setCellValueFactory(param -> {
             Pedido pedido = param.getValue().getValue();
 
-            if (pedido == null || pedido.getCliente() == null) {
+            if (pedido == null || pedido.getCustomer() == null) {
                 return new SimpleStringProperty("");
             }
 
-            return new SimpleStringProperty(pedido.getCliente().getName());
+            return new SimpleStringProperty(pedido.getCustomer().getName());
         });
 
 
+
+        TreeTableColumn<Pedido, String> colunaData = new TreeTableColumn<>("Data do Pedido");
+        colunaData.setCellValueFactory(param -> {
+            LocalDateTime createAt = param.getValue().getValue().getCreatedAt();
+            if (createAt != null) {
+                return new SimpleStringProperty(createAt.toLocalDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+            }
+            return new SimpleStringProperty("");
+        });
+
         TreeTableColumn<Pedido, BigDecimal> colunaValorTotal = new TreeTableColumn<>("Valor Total");
         colunaValorTotal.setCellValueFactory(param ->
-                new SimpleObjectProperty<>(param.getValue().getValue().getValorTotal()));
+                new SimpleObjectProperty<>(param.getValue().getValue().getTotalAmount()));
 
 
         TreeTableColumn<Pedido, String> colunaNomeEntregador = new TreeTableColumn<>("Nome do Entregador");
         colunaNomeEntregador.setCellValueFactory(param -> {
             Pedido pedido = param.getValue().getValue();
 
-            if (pedido == null || pedido.getEntregador() == null) {
+            if (pedido == null || pedido.getDeliveryPerson() == null) {
                 return new SimpleStringProperty("");
             }
 
-            return new SimpleStringProperty(pedido.getEntregador().getName());
+            return new SimpleStringProperty(pedido.getDeliveryPerson().getName());
         });
 
 
         // Adiciona as colunas na TreeTableView
         tabelaPedido.getColumns().clear();
-        tabelaPedido.getColumns().addAll(colunaNumeroPedido, colunaNomeCliente, colunaValorTotal, colunaNomeEntregador);
+        tabelaPedido.getColumns().addAll(colunaNumeroPedido, colunaNomeCliente, colunaData, colunaValorTotal, colunaNomeEntregador);
 
         tabelaPedido.setRowFactory(tv -> {
             TreeTableRow<Pedido> row = new TreeTableRow<Pedido>() {
@@ -238,14 +257,14 @@ public class PedidoController {
             LocalDate fim = datePickerFim.getValue();
             if (inicio != null) {
                 listaPedido = listaPedido.stream()
-                        .filter(pedido -> pedido.getDataPedido() != null &&
-                                !pedido.getDataPedido().toLocalDate().isBefore(inicio))
+                        .filter(pedido -> pedido.getCreatedAt() != null &&
+                                !pedido.getCreatedAt().toLocalDate().isBefore(inicio))
                         .collect(Collectors.toList());
             }
             if (fim != null) {
                 listaPedido = listaPedido.stream()
-                        .filter(pedido -> pedido.getDataPedido() != null &&
-                                !pedido.getDataPedido().toLocalDate().isAfter(fim))
+                        .filter(pedido -> pedido.getCreatedAt() != null &&
+                                !pedido.getCreatedAt().toLocalDate().isAfter(fim))
                         .collect(Collectors.toList());
             }
 
@@ -253,8 +272,8 @@ public class PedidoController {
                 String nomeClienteSelecionado = comboClientes.getValue().getName();
                 if (nomeClienteSelecionado != null) {
                     listaPedido = listaPedido.stream()
-                            .filter(pedido -> pedido.getCliente() != null &&
-                                    nomeClienteSelecionado.equals(pedido.getCliente().getName()))
+                            .filter(pedido -> pedido.getCustomer() != null &&
+                                    nomeClienteSelecionado.equals(pedido.getCustomer().getName()))
                             .collect(Collectors.toList());
                 }
             }
@@ -263,8 +282,8 @@ public class PedidoController {
                 String nomeEntregadorSelecionado = comboEntregador.getValue().getName();
                 if (nomeEntregadorSelecionado != null) {
                     listaPedido = listaPedido.stream()
-                            .filter(pedido -> pedido.getEntregador() != null &&
-                                    nomeEntregadorSelecionado.equals(pedido.getEntregador().getName()))
+                            .filter(pedido -> pedido.getDeliveryPerson() != null &&
+                                    nomeEntregadorSelecionado.equals(pedido.getDeliveryPerson().getName()))
                             .collect(Collectors.toList());
                 }
             }
@@ -291,14 +310,14 @@ public class PedidoController {
             int anoAtual = hoje.getYear();
 
             listaPedido = listaPedido.stream()
-                    .filter(pedido -> pedido.getDataPedido() != null &&
-                            pedido.getDataPedido().toLocalDate().getMonthValue() == mesAtual &&
-                            pedido.getDataPedido().toLocalDate().getYear() == anoAtual)
+                    .filter(pedido -> pedido.getCreatedAt() != null &&
+                            pedido.getCreatedAt().toLocalDate().getMonthValue() == mesAtual &&
+                            pedido.getCreatedAt().toLocalDate().getYear() == anoAtual)
                     .collect(Collectors.toList());
 
             Map<LocalDate, TreeItem<Pedido>> gruposPorData = new LinkedHashMap<>();
             for (Pedido pedido : listaPedido) {
-                LocalDate data = pedido.getDataPedido().toLocalDate();
+                LocalDate data = pedido.getCreatedAt().toLocalDate();
                 gruposPorData.putIfAbsent(data, new TreeItem<>(new Pedido()));
                 gruposPorData.get(data).getChildren().add(new TreeItem<>(pedido));
             }
@@ -344,7 +363,7 @@ public class PedidoController {
         Map<LocalDate, TreeItem<Pedido>> gruposPorData = new LinkedHashMap<>();
 
         for (Pedido pedido : listaPedidos) {
-            LocalDate data = pedido.getDataPedido().toLocalDate();
+            LocalDate data = pedido.getCreatedAt().toLocalDate();
 
             gruposPorData.putIfAbsent(data, new TreeItem<>(new Pedido(data.atStartOfDay())));
 
@@ -439,23 +458,6 @@ public class PedidoController {
         try {
             carregarListaClientes();
             carregarListaEntregadores();
-            comboStatusPedido.setItems(FXCollections.observableArrayList(PedidoStatus.values()));
-            comboStatusPedido.setConverter(new StringConverter<PedidoStatus>() {
-                @Override
-                public String toString(PedidoStatus statusPedido) {
-                    return statusPedido != null ? statusPedido.getDescricao() : "";
-                }
-
-                @Override
-                public PedidoStatus fromString(String string) {
-                    for (PedidoStatus statusPedido : PedidoStatus.values()) {
-                        if (statusPedido.getDescricao().equals(string)) {
-                            return statusPedido;
-                        }
-                    }
-                    return null;
-                }
-            });
             comboStatusPagamento.setItems(FXCollections.observableArrayList(PaymentStatus.values()));
             comboStatusPagamento.setConverter(new StringConverter<PaymentStatus>() {
                 public String toString(PaymentStatus status) {
