@@ -5,7 +5,9 @@ import edu.pies.sysaguaapp.enumeration.Pedidos.PedidoStatus;
 import edu.pies.sysaguaapp.enumeration.Pedidos.PedidoStatusPagamento;
 import edu.pies.sysaguaapp.models.Clientes;
 import edu.pies.sysaguaapp.models.Entregador;
+import edu.pies.sysaguaapp.models.Estoque;
 import edu.pies.sysaguaapp.models.Pedido.Pedido;
+import edu.pies.sysaguaapp.models.Produto;
 import edu.pies.sysaguaapp.services.ClientesService;
 import edu.pies.sysaguaapp.services.PedidoService;
 import edu.pies.sysaguaapp.services.EntregadorService;
@@ -86,6 +88,8 @@ public class PedidoController {
     public void initialize() {
         configurarTabela();
         carregarPedidos();
+        carregarListaClientes();
+        carregarListaEntregadores();
         showMenuContext();
         btnAdicionar.setCursor(Cursor.HAND);
         btnFiltrar.setCursor(Cursor.HAND);
@@ -174,35 +178,6 @@ public class PedidoController {
             return new SimpleStringProperty(pedido.getCliente().getName());
         });
 
-        TreeTableColumn<Pedido, String> colunaData = new TreeTableColumn<>("Data do Pedido");
-        colunaData.setCellValueFactory(param -> {
-            LocalDateTime dataPedido = param.getValue().getValue().getDataPedido();
-            if (dataPedido != null) {
-                return new SimpleStringProperty(dataPedido.toLocalDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-            }
-            return new SimpleStringProperty("");
-        });
-
-        TreeTableColumn<Pedido, String> colunaStatusPedido = new TreeTableColumn<>("Status do Pedido");
-        colunaStatusPedido.setCellValueFactory(param -> {
-            Enum status = param.getValue().getValue().getStatus();
-            if (status != null) {
-                return new SimpleStringProperty(status.name());
-            }
-            return new SimpleStringProperty("");
-        });
-
-        TreeTableColumn<Pedido, String> colunaStatusPagamento = new TreeTableColumn<>("Status de Pagamento");
-        colunaStatusPagamento.setCellValueFactory(param -> {
-            Pedido pedido = param.getValue().getValue();
-
-            if (pedido == null || pedido.getCliente() == null) {
-                return new SimpleStringProperty("");
-            }
-
-            return new SimpleStringProperty(pedido.getStatusPagamento().getDescricao());
-        });
-
 
         TreeTableColumn<Pedido, BigDecimal> colunaValorTotal = new TreeTableColumn<>("Valor Total");
         colunaValorTotal.setCellValueFactory(param ->
@@ -223,7 +198,7 @@ public class PedidoController {
 
         // Adiciona as colunas na TreeTableView
         tabelaPedido.getColumns().clear();
-        tabelaPedido.getColumns().addAll(colunaNumeroPedido, colunaNomeCliente, colunaData, colunaStatusPedido, colunaStatusPagamento,  colunaValorTotal, colunaNomeEntregador);
+        tabelaPedido.getColumns().addAll(colunaNumeroPedido, colunaNomeCliente, colunaValorTotal, colunaNomeEntregador);
 
         tabelaPedido.setRowFactory(tv -> {
             TreeTableRow<Pedido> row = new TreeTableRow<Pedido>() {
@@ -283,24 +258,6 @@ public class PedidoController {
                             .collect(Collectors.toList());
                 }
             }
-            if (comboStatusPedido.getValue() != null) {
-                PedidoStatus statusSelecionado = comboStatusPedido.getValue();
-                if (statusSelecionado != null) {
-                    listaPedido = listaPedido.stream()
-                            .filter(pedido -> statusSelecionado.equals(pedido.getStatus()))
-                            .collect(Collectors.toList());
-                }
-            }
-
-
-            if (comboStatusPagamento.getValue() != null) {
-                PaymentStatus statusPagamentoSelecionado = comboStatusPagamento.getValue();
-                if (statusPagamentoSelecionado != null) {
-                    listaPedido = listaPedido.stream()
-                            .filter(pedido -> statusPagamentoSelecionado.equals(pedido.getStatusPagamento().getDescricao()))
-                            .collect(Collectors.toList());
-                }
-            }
 
             if (comboEntregador.getValue() != null) {
                 String nomeEntregadorSelecionado = comboEntregador.getValue().getName();
@@ -324,6 +281,7 @@ public class PedidoController {
             System.out.println("Erro ao aplicar os filtros: " + e.getMessage());
         }
     }
+
 
     private void filtrarPorMesAtual() {
         try {
@@ -386,9 +344,7 @@ public class PedidoController {
         Map<LocalDate, TreeItem<Pedido>> gruposPorData = new LinkedHashMap<>();
 
         for (Pedido pedido : listaPedidos) {
-            LocalDate data = (pedido.getDataPedido() != null)
-                    ? pedido.getDataPedido().toLocalDate()
-                    : LocalDate.now();
+            LocalDate data = pedido.getDataPedido().toLocalDate();
 
             gruposPorData.putIfAbsent(data, new TreeItem<>(new Pedido(data.atStartOfDay())));
 

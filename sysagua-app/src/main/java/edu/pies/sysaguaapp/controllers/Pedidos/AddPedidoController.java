@@ -189,8 +189,15 @@ public class AddPedidoController {
                 SendPedidoDto novoPedido = new SendPedidoDto();
                 novoPedido.setCustomerId(clientesComboBox.getValue().getId());
                 novoPedido.setDeliveryPersonId(entregadorComboBox.getValue().getId());
-                novoPedido.setReceivedAmount(BigDecimal.ZERO);
-                novoPedido.setTotalAmount(BigDecimal.ZERO);
+
+                BigDecimal valorRecebido = new BigDecimal(valorRecebidoField.getText().replace(",", "."));
+
+                novoPedido.setReceivedAmount(valorRecebido);
+
+                BigDecimal totalAmount = produtosAddList.stream()
+                        .map(item -> item.getPurchasePrice().multiply(BigDecimal.valueOf(item.getQuantity())))
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+                novoPedido.setTotalAmount(totalAmount);
                 novoPedido.setPaymentMethod(metodoPagamento.getValue());
                 novoPedido.setDescription("Sem descrição");
 
