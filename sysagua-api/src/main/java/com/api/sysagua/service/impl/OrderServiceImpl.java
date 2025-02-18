@@ -50,10 +50,7 @@ public class OrderServiceImpl implements OrderService {
         order.setDeliveryStatus(DeliveryStatus.PENDING);
         order.setReceivedAmount(dto.getReceivedAmount());
 
-        BigDecimal totalAmount = dto.getProductOrders().stream()
-                .map(product -> product.getUnitPrice().multiply(BigDecimal.valueOf(product.getQuantity())))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-        order.setTotalAmount(totalAmount);
+        order.calculateTotalAmount();
 
         order.setBalance(order.getTotalAmount().subtract(dto.getReceivedAmount()));
         order.setPaymentMethod(dto.getPaymentMethod());
@@ -109,7 +106,6 @@ public class OrderServiceImpl implements OrderService {
     }
 
 
-
     @Override
     public void update(Long id, UpdateOrderDto dto) {
         var order = this.orderRepository.findById(id).orElseThrow(
@@ -117,15 +113,15 @@ public class OrderServiceImpl implements OrderService {
         );
 
 
-        if(dto.getStatus() != null){
+        if (dto.getStatus() != null) {
             DeliveryStatus newStatus = dto.getStatus();
 
-            if(newStatus == DeliveryStatus.CANCELED && order.getDeliveryStatus() == DeliveryStatus.PENDING){
+            if (newStatus == DeliveryStatus.CANCELED && order.getDeliveryStatus() == DeliveryStatus.PENDING) {
                 order.setCanceledAt(LocalDateTime.now());
                 order.setPaymentStatus(PaymentStatus.CANCELED);
             }
 
-            if(newStatus == DeliveryStatus.FINISHED && order.getDeliveryStatus() == DeliveryStatus.PENDING){
+            if (newStatus == DeliveryStatus.FINISHED && order.getDeliveryStatus() == DeliveryStatus.PENDING) {
                 processOrderProducts(order);
                 order.setFinishedAt(LocalDateTime.now());
             }
@@ -134,11 +130,11 @@ public class OrderServiceImpl implements OrderService {
             order.setDeliveryStatus(newStatus);
         }
 
-        if(dto.getReceivedAmount() != null) {
+        if (dto.getReceivedAmount() != null) {
             BigDecimal previousAmount = order.getReceivedAmount();
             BigDecimal newAmount = previousAmount.add(dto.getReceivedAmount());
 
-            if(newAmount.compareTo(order.getTotalAmount()) == 0){
+            if (newAmount.compareTo(order.getTotalAmount()) == 0) {
                 newAmount = order.getTotalAmount();
                 order.setPaymentStatus(PaymentStatus.PAID);
             }
@@ -156,26 +152,24 @@ public class OrderServiceImpl implements OrderService {
 
             }
             order.setBalance(order.getTotalAmount().subtract(newAmount));
-            if(newAmount.equals(order.getTotalAmount())){
+            if (newAmount.equals(order.getTotalAmount())) {
                 order.setPaymentStatus(PaymentStatus.PAID);
-            }else if(newAmount.compareTo(order.getTotalAmount()) < 0){
+            } else if (newAmount.compareTo(order.getTotalAmount()) < 0) {
                 order.setReceivedAmount(newAmount);
-            }else if(newAmount.compareTo(order.getTotalAmount()) > 0){
+            } else if (newAmount.compareTo(order.getTotalAmount()) > 0) {
                 throw new BusinessException("Order received value overtakes total value.");
             }
         }
 
         var saved_order = this.orderRepository.save(order);
 
-        if(order.getPaymentStatus() != null){
+        if (order.getPaymentStatus() != null) {
             PaymentStatus paymentStatus = order.getPaymentStatus();
 
             switch (paymentStatus) {
-                case PAID ->
-                        createPaidTransaction(saved_order);
-                case CANCELED ->
-                    createCanceledTransaction(saved_order);
-                case PENDING -> createTransaction(order, TransactionStatus.PENDING, saved_order.getReceivedAmount(), TransactionType.INCOME);
+                case PAID -> createPaidTransaction(saved_order);
+                case CANCELED -> createCanceledTransaction(saved_order);
+                case PENDING -> createTransaction(order, dto.getReceivedAmount(), TransactionType.INCOME);
             }
             order.setPaymentStatus(paymentStatus);
         }
@@ -233,7 +227,7 @@ public class OrderServiceImpl implements OrderService {
 
     }
 
-    private void createTransaction(Order order, TransactionStatus status, BigDecimal amout, TransactionType type) {
+    private void createTransaction(Order order, BigDecimal amout, TransactionType type) {
         var amountPending = order.getBalance();
         var description = "Quantia paga R$ " + amout + ", Quantia pendente R$" + amountPending;
         var user = this.userService.getLoggedUser();
@@ -278,9 +272,9 @@ public class OrderServiceImpl implements OrderService {
     private void createCanceledTransaction(Order order) {
         var user = this.userService.getLoggedUser();
         var t = new Transaction(
-                order.getReceivedAmount(),
+                order.getReceivedAmount().negate(),
                 TransactionType.EXPENSE,
-                "Pedido cancelado. O valor foi registrado como despesa.",
+                "Pedido cancelado e valor pago estornado",
                 user,
                 order,
                 null

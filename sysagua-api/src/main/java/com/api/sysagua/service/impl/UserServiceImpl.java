@@ -4,6 +4,7 @@ import com.api.sysagua.dto.user.*;
 import com.api.sysagua.enumeration.UserAccess;
 import com.api.sysagua.enumeration.UserStatus;
 import com.api.sysagua.exception.BusinessException;
+import com.api.sysagua.factory.UserFactory;
 import com.api.sysagua.model.User;
 import com.api.sysagua.repository.UserRepository;
 import com.api.sysagua.service.TokenService;
@@ -14,7 +15,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -34,11 +34,11 @@ public class UserServiceImpl implements UserService {
         checkIfEmailExists(userDto.getEmail());
         checkIfPhoneExists(userDto.getPhone());
 
-        var userToSave = userDto.toModel();
-        userToSave.setPassword(new BCryptPasswordEncoder().encode(userToSave.getPassword()));
+        var userToSave = UserFactory.createUser(userDto);
 
         return userRepository.save(userToSave);
     }
+
     private void checkIfEmailExists(String email) {
         userRepository.findByEmail(email).ifPresent(user -> {
             if (user.getStatus().equals(UserStatus.INACTIVE)) {
@@ -53,6 +53,7 @@ public class UserServiceImpl implements UserService {
             );
         });
     }
+
     private void checkIfPhoneExists(String phone) {
         if (phone == null || phone.isEmpty()) {
             return;
@@ -71,12 +72,14 @@ public class UserServiceImpl implements UserService {
             );
         });
     }
+
     @Override
     public UserDetails getUserByEmail(String email) {
         return this.userRepository.findByEmail(email).orElseThrow(() ->
                 new BusinessException("No user was found with the email provided", HttpStatus.NOT_FOUND)
         );
     }
+
     @Override
     public void deactivateUser(String email) {
         var user = (User) this.getUserByEmail(email);
@@ -90,6 +93,7 @@ public class UserServiceImpl implements UserService {
         user.setStatus(UserStatus.INACTIVE);
         this.userRepository.save(user);
     }
+
     @Override
     public Token authenticateUser(LoginDto loginDto) {
         var usernamePassword = new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword());
@@ -105,6 +109,7 @@ public class UserServiceImpl implements UserService {
         var token = this.tokenService.generateToken(user);
         return new Token(token);
     }
+
     @Override
     public List<User> getUsers(UUID id, String name, String surname, String phone, String email, UserStatus status, UserAccess access) {
 
@@ -115,27 +120,31 @@ public class UserServiceImpl implements UserService {
 
         return userRepository.findByFilters(id, name, surname, phone, email, status, access);
     }
+
     @Override
     public void updateUser(UpdateUserDto userDto) {
         User user = userRepository.findById(userDto.getId())
                 .orElseThrow(() -> new BusinessException("User not found", HttpStatus.NOT_FOUND));
 
-        if (userDto.getName() != null) user.setName(userDto.getName());
-        if (userDto.getSurname() != null) user.setSurname(userDto.getSurname());
-        if (userDto.getPhone() != null) user.setPhone(userDto.getPhone());
-        if (userDto.getEmail() != null) user.setEmail(userDto.getEmail());
-        if (userDto.getAccess() != null) user.setAccess(userDto.getAccess());
-        if (userDto.getStatus() != null) user.setStatus(userDto.getStatus());
+        user = User.Builder.fromUser(user)
+                .withName(userDto.getName())
+                .withSurname(userDto.getSurname())
+                .withPhone(userDto.getPhone())
+                .withEmail(userDto.getEmail())
+                .withAccess(userDto.getAccess())
+                .withStatus(userDto.getStatus())
+                .build();
 
         userRepository.save(user);
     }
+
     @Override
     public User getLoggedUser() {
         String email = "";
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         if (principal instanceof UserDetails) {
-            email =  ((UserDetails) principal).getUsername();
+            email = ((UserDetails) principal).getUsername();
         } else {
             email = principal.toString();
         }

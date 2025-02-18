@@ -21,7 +21,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public void createCustomer(CreateCustomerDto dto) {
-        this.validatePhoneAndCnpj(dto.getPhone(),dto.getCnpj());
+        this.validatePhoneAndCnpj(dto.getPhone(), dto.getCnpj());
 
         var toSave = dto.toModel();
         toSave.setCreatedAt(LocalDate.now());
@@ -65,13 +65,13 @@ public class CustomerServiceImpl implements CustomerService {
         var customer = this.repository.findById(id).orElseThrow(
                 () -> new BusinessException("Customer with id not found", HttpStatus.NOT_FOUND)
         );
-        if (!customer.getCnpj().equals(dto.getCnpj())){
-            this.repository.findByCnpj(dto.getCnpj()).ifPresent(c ->{
+        if (!customer.getCnpj().equals(dto.getCnpj())) {
+            this.repository.findByCnpj(dto.getCnpj()).ifPresent(c -> {
                 throw new BusinessException("There is already a customer with this CNPJ");
             });
         }
-        if (!customer.getPhone().equals(dto.getPhone())){
-            this.repository.findByPhone(dto.getPhone()).ifPresent(c ->{
+        if (!customer.getPhone().equals(dto.getPhone())) {
+            this.repository.findByPhone(dto.getPhone()).ifPresent(c -> {
                 throw new BusinessException("There is already a customer with this Phone");
             });
         }
@@ -89,7 +89,7 @@ public class CustomerServiceImpl implements CustomerService {
         this.repository.save(customer);
     }
 
-    private void validatePhoneAndCnpj(String phone, String cnpj){
+    private void validatePhoneAndCnpj(String phone, String cnpj) {
         this.repository.findByCnpj(cnpj).ifPresent(
                 c -> {
                     throw new BusinessException("There is already a customer with this CNPJ");
