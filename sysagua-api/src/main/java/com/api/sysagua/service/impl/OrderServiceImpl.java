@@ -234,10 +234,10 @@ public class OrderServiceImpl implements OrderService {
         var t = new Transaction(
                 amout,
                 type,
+                order.getPaymentMethod(),
                 description,
                 user,
-                order,
-                null
+                order
         );
         this.transactionRepository.save(t);
     }
@@ -247,10 +247,10 @@ public class OrderServiceImpl implements OrderService {
         var t = new Transaction(
                 order.getReceivedAmount(),
                 TransactionType.INCOME,
+                order.getPaymentMethod(),
                 "Pedido aguardando pagamento - Restante a ser pago: R$" + order.getTotalAmount().subtract(order.getReceivedAmount()),
                 user,
-                order,
-                null
+                order
         );
         this.transactionRepository.save(t);
     }
@@ -260,11 +260,11 @@ public class OrderServiceImpl implements OrderService {
         var t = new Transaction(
                 order.getReceivedAmount(),
                 TransactionType.INCOME,
+                order.getPaymentMethod(),
                 String.format("Pagamento confirmado! O pedido foi pago com sucesso. Valor total: R$ %.2f, valor recebido: R$ %.2f. A transação foi concluída e o pedido está finalizado.",
                         order.getTotalAmount(), order.getReceivedAmount()),
                 user,
-                order,
-                null
+                order
         );
         this.transactionRepository.save(t);
     }
@@ -274,10 +274,10 @@ public class OrderServiceImpl implements OrderService {
         var t = new Transaction(
                 order.getReceivedAmount().negate(),
                 TransactionType.EXPENSE,
+                order.getPaymentMethod(),
                 "Pedido cancelado e valor pago estornado",
                 user,
-                order,
-                null
+                order
         );
         this.transactionRepository.save(t);
 

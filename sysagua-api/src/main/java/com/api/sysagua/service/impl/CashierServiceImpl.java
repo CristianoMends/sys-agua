@@ -1,6 +1,7 @@
 package com.api.sysagua.service.impl;
 
 import com.api.sysagua.dto.cashier.ViewCashierDto;
+import com.api.sysagua.enumeration.PaymentMethod;
 import com.api.sysagua.enumeration.TransactionStatus;
 import com.api.sysagua.enumeration.TransactionType;
 import com.api.sysagua.model.Cashier;
@@ -90,9 +91,9 @@ public class CashierServiceImpl implements CashierService {
         var t = new Transaction(
                 amount,
                 TransactionType.EXPENSE,
+                PaymentMethod.UNDEFINED,
                 description,
                 user,
-                null,
                 null
         );
         this.transactionRepository.save(t);
