@@ -1,12 +1,12 @@
 package edu.pies.sysaguaapp.controllers.compras;
 
-import edu.pies.sysaguaapp.dtos.compra.SendCompraDto;
 import edu.pies.sysaguaapp.dtos.compra.SendPgtoCompraDto;
 import edu.pies.sysaguaapp.enumeration.PaymentMethod;
-import edu.pies.sysaguaapp.models.CompraTransaction;
+import edu.pies.sysaguaapp.models.Transaction;
 import edu.pies.sysaguaapp.models.compras.Compra;
 import edu.pies.sysaguaapp.models.compras.ItemCompra;
 import edu.pies.sysaguaapp.services.CompraService;
+import edu.pies.sysaguaapp.services.TransactionService;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -20,10 +20,13 @@ import javafx.util.StringConverter;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 public class CompraDetalhesController {
     private final CompraService compraService;
+    private final TransactionService transactionService;
     private final String token;
     private Compra compra;
 
@@ -34,16 +37,19 @@ public class CompraDetalhesController {
     private ObservableList<ItemCompra> produtosAddList;
 
     @FXML
-    private ObservableList<CompraTransaction> pagamentosAddList;
+    private ObservableList<Transaction> pagamentosAddList;
 
     @FXML
-    private TableView<ItemCompra> pagamentosTableView;
+    private TableView<Transaction> pagamentosTableView;
 
     @FXML
     private TableView<ItemCompra> produtosTableView;
 
     @FXML
     private TableColumn<ItemCompra, String> produtoColumn, precoColumn, codigoColumn;
+
+    @FXML
+    private TableColumn<Transaction, String> dataColumn, tipoColumn, valorColumn;
 
     @FXML
     private TableColumn<ItemCompra, Integer> quantidadeColumn;
@@ -62,6 +68,7 @@ public class CompraDetalhesController {
 
     public CompraDetalhesController(CompraService compraService, String token, Compra compra) {
         this.compraService = compraService;
+        transactionService = new TransactionService();
         this.token = token;
         this.compra = compra;
         produtosAddList = FXCollections.observableArrayList();
@@ -74,6 +81,7 @@ public class CompraDetalhesController {
         preencherCampos();
         atualizarTotais();
         validarCampos();
+        obterPagamentos();
 
         produtosTableView.setItems(produtosAddList);
         codigoColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getProduct().getId().toString()));
@@ -82,6 +90,14 @@ public class CompraDetalhesController {
         precoColumn.setCellValueFactory(cellData -> {
             BigDecimal preco = cellData.getValue().getPurchasePrice();
             return new SimpleStringProperty(preco != null ? "R$ " + preco.setScale(2, RoundingMode.HALF_UP).toString().replace(".", ",") : "");
+        });
+
+        pagamentosTableView.setItems(pagamentosAddList);
+        dataColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getCreatedAt().toLocalDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))));
+        tipoColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getPurchase().getPaymentMethod().getDescription()));
+        valorColumn.setCellValueFactory(cellData -> {
+            BigDecimal valor = cellData.getValue().getAmount();
+            return new SimpleStringProperty(valor != null ? "R$ " + valor.setScale(2, RoundingMode.HALF_UP).toString().replace(".", ",") : "");
         });
 
         metodoPagamento.setItems(FXCollections.observableArrayList(PaymentMethod.values()));
@@ -111,17 +127,19 @@ public class CompraDetalhesController {
                 BigDecimal valor = new BigDecimal(valorField.getText().replace(",", "."));
                 novoPagamento.setAmount(valor);
                 novoPagamento.setPaymentMethod(metodoPagamento.getValue());
-                novoPagamento.setIdCompra(compra.getId());
+                novoPagamento.setDescription("Pagamento via " + metodoPagamento.getValue() + " em: " + LocalDateTime.now());
+                Long idCompra = compra.getId();
 
-                compraService.cadastrarPagamento(novoPagamento, token);
-
+                compraService.cadastrarPagamento(novoPagamento, idCompra, token);
+//                Transaction transacao = transactionService.buscarTransacaoId(novoPagamento, token);
+//                pagamentosAddList.add(transacao);
+//                pagamentosTableView.refresh();
 
             } catch (Exception e) {
                 e.printStackTrace();
                 System.out.println("Erro ao fazer pagamento" + e.getMessage());
             }
         }
-        System.out.println("add pagamento");
     }
 
     private void preencherCampos() {
@@ -139,6 +157,18 @@ public class CompraDetalhesController {
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("Erro ao carregar tela: " + e.getMessage());
+        }
+    }
+
+    private void obterPagamentos() {
+        try {
+            List<Transaction> transacoes = transactionService.buscarTransacaoCompraId(compra.getId(), token);
+            if (transacoes != null) {
+                pagamentosAddList.setAll(transacoes);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Erro ao obter pagamentos " + e.getMessage());
         }
     }
 
