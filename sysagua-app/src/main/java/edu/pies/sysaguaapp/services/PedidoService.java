@@ -22,7 +22,6 @@ public class PedidoService {
         this.httpClient = HttpClient.newHttpClient();
         this.objectMapper = new ObjectMapper();
         this.objectMapper.registerModule(new JavaTimeModule());
-        this.objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     }
     public List<Pedido> buscarPedidos(String token) throws Exception {
         HttpRequest request = HttpRequest.newBuilder()
@@ -44,6 +43,7 @@ public class PedidoService {
 
     public Pedido criarPedido(SendPedidoDto pedidos, String token) throws Exception {
         String pedidoJson = objectMapper.writeValueAsString(pedidos);
+        System.out.println(pedidoJson);
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(BASE_URL))
@@ -59,35 +59,27 @@ public class PedidoService {
         } else {
             throw new Exception("Erro ao cadastrar: " + response.body());
         }
+
+
+
     }
 
     public static Pedido cancelarPedido(Pedido pedido, String token) throws Exception {
-        pedido.setActive(false);
-
-        String pedidoJson = objectMapper.writeValueAsString(pedido);
         String urlComId = BASE_URL + "/" + pedido.getId();
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(urlComId))
-                .PUT(HttpRequest.BodyPublishers.ofString(pedidoJson))
+                .DELETE()
                 .header("Content-Type", "application/json")
                 .header("Authorization", "Bearer " + token)
                 .build();
 
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
-        if (response.statusCode() == 200 || response.statusCode() == 204) {
-            if (response.body().isEmpty()) {
-                return pedido;
-            } else {
-                try {
-                    return objectMapper.readValue(response.body(), Pedido.class);
-                } catch (IOException e) {
-                    throw new Exception("Erro ao processar a resposta do servidor: ");
-                }
-            }
+        if (response.statusCode() == 204) {
+            return null;
         } else {
-            throw new Exception("Erro ao inativar pedido: ");
+            throw new Exception("Erro ao cancelar: " + response.body());
         }
     }
 
