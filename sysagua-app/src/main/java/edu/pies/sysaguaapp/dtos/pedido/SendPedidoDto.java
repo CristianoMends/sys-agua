@@ -5,11 +5,14 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Getter @Setter
 public class SendPedidoDto {
+    private LocalDate dataPedido;
     private Long customerId;
     private Long deliveryPersonId;
     private List<ItemPedidoDto> productOrders;
@@ -21,7 +24,8 @@ public class SendPedidoDto {
     public SendPedidoDto() {
         productOrders = new ArrayList<>();
     }
-    public SendPedidoDto(List<ItemPedidoDto> productOrders, Long customerId, Long deliveryPersonId, BigDecimal totalAmount, PaymentMethod paymentMethod, String description) {
+    public SendPedidoDto(List<ItemPedidoDto> productOrders, Long customerId, Long deliveryPersonId, BigDecimal totalAmount, PaymentMethod paymentMethod, String description, LocalDate dataPedido) {
+        this.dataPedido = dataPedido;
         this.productOrders = productOrders;
         this.customerId = customerId;
         this.deliveryPersonId = deliveryPersonId;
