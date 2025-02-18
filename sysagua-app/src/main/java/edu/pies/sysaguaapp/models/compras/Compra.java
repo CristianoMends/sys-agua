@@ -24,6 +24,7 @@ public class Compra {
     private Fornecedor supplier;
     private BigDecimal paidAmount;
     private BigDecimal totalAmount;
+    private BigDecimal balance;
     private LocalDateTime entryAt;
     private LocalDateTime canceledAt;
     private LocalDateTime finishedAt;
