@@ -1,9 +1,13 @@
 package edu.pies.sysaguaapp.controllers;
 
+import edu.pies.sysaguaapp.enumeration.DeliveryStatus;
+import edu.pies.sysaguaapp.models.Pedido.Pedido;
+import edu.pies.sysaguaapp.models.Pedido.ProductOrder;
 import edu.pies.sysaguaapp.models.Produto;
 import edu.pies.sysaguaapp.models.compras.Compra;
 import edu.pies.sysaguaapp.models.compras.ItemCompra;
 import edu.pies.sysaguaapp.services.CompraService;
+import edu.pies.sysaguaapp.services.PedidoService;
 import edu.pies.sysaguaapp.services.TokenManager;
 import edu.pies.sysaguaapp.utils.ChartUtilsPie;
 import edu.pies.sysaguaapp.utils.ChartUtilsXY;
@@ -20,12 +24,15 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.util.Duration;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class DashboardController{
     private final CompraService compraService;
+    private final PedidoService pedidoService;
     private final String token;
 
     @FXML
@@ -52,6 +59,9 @@ public class DashboardController{
     private DatePicker dateInicio, dateFim;
 
     @FXML
+    private Label totalReceitasMes, percentualReceitasMes;
+
+    @FXML
     private Button btnAmpliarFirstGraph, btnAmpliarSecondGraph,btnAmpliarThirdGraph, btnAmpliarFifthGraph;
 
     @FXML
@@ -59,6 +69,7 @@ public class DashboardController{
 
     public DashboardController() {
         compraService = new CompraService();
+        pedidoService = new PedidoService();
         token = TokenManager.getInstance().getToken();
     }
 
@@ -78,6 +89,7 @@ public class DashboardController{
         atualizarListaPrincipaisClientes();
         configurarLista();
         carregarChartPedidoDia();
+        carregarValores();
 
         firstLineGraph.prefHeightProperty().bind(graphicArea.heightProperty().multiply(0.5));
         firstGraph.prefWidthProperty().bind(firstLineGraph.widthProperty().multiply(0.5));
@@ -111,7 +123,6 @@ public class DashboardController{
         });
     }
 
-
     private void filtrarGraficos() {
         LocalDate inicio = dateInicio.getValue();
         LocalDate fim = dateFim.getValue();
@@ -134,7 +145,7 @@ public class DashboardController{
 
     private void carregarChartPedidoDia() {
         try {
-            List<Compra> compras = compraService.buscarCompras(token);
+            List<Pedido> pedidos = pedidoService.buscarPedidos(token);
             LocalDate inicio = dateInicio.getValue();
             LocalDate fim = dateFim.getValue();
     
@@ -155,24 +166,24 @@ public class DashboardController{
             }
     
             // Agrega os valores das compras no período atual
-            for (Compra compra : compras) {
-                if (compra.getEntryAt() == null) continue;
-                LocalDate dataCompra = compra.getEntryAt().toLocalDate();
-                // Mês atual: data da compra deve estar entre inicio e fim
-                if (!dataCompra.isBefore(inicio) && !dataCompra.isAfter(fim)) {
-                    int dia = dataCompra.getDayOfMonth();
+            for (Pedido pedido: pedidos) {
+                if (pedido.getCreatedAt() == null) continue;
+                LocalDate dataPedido = pedido.getCreatedAt().toLocalDate();
+                // Mês atual: data da pedido deve estar entre inicio e fim
+                if (!dataPedido.isBefore(inicio) && !dataPedido.isAfter(fim)) {
+                    int dia = dataPedido.getDayOfMonth();
                     if (somaPorDiaAtual.containsKey(dia)) {
                         BigDecimal somaAtual = somaPorDiaAtual.get(dia);
-                        somaPorDiaAtual.put(dia, somaAtual.add(compra.getTotalAmount()));
+                        somaPorDiaAtual.put(dia, somaAtual.add(pedido.getTotalAmount()));
                     }
                 }
-                // Mês anterior: data da compra deve estar entre inicioAnterior e fimAnterior
-                if (!dataCompra.isBefore(inicioAnterior) && !dataCompra.isAfter(fimAnterior)) {
-                    int dia = dataCompra.getDayOfMonth();
+                // Mês anterior: data da pedido deve estar entre inicioAnterior e fimAnterior
+                if (!dataPedido.isBefore(inicioAnterior) && !dataPedido.isAfter(fimAnterior)) {
+                    int dia = dataPedido.getDayOfMonth();
                     // Apenas acrescente se o dia também estiver dentro do intervalo filtrado
                     if (somaPorDiaAnterior.containsKey(dia)) {
                         BigDecimal somaAnterior = somaPorDiaAnterior.get(dia);
-                        somaPorDiaAnterior.put(dia, somaAnterior.add(compra.getTotalAmount()));
+                        somaPorDiaAnterior.put(dia, somaAnterior.add(pedido.getTotalAmount()));
                     }
                 }
             }
@@ -199,20 +210,19 @@ public class DashboardController{
             System.out.println("Erro ao carregar o gráfico de pedidos por dia: " + e.getMessage());
         }
     }
-    
 
     private void carregarChartVendasLinha() {
         try {
-            List<Compra> compras = compraService.buscarCompras(token);
+            List<Pedido> pedidos = pedidoService.buscarPedidos(token);
             LocalDate inicio = dateInicio.getValue();
             LocalDate fim = dateFim.getValue();
             // Mapa para acumular a quantidade vendida para cada linha de produto filtrando pela data de entrada
             Map<String, Integer> vendasPorLinha = new TreeMap<>();
-            for (Compra compra : compras) {
-                if (compra.getItems() == null || compra.getEntryAt() == null) continue;
-                LocalDate dataCompra = compra.getEntryAt().toLocalDate();
-                if (dataCompra.isBefore(inicio) || dataCompra.isAfter(fim)) continue;
-                for (ItemCompra item : compra.getItems()) {
+            for (Pedido pedido : pedidos) {
+                if (pedido.getProductOrders() == null || pedido.getCreatedAt() == null) continue;
+                LocalDate dataPedido = pedido.getCreatedAt().toLocalDate();
+                if (dataPedido.isBefore(inicio) || dataPedido.isAfter(fim)) continue;
+                for (ProductOrder item : pedido.getProductOrders()) {
                     Produto produto = item.getProduct();
                     if (produto == null || produto.getLine() == null) continue;
                     String nomeLinha = produto.getLine().getName();
@@ -235,22 +245,21 @@ public class DashboardController{
             System.out.println("Erro ao carregar o gráfico de vendas por linha: " + e.getMessage());
         }
     }
-    
 
     private void carregarChartComprasBubble() {
         try {
-            List<Compra> compras = compraService.buscarCompras(token);
+            List<Pedido> pedidos = pedidoService.buscarPedidos(token);
             LocalDate inicio = dateInicio.getValue();
             LocalDate fim = dateFim.getValue();
             // Mapa para acumular a quantidade vendida para cada produto filtrando pela data de entrada
             Map<String, Integer> produtosVendas = new TreeMap<>();
-            for (Compra compra : compras) {
-                if (compra.getItems() == null || compra.getEntryAt() == null)
+            for (Pedido pedido : pedidos) {
+                if (pedido.getProductOrders() == null || pedido.getCreatedAt() == null)
                     continue;
-                LocalDate dataCompra = compra.getEntryAt().toLocalDate();
+                LocalDate dataCompra = pedido.getCreatedAt().toLocalDate();
                 if (dataCompra.isBefore(inicio) || dataCompra.isAfter(fim))
                     continue;
-                for (ItemCompra item : compra.getItems()) {
+                for (ProductOrder item : pedido.getProductOrders()) {
                     if (item.getProduct() == null) continue;
                     String nomeProduto = item.getProduct().getName();
                     int quantidade = item.getQuantity();
@@ -272,7 +281,6 @@ public class DashboardController{
             System.out.println("Erro ao carregar o gráfico de pizza: " + e.getMessage());
         }
     }
-    
 
     private void updatePieChartLegend(PieChart pieChart) {
         double total = 0;
@@ -291,17 +299,17 @@ public class DashboardController{
 
     private void atualizarListaPrincipaisClientes() {
         try {
-            List<Compra> compras = compraService.buscarCompras(token);
+            List<Pedido> pedidos = pedidoService.buscarPedidos(token);
             LocalDate inicio = dateInicio.getValue();
             LocalDate fim = dateFim.getValue();
             // Agrupa os totais de compras por fornecedor filtrando pela data de entrada
             Map<String, BigDecimal> fornecedorTotals = new HashMap<>();
-            for (Compra compra : compras) {
-                if (compra.getSupplier() == null || compra.getEntryAt() == null) continue;
-                LocalDate dataCompra = compra.getEntryAt().toLocalDate();
+            for (Pedido pedido : pedidos) {
+                if (pedido.getCustomer() == null || pedido.getCreatedAt() == null) continue;
+                LocalDate dataCompra = pedido.getCreatedAt().toLocalDate();
                 if (dataCompra.isBefore(inicio) || dataCompra.isAfter(fim)) continue;
-                String supplierName = compra.getSupplier().getSocialReason();
-                BigDecimal totalCompra = compra.getTotalAmount();
+                String supplierName = pedido.getCustomer().getName();
+                BigDecimal totalCompra = pedido.getTotalAmount();
                 BigDecimal totalAtual = fornecedorTotals.getOrDefault(supplierName, BigDecimal.ZERO);
                 fornecedorTotals.put(supplierName, totalAtual.add(totalCompra));
             }
@@ -326,8 +334,6 @@ public class DashboardController{
             System.out.println("Erro ao atualizar lista dos principais fornecedores: " + e.getMessage());
         }
     }
-    
-
 
     private void carregarChartCompras() {
         try {
@@ -391,14 +397,15 @@ public class DashboardController{
             System.out.println("Erro ao carregar o gráfico de compras: " + e.getMessage());
         }
     }
-    
-    
-
-
 
     @FXML
     private void handleProdutosChartMaximization() {
         ChartUtilsPie.maximizeChart(chartComprasBubble, "Produtos mais vendidos", rootPane);
+    }
+
+    @FXML
+    private void handleLineChartMaximization() {
+        ChartUtilsPie.maximizeChart(chartVendasLinha, "Linha de produtos mais vendidos", rootPane);
     }
 
     @FXML
@@ -416,7 +423,49 @@ public class DashboardController{
         ChartUtilsXY.maximizeChart(chartComprasDia, "Compras do Mês", rootPane);
     }
 
+    private void carregarValores() {
+        BigDecimal totalReceitasMesAtual = BigDecimal.ZERO;
+        BigDecimal totalReceitasMesAnterior = BigDecimal.ZERO;
 
+        try {
+            List<Pedido> pedidos = pedidoService.buscarPedidos(token);
+            LocalDate primeiroDiaMesAtual = LocalDate.now().withDayOfMonth(1);
+            LocalDate primeiroDiaMesAnterior = primeiroDiaMesAtual.minusMonths(1);
+
+            for (Pedido pedido : pedidos) {
+                LocalDate dataPedido = pedido.getCreatedAt().toLocalDate();
+                BigDecimal totalPedido = pedido.getTotalAmount();
+
+                if (!pedido.getDeliveryStatus().equals(DeliveryStatus.CANCELED)) {
+                    if (dataPedido.isAfter(primeiroDiaMesAtual.minusDays(1))) {
+                        totalReceitasMesAtual = totalReceitasMesAtual.add(totalPedido);
+                    } else if (dataPedido.isAfter(primeiroDiaMesAnterior.minusDays(1)) && dataPedido.isBefore(primeiroDiaMesAtual)) {
+                        totalReceitasMesAnterior = totalReceitasMesAnterior.add(totalPedido);
+                    }
+                }
+            }
+
+            totalReceitasMes.setText("R$ " + totalReceitasMesAtual.setScale(2, RoundingMode.HALF_UP));
+
+            // Calcula a variação percentual
+            BigDecimal percentual = BigDecimal.ZERO;
+            if (totalReceitasMesAnterior.compareTo(BigDecimal.ZERO) > 0) {
+                percentual = totalReceitasMesAtual.subtract(totalReceitasMesAnterior)
+                        .divide(totalReceitasMesAnterior, 4, RoundingMode.HALF_UP)
+                        .multiply(BigDecimal.valueOf(100));
+            }
+
+            // Define cor e emoji da variação
+            String cor = (percentual.compareTo(BigDecimal.ZERO) >= 0) ? "green" : "red";
+            String emoji = (percentual.compareTo(BigDecimal.ZERO) >= 0) ? "🔺" : "🔻";
+
+            percentualReceitasMes.setStyle("-fx-text-fill: " + cor);
+            percentualReceitasMes.setText(String.format("%.2f%% %s", percentual.setScale(2, RoundingMode.HALF_UP), emoji));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
 
 }
