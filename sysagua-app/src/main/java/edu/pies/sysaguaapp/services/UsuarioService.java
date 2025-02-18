@@ -7,7 +7,7 @@ import java.net.http.HttpClient;
 
 public class UsuarioService {
 
-    private static final String BASE_URL = "http://localhost:8080/orders";
+    private static final String BASE_URL = "http://localhost:8080/users";
     private static HttpClient httpClient;
     private static ObjectMapper objectMapper;
 
