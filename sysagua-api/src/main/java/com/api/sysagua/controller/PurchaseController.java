@@ -76,8 +76,8 @@ public class PurchaseController implements PurchaseDoc {
         ));
     }
 
-    @PostMapping("payment")
-    public ResponseEntity<Void> addPayment(Long id, CreateTransactionDto dto) {
+    @PostMapping("payment/{id}")
+    public ResponseEntity<Void> addPayment(@PathVariable Long id, @RequestBody CreateTransactionDto dto) {
         this.purchaseService.addPayment(id, dto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
