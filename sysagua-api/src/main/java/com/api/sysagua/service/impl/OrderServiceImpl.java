@@ -238,7 +238,6 @@ public class OrderServiceImpl implements OrderService {
         var description = "Quantia paga R$ " + amout + ", Quantia pendente R$" + amountPending;
         var user = this.userService.getLoggedUser();
         var t = new Transaction(
-                status,
                 amout,
                 type,
                 description,
