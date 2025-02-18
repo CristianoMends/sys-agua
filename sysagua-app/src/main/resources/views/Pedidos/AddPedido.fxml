@@ -97,6 +97,16 @@
                             <children>
                                 <HBox alignment="CENTER_LEFT" spacing="10.0" VBox.vgrow="SOMETIMES">
                                     <children>
+                                        <Label minWidth="120.0" styleClass="label-field" text="STATUS DE PAGAMENTO" />
+                                        <ComboBox fx:id="statusPagamento" promptText="Status de pagamento" styleClass="combo-box" HBox.hgrow="ALWAYS" />
+                                    </children>
+                                </HBox>
+                            </children>
+                        </VBox>
+                        <VBox alignment="CENTER" spacing="5.0">
+                            <children>
+                                <HBox alignment="CENTER_LEFT" spacing="10.0" VBox.vgrow="SOMETIMES">
+                                    <children>
                                         <Label minWidth="120.0" styleClass="label-field" text="VALOR RECEBIDO" />
                                         <TextField fx:id="valorRecebidoField" maxWidth="1.7976931348623157E308" styleClass="text-field" HBox.hgrow="ALWAYS" />
                                     </children>
