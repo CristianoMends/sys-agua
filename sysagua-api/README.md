@@ -1,101 +1,98 @@
-# Sys Água API
+<h1 align="center"> Sys Água 💻💦</h1>
 
-## 📌 Como Rodar o Projeto
+## 📌 Índice
 
-### 🛠 Ambiente de Desenvolvimento (DEV)
-O ambiente de desenvolvimento está configurado para rodar com banco de dados em memória H2 e possui migrations para popular o banco automaticamente, facilitando os testes.
+1. [Sobre o Projeto](#sobre-o-projeto)
+2. [📌 Arquitetura e Metodologias](#-arquitetura-e-metodologias)
+2. [🚀 Tecnologias](#tecnologias)
+3. [🛠️ Funcionalidades](#funcionalidades)
+4. [🤝 Colaboradores](#colaboradores)
+5. [📄 Licença](#licenca)
 
-▶️ Passos para Rodar o Projeto
+---
 
-```bash
-# Clonar o repositório
-https://github.com/CristianoMends/sys-agua
-cd sys-agua
-cd sysagua-api
-````
+## 📜 Sobre o Projeto&#x20;
 
-### 🔧 Configuração das Variáveis de Ambiente
-execute no terminal, altere conforme necessario:
-```bash
-export DEFAULT_EMAIL=dev@gmail.com
-export DEFAULT_PASSWORD=dev123
-export JWT_SECRET_KEY=secret1234
-export SPRING_PROFILES_ACTIVE=dev
-```
+Um sistema completo para gerenciar pedidos, controle de estoque e entregas de água, facilitando a organização do processo logístico e melhorando o atendimento ao cliente.
 
-### compilar e testar
-```bash
-./gradlew clean build
-```
-### Rodar a aplicação localmente
-```bash
-./gradlew bootRun
-```
+Este projeto foi desenvolvido como parte da disciplina Projeto Integrado em Engenharia de Software I, visando a aplicação prática de conceitos de engenharia de software no desenvolvimento de uma solução real.
 
-## 🏗 Ambiente de Homologação (STAGING)
-O ambiente de staging está configurado para rodar com PostgreSQL na máquina local.
+Durante o desenvolvimento, foram trabalhados conceitos avançados de **Gerência de Configuração**, incluindo o uso de Docker, Docker Compose, GitHub Actions (CI/CD), conceitos de GitHub Workflow e Git Flow.
 
-▶️ Passos para Rodar o Projeto
+Além disso, houve um foco no aprendizado de **projeto detalhado de software**, utilizando padrões de projeto e os princípios SOLID, garantindo uma arquitetura escalável e modular.
 
-```bash
-# Clonar o repositório
-https://github.com/CristianoMends/sys-agua
-cd sys-agua
-cd sysagua-api
-````
+O projeto também contemplou conceitos de **Redes de Computadores**, trabalhando com a camada de aplicação no protocolo HTTP na implementação da API REST, e conceitos de **fundamentos de Bancos de Dados**, aplicados na modelagem e otimização do PostgreSQL.
 
-### 🔧 Configuração das Variáveis de Ambiente
-execute no terminal, altere conforme necessario:
+## 📌 Arquitetura e Metodologias
 
-```bash
-export DEFAULT_EMAIL=dev@gmail.com
-export DEFAULT_PASSWORD=dev123
-export JWT_SECRET_KEY=secret1234
-export SPRING_PROFILES_ACTIVE=dev
-```
+O desenvolvimento do Sys Água seguiu os princípios SOLID e utilizou diversos padrões de projeto para garantir um código modular e escalável.
 
-### compilar e testar
-```bash
-./gradlew clean build
-```
+Além disso, foram implementados diferentes ambientes de execução como:
+- Desenvolvimento (dev), onde trabalhamos com banco H2 facilitando nos testes.
+- Staging, onde usamos um banco postgreSQL local, simulando o ambiente de produção.
+- Produção (prod), onde usamos docker para criar todo o sistema incluindo o banco postgres.
 
-### Rodar a aplicação localmente
-```bash
-./gradlew bootRun
-```
+O gerenciamento do projeto seguiu a metodologia Scrum, com sprints definidas para entregas incrementais e revisões constantes.
 
+---
 
-## 🚀 Ambiente de Produção (PROD)
-O ambiente de produção está configurado para rodar dentro de containers Docker.
+## 🚀 Tecnologias&#x20;
 
-🔧 Configuração das Variáveis de Ambiente
-Crie um arquivo .env na raiz do projeto (/sys-agua) e adicione as variáveis abaixo:
+O projeto Sys Água é composto por duas partes principais: uma API REST desenvolvida em **Spring Boot** e um aplicativo desktop construído com **JavaFX**.
 
-```env
-DB_PASSWORD=sysagua2024         #senha do banco a ser criado pelo docker
-DEFAULT_EMAIL=dev@gmail.com     #email para o primeiro usuario do sistema
-DEFAULT_PASSWORD=dev123         #senha para o primeiro usuario
-JWT_SECRET_KEY=secret1234       #chave secreta para JWT
-```
-▶️ Passos para Rodar o Projeto
-```sh
-# Clonar o repositório
-git clone https://github.com/seu-repositorio.git
-cd seu-repositorio
-```
+### 🌐 API REST
 
-# Construir e subir os containers
-```sh
-docker-compose up --build -d
-```
+🔗 [Repositório da API](https://github.com/CristianoMends/sys-agua/tree/develop/sysagua-api)
 
-### ⏹ Parar a Aplicação
-Para parar a aplicação nos ambientes produção:
-```sh
-docker-compose down
-```
+- **Java 21 [LTS]**
+- **Spring Boot 3**
+- **Spring Data JPA**
+- **Spring Security**
+- **JSON Web Tokens (JWT)**
+- **PostgreSQL**
+- **Flyway Migrations**
+- **Swagger OpenAPI**
+- **Docker compose**
+- **Gradle**
 
-Para parar no ambiente de desenvolvimento e staging:
-```sh
-CTRL + C  # Se estiver rodando em terminal
-```
+### 🖥️ Aplicação Desktop (JavaFX)
+
+🔗 [Repositório da Aplicação](https://github.com/CristianoMends/sys-agua/tree/develop/sysagua-app)
+
+- **Java 21 [LTS]**
+- **JavaFX**
+- **FXML**
+- **BootstrapFX**
+- **Maven**
+- **Jackson ObjectMapper**
+
+---
+
+## 🛠️ Funcionalidades&#x20;
+
+- ✅ Cadastro e gerenciamento de pedidos 📦
+- ✅ Gerenciamento de clientes e fornecedores 📊
+- ✅ Controle de estoque eficiente 📊
+- ✅ Gestão de entregas 🚚
+- ✅ Segurança com autenticação JWT 🔐
+- ✅ Interface intuitiva para desktop 🎨
+- ✅ Documentação interativa com Swagger 📜
+
+---
+
+## 🤝 Colaboradores&#x20;
+
+| [Cristiano](https://github.com/CristianoMends)                                                                            | [Rafael](https://github.com/Rafaelleit3)                                                                        | [Natan](https://github.com/jnatansb)                                                                           | [Josias](https://github.com/josiasdev)                                                                         |
+|---------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------|
+| <img src="https://avatars.githubusercontent.com/u/116528159?v=4" width="100px" alt="Foto de perfil de Cristiano Mendes"/> | <img src="https://avatars.githubusercontent.com/u/137407431?v=4" width="100px" alt="Foto de perfil de Rafael"/> | <img src="https://avatars.githubusercontent.com/u/111660222?v=4" width="100px" alt="Foto de perfil de Natan"/> | <img src="https://avatars.githubusercontent.com/u/71450649?v=4" width="100px" alt="Foto de perfil de Josias"/> |
+
+---
+
+## 📄 Licença&#x20;
+
+Projeto desenvolvido para fins acadêmicos.
+
+💡 **Dúvidas ou sugestões?** Entre em contato com os colaboradores através do GitHub!
+
+🚀 **Contribua!** Sinta-se à vontade para abrir issues e pull requests. 😃
+
