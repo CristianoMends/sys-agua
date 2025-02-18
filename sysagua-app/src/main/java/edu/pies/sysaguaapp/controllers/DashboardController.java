@@ -1,11 +1,10 @@
 package edu.pies.sysaguaapp.controllers;
 
-import edu.pies.sysaguaapp.enumeration.DeliveryStatus;
+import edu.pies.sysaguaapp.enumeration.Pedidos.PedidoStatus;
+import edu.pies.sysaguaapp.models.Pedido.ItemPedido;
 import edu.pies.sysaguaapp.models.Pedido.Pedido;
-import edu.pies.sysaguaapp.models.Pedido.ProductOrder;
 import edu.pies.sysaguaapp.models.Produto;
 import edu.pies.sysaguaapp.models.compras.Compra;
-import edu.pies.sysaguaapp.models.compras.ItemCompra;
 import edu.pies.sysaguaapp.services.CompraService;
 import edu.pies.sysaguaapp.services.PedidoService;
 import edu.pies.sysaguaapp.services.TokenManager;
@@ -27,7 +26,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class DashboardController{
@@ -222,7 +220,7 @@ public class DashboardController{
                 if (pedido.getProductOrders() == null || pedido.getCreatedAt() == null) continue;
                 LocalDate dataPedido = pedido.getCreatedAt().toLocalDate();
                 if (dataPedido.isBefore(inicio) || dataPedido.isAfter(fim)) continue;
-                for (ProductOrder item : pedido.getProductOrders()) {
+                for (ItemPedido item : pedido.getProductOrders()) {
                     Produto produto = item.getProduct();
                     if (produto == null || produto.getLine() == null) continue;
                     String nomeLinha = produto.getLine().getName();
@@ -259,7 +257,7 @@ public class DashboardController{
                 LocalDate dataCompra = pedido.getCreatedAt().toLocalDate();
                 if (dataCompra.isBefore(inicio) || dataCompra.isAfter(fim))
                     continue;
-                for (ProductOrder item : pedido.getProductOrders()) {
+                for (ItemPedido item : pedido.getProductOrders()) {
                     if (item.getProduct() == null) continue;
                     String nomeProduto = item.getProduct().getName();
                     int quantidade = item.getQuantity();
@@ -436,7 +434,7 @@ public class DashboardController{
                 LocalDate dataPedido = pedido.getCreatedAt().toLocalDate();
                 BigDecimal totalPedido = pedido.getTotalAmount();
 
-                if (!pedido.getDeliveryStatus().equals(DeliveryStatus.CANCELED)) {
+                if (!pedido.getDeliveryStatus().equals(PedidoStatus.CANCELED)) {
                     if (dataPedido.isAfter(primeiroDiaMesAtual.minusDays(1))) {
                         totalReceitasMesAtual = totalReceitasMesAtual.add(totalPedido);
                     } else if (dataPedido.isAfter(primeiroDiaMesAnterior.minusDays(1)) && dataPedido.isBefore(primeiroDiaMesAtual)) {
