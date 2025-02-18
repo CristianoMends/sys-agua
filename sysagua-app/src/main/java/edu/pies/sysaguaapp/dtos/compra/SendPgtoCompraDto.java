@@ -14,5 +14,4 @@ public class SendPgtoCompraDto {
     private BigDecimal amount;
     private PaymentMethod paymentMethod;
     private String description;
-    private Long idCompra;
 }
