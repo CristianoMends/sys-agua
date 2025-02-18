@@ -10,5 +10,5 @@ CREATE TABLE IF NOT EXISTS transactions (
     CONSTRAINT fk_transactions_user FOREIGN KEY (responsible_id) REFERENCES users(user_id),
     CONSTRAINT transactions_pkey PRIMARY KEY (id),
     CONSTRAINT fk_order_transactions FOREIGN KEY (order_id) REFERENCES orders(id),
-    CONSTRAINT fk_purchase_transactions FOREIGN KEY (purchase_id) REFERENCES purchases(purchase_id)
+    CONSTRAINT fk_purchase_transactions FOREIGN KEY (purchase_id) REFERENCES purchases(id)
 );
