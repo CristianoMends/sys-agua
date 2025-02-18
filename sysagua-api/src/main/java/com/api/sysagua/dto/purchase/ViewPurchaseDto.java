@@ -1,5 +1,6 @@
 package com.api.sysagua.dto.purchase;
 
+import com.api.sysagua.dto.transaction.ViewTransactableDto;
 import com.api.sysagua.enumeration.DeliveryStatus;
 import com.api.sysagua.enumeration.PaymentMethod;
 import com.api.sysagua.enumeration.PaymentStatus;
@@ -19,7 +20,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Schema(description = "DTO para visualização de uma compra")
-public class ViewPurchaseDto {
+public class ViewPurchaseDto extends ViewTransactableDto {
 
     @Schema(description = "Identificador único da compra", example = "1")
     private Long id;
@@ -66,4 +67,21 @@ public class ViewPurchaseDto {
 
     @Schema(description = "Fornecedor da compra", implementation = Supplier.class)
     private Supplier supplier;
+
+
+    public ViewPurchaseDto(Long id, BigDecimal totalAmount, BigDecimal balance, LocalDateTime createdAt, LocalDateTime canceledAt, LocalDateTime finishedAt, PaymentMethod paymentMethod, PaymentStatus paymentStatus, String nfe, String description, Boolean active, List<ViewProductPurchaseDto> list, Supplier supplier) {
+        super();
+        this.id = id;
+        this.totalAmount = totalAmount;
+        this.balance = balance;
+        this.createdAt = createdAt;
+        this.canceledAt = canceledAt;
+        this.finishedAt = finishedAt;
+        this.paymentMethod = paymentMethod;
+        this.paymentStatus = paymentStatus;
+        this.nfe = nfe;
+        this.description = description;
+        this.active = active;
+        this.supplier = supplier;
+    }
 }

@@ -5,5 +5,5 @@ CREATE TABLE IF NOT EXISTS product_purchases (
     purchase_price NUMERIC(10,2) NOT NULL,
     quantity INT NOT NULL,
     CONSTRAINT pp_pkey PRIMARY KEY (id),
-    CONSTRAINT fk_purchase FOREIGN KEY (purchase_id) REFERENCES purchases(purchase_id) ON DELETE CASCADE
+    CONSTRAINT fk_purchase FOREIGN KEY (purchase_id) REFERENCES purchases(id) ON DELETE CASCADE
 );

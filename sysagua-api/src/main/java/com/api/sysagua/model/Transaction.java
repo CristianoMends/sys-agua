@@ -2,7 +2,6 @@ package com.api.sysagua.model;
 
 import com.api.sysagua.dto.transaction.ViewTransactionDto;
 import com.api.sysagua.enumeration.PaymentMethod;
-import com.api.sysagua.enumeration.TransactionStatus;
 import com.api.sysagua.enumeration.TransactionType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -38,6 +37,9 @@ public class Transaction {
     @Column(nullable = false)
     private TransactionType type;
 
+    @Enumerated(EnumType.STRING)
+    private PaymentMethod paymentMethod;
+
     @Column(nullable = false)
     private String description;
 
@@ -53,13 +55,19 @@ public class Transaction {
     @JoinColumn(name = "purchase_id")
     private Purchase purchase;
 
-    public Transaction(BigDecimal amount, TransactionType type, String description, User responsibleUser, Order order, Purchase purchase) {
+
+    public Transaction(BigDecimal amount, TransactionType type, PaymentMethod paymentMethod,String description, User responsibleUser, Transactable transactable) {
         this.amount = amount;
         this.type = type;
         this.description = description;
         this.responsibleUser = responsibleUser;
-        this.order = order;
-        this.purchase = purchase;
+        this.paymentMethod = paymentMethod;
+
+        if (transactable instanceof Order) {
+            this.order = (Order) transactable;
+        } else if (transactable instanceof Purchase) {
+            this.purchase = (Purchase) transactable;
+        }
     }
 
     @PrePersist
@@ -73,10 +81,10 @@ public class Transaction {
                 getCreatedAt(),
                 getAmount(),
                 getType(),
+                getPaymentMethod(),
                 getDescription(),
-                getResponsibleUser()    != null ? getResponsibleUser()  : null,
-                getOrder()              != null ? getOrder().toView()   : null,
-                getPurchase()           != null ? getPurchase().toView() : null
+                getResponsibleUser() != null ? getResponsibleUser().toView() : null,
+                purchase != null ? purchase.toView() : order != null ? order.toView() : null
         );
     }
 }

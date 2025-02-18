@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS purchases (
-    purchase_id BIGINT NOT NULL,
+    id BIGINT NOT NULL,
     supplier_id BIGINT,
     total_amount NUMERIC(10,2),
     paid_amount NUMERIC(10,2),
@@ -13,6 +13,6 @@ CREATE TABLE IF NOT EXISTS purchases (
     payment_method VARCHAR(50),
     payment_status VARCHAR(50),
     nfe VARCHAR(11),
-    CONSTRAINT purchases_pkey PRIMARY KEY (purchase_id),
+    CONSTRAINT purchases_pkey PRIMARY KEY (id),
     CONSTRAINT fk_supplier FOREIGN KEY (supplier_id) REFERENCES suppliers(id)
 );

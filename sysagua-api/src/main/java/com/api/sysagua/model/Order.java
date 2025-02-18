@@ -4,8 +4,10 @@ import com.api.sysagua.dto.order.ViewOrderDto;
 import com.api.sysagua.enumeration.DeliveryStatus;
 import com.api.sysagua.enumeration.PaymentMethod;
 import com.api.sysagua.enumeration.PaymentStatus;
-import lombok.*;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 
 import java.math.BigDecimal;
@@ -17,11 +19,9 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
-public class Order {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class Order extends Transactable {
+
+    Long id;
 
     @OneToOne(orphanRemoval = true)
     @JoinColumn(name = "customer_id")

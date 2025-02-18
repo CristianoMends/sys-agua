@@ -69,7 +69,7 @@ public class PurchaseServiceImpl implements PurchaseService {
         var saved = this.purchaseRepository.save(purchase);
 
         if (dto.getPaidAmount() != null) {
-            createTransaction(saved, dto.getPaidAmount().negate(), "Compra registrada");
+            createTransaction(saved, dto.getPaidAmount().negate(), dto.getPaymentMethod(),"Compra registrada");
         }
 
         processProductsOnStock(saved);
@@ -89,7 +89,7 @@ public class PurchaseServiceImpl implements PurchaseService {
         }
 
         var saved = this.purchaseRepository.save(purchase);
-        createTransaction(saved, dto.getAmount().negate(), dto.getDescription());
+        createTransaction(saved, dto.getAmount().negate(), dto.getPaymentMethod(),dto.getDescription());
     }
 
     @Override
@@ -101,7 +101,7 @@ public class PurchaseServiceImpl implements PurchaseService {
 
         var saved = this.purchaseRepository.save(purchase);
 
-        createTransaction(purchase, purchase.getPaidAmount(), "Estorno de pagamentos");
+        createTransaction(purchase, purchase.getPaidAmount(), PaymentMethod.UNDEFINED,"Estorno de pagamentos");
         processProductRefunds(saved);
     }
 
@@ -153,7 +153,7 @@ public class PurchaseServiceImpl implements PurchaseService {
     }
 
     private boolean isPaid(Purchase purchase) {
-        if (purchase.getTotalAmount() == null) purchase.updateTotalValue();
+        if (purchase.getTotalAmount() == null) purchase.calculateTotalAmount();
 
         return purchase.getPaidAmount().compareTo(purchase.getTotalAmount()) >= 0;
     }
@@ -198,15 +198,15 @@ public class PurchaseServiceImpl implements PurchaseService {
                 .forEach(p -> remEntriesProductOnStock(p.getQuantity(), p.getProduct()));
     }
 
-    private void createTransaction(Purchase purchase, BigDecimal amount, String description) {
+    private void createTransaction(Purchase purchase, BigDecimal amount, PaymentMethod paymentMethod,String description) {
 
         var user = this.userService.getLoggedUser();
         var t = new Transaction(
                 amount,
                 TransactionType.EXPENSE,
+                paymentMethod,
                 description,
                 user,
-                null,
                 purchase
         );
         this.transactionRepository.save(t);

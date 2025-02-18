@@ -5,6 +5,6 @@ CREATE TABLE product_purchases (
     purchase_price NUMERIC(10,2) NOT NULL,
     quantity INT NOT NULL,
     total NUMERIC(10,2),
-    FOREIGN KEY (purchase_id) REFERENCES purchases(purchase_id) ON DELETE CASCADE
+    FOREIGN KEY (purchase_id) REFERENCES purchases(id) ON DELETE CASCADE
 );
 

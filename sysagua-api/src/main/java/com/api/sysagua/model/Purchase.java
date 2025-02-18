@@ -1,26 +1,26 @@
 package com.api.sysagua.model;
 
-
 import com.api.sysagua.dto.purchase.ViewPurchaseDto;
 import com.api.sysagua.enumeration.PaymentMethod;
 import com.api.sysagua.enumeration.PaymentStatus;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
 @Entity
 @Table(name = "purchases")
-public class Purchase {
+@Getter
+@Setter
+@NoArgsConstructor
+public class Purchase extends Transactable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(nullable = false, name = "purchase_id")
+    @Column(nullable = false, name = "id")
     private Long id;
     private BigDecimal paidAmount;
     private BigDecimal totalAmount;
@@ -44,7 +44,7 @@ public class Purchase {
 
     @PrePersist
     private void prePersist(){
-        updateTotalValue();
+        calculateTotalAmount();
         setCreatedAt(LocalDateTime.now());
         setBalance(totalAmount.subtract(paidAmount));
     }
@@ -54,8 +54,8 @@ public class Purchase {
         setActive(true);
     }
 
-
-    public void updateTotalValue() {
+    @Override
+    public void calculateTotalAmount() {
         if (getTotalAmount() != null) return;
 
         this.totalAmount = productPurchases.stream()
@@ -82,6 +82,4 @@ public class Purchase {
                 getSupplier()
         );
     }
-
-
 }
