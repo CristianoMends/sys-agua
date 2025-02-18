@@ -69,9 +69,6 @@ public class PedidoController {
     private ComboBox<Clientes> comboClientes;
 
     @FXML
-    private ComboBox<PedidoStatus> comboStatusPedido;
-
-    @FXML
     private CheckBox exibirCompraMes;
 
     private ObservableList<Pedido> pedidoObservable;
@@ -200,6 +197,9 @@ public class PedidoController {
         TreeTableColumn<Pedido, String> colunaStatus = new TreeTableColumn<>("Status de Pagamento");
         colunaStatus.setCellValueFactory(param-> {
             Pedido pedido = param.getValue().getValue();
+            if (pedido.getDeliveryStatus() == PedidoStatus.CANCELED) {
+                return new SimpleObjectProperty<>("Cancelado");
+            }
             if(pedido.getPaymentStatus() != null){
                 return new SimpleObjectProperty<>(pedido.getPaymentStatus().getDescription());
             }
@@ -259,53 +259,63 @@ public class PedidoController {
 
             LocalDate inicio = datePickerInicio.getValue();
             LocalDate fim = datePickerFim.getValue();
-            if (inicio != null) {
-                listaPedido = listaPedido.stream()
-                        .filter(pedido -> pedido.getCreatedAt() != null &&
-                                !pedido.getCreatedAt().toLocalDate().isBefore(inicio))
-                        .collect(Collectors.toList());
-            }
-            if (fim != null) {
-                listaPedido = listaPedido.stream()
-                        .filter(pedido -> pedido.getCreatedAt() != null &&
-                                !pedido.getCreatedAt().toLocalDate().isAfter(fim))
-                        .collect(Collectors.toList());
-            }
+            // Filtrar pedidos baseado no intervalo de datas
+            listaPedido = listaPedido.stream()
+                    .filter(pedido -> {
+                        boolean dentroDoIntervalo = true;
 
-            if(comboStatusPagamento.getValue() != null) {
-                String statusPagamentoSelecionado = comboStatusPagamento.getValue().getDescription();
-                if (statusPagamentoSelecionado != null) {
-                    listaPedido = listaPedido.stream()
-                            .filter(pedio -> pedio.getPaymentStatus() != null &&
-                                    statusPagamentoSelecionado.equals(pedio.getPaymentStatus().getDescription()))
-                            .collect(Collectors.toList());
-                }
-            }
+                        // Verificar data de início
+                        if (inicio != null && pedido.getCreatedAt() != null) {
+                            dentroDoIntervalo &= !pedido.getCreatedAt().toLocalDate().isBefore(inicio);
+                        }
 
-            if (comboClientes.getValue() != null) {
-                String nomeClienteSelecionado = comboClientes.getValue().getName();
-                if (nomeClienteSelecionado != null) {
-                    listaPedido = listaPedido.stream()
-                            .filter(pedido -> pedido.getCustomer() != null &&
-                                    nomeClienteSelecionado.equals(pedido.getCustomer().getName()))
-                            .collect(Collectors.toList());
-                }
-            }
+                        // Verificar data de fim
+                        if (fim != null && pedido.getCreatedAt() != null) {
+                            dentroDoIntervalo &= !pedido.getCreatedAt().toLocalDate().isAfter(fim);
+                        }
 
-            if (comboEntregador.getValue() != null) {
-                String nomeEntregadorSelecionado = comboEntregador.getValue().getName();
-                if (nomeEntregadorSelecionado != null) {
-                    listaPedido = listaPedido.stream()
-                            .filter(pedido -> pedido.getDeliveryPerson() != null &&
-                                    nomeEntregadorSelecionado.equals(pedido.getDeliveryPerson().getName()))
-                            .collect(Collectors.toList());
-                }
-            }
+                        return dentroDoIntervalo;
+                    })
+                    .filter(pedido -> {
+                        // Filtrando por status de pagamento (Cancelado ou outro)
+                        if (comboStatusPagamento.getValue() != null) {
+                            String statusPagamentoSelecionado = comboStatusPagamento.getValue().getDescription();
+                            if ("Cancelado".equals(statusPagamentoSelecionado)) {
+                                pedido.setDeliveryStatus(PedidoStatus.CANCELED);
+                                return pedido.getDeliveryStatus() == PedidoStatus.CANCELED;
+                            } else if (pedido.getPaymentStatus() != null) {
+                                return statusPagamentoSelecionado.equals(pedido.getPaymentStatus().getDescription());
+                            }
+                        }
+                        return true; // Se não houver filtro de status de pagamento, mantemos o pedido
+                    })
+                    .filter(pedido -> {
+                        // Filtrando por nome do cliente
+                        if (comboClientes.getValue() != null) {
+                            String nomeClienteSelecionado = comboClientes.getValue().getName();
+                            if (nomeClienteSelecionado != null && pedido.getCustomer() != null) {
+                                return nomeClienteSelecionado.equals(pedido.getCustomer().getName());
+                            }
+                        }
+                        return true; // Se não houver filtro de cliente, mantemos o pedido
+                    })
+                    .filter(pedido -> {
+                        // Filtrando por nome do entregador
+                        if (comboEntregador.getValue() != null) {
+                            String nomeEntregadorSelecionado = comboEntregador.getValue().getName();
+                            if (nomeEntregadorSelecionado != null && pedido.getDeliveryPerson() != null) {
+                                return nomeEntregadorSelecionado.equals(pedido.getDeliveryPerson().getName());
+                            }
+                        }
+                        return true; // Se não houver filtro de entregador, mantemos o pedido
+                    })
+                    .collect(Collectors.toList());
 
             // Reagrupar as compras filtradas por data
             agruparPedidos(listaPedido);
             btnClearFilter.setVisible(true);
             btnClearFilter.setManaged(true);
+
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -348,9 +358,9 @@ public class PedidoController {
     private void handleLimparFiltros() {
         datePickerInicio.setValue(null);
         datePickerFim.setValue(null);
-        comboStatusPedido.setValue(null);
         comboStatusPagamento.setValue(null);
         comboClientes.setValue(null);
+        comboEntregador.setValue(null);
         carregarPedidos();
         filtrarPorMesAtual();
         btnClearFilter.setVisible(false);
