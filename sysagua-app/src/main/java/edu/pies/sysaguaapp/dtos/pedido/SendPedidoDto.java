@@ -1,8 +1,6 @@
 package edu.pies.sysaguaapp.dtos.pedido;
 
-import edu.pies.sysaguaapp.dtos.compra.ItemCompraDto;
 import edu.pies.sysaguaapp.enumeration.PaymentMethod;
-import edu.pies.sysaguaapp.models.Produto;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -23,8 +21,12 @@ public class SendPedidoDto {
     public SendPedidoDto() {
         productOrders = new ArrayList<>();
     }
-    public SendPedidoDto(List<ItemPedidoDto> productOrders, Long customerId) {
+    public SendPedidoDto(List<ItemPedidoDto> productOrders, Long customerId, Long deliveryPersonId, BigDecimal totalAmount, PaymentMethod paymentMethod, String description) {
         this.productOrders = productOrders;
         this.customerId = customerId;
+        this.deliveryPersonId = deliveryPersonId;
+        this.totalAmount = totalAmount;
+        this.paymentMethod = paymentMethod;
+        this.description = description;
     }
 }
