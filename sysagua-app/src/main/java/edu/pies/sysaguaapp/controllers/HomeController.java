@@ -105,7 +105,7 @@ public class HomeController implements Initializable {
 
     @FXML
     private void handleAjuda() {
-        showMessage("Usuário");
+        loadView("/views/Ajuda.fxml");
     }
 
     @FXML

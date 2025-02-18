@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Accordion?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<StackPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.pies.sysaguaapp.controllers.AjudaController" stylesheets="@../styles/ajuda.css">
+   <children>
+      <Accordion>
+        <panes>
+          <TitledPane animated="false" text="Cadastro de Usuário">
+               <content>
+                  <VBox prefHeight="200.0" prefWidth="100.0">
+                     <children>
+                         <Label text="Para cadastrar um novo usuário, siga os passos abaixo:"/>
+                         <Label text="1. Acesse a tela de cadastro de usuários no sistema."/>
+                         <Label text="2. Preencha os seguintes campos obrigatórios:"/>
+                         <Label text="   a. Nome completo"/>
+                         <Label text="   b. E-mail (único e de fácil contato)"/>
+                         <Label text="   c. Função ou cargo (ex.: Proprietário, Funcionário, Entregador, etc.)"/>
+                         <Label text="   d. Senha (e campo para confirmação)"/>
+                         <Label text="3. Preencha o campo opcional de telefone de contato, se necessário."/>
+                         <Label text="4. O administrador deve escolher a role e permissões do usuário:"/>
+                         <Label text="   a. Proprietário: Acesso total a todas as funcionalidades."/>
+                         <Label text="   b. Funcionário: Acesso ao gerenciamento de pedidos, produtos e clientes, mas sem acesso a relatórios financeiros."/>
+                         <Label text="   c. Gestor: Acesso a métricas e relatórios financeiros."/>
+                         <Label text="5. Verifique se o e-mail inserido é único e está no formato correto."/>
+                         <Label text="6. Clique no botão 'Salvar' para concluir o cadastro."/>
+                         <Label text="7. O administrador pode editar, desativar ou excluir usuários posteriormente, com registro de cada alteração (quem fez, quando e o que foi alterado)."/>
+                         <Label text="8. Para visualizar a lista de todos os usuários cadastrados, acesse a tela de gerenciamento de usuários."/>
+                     </children>
+                  </VBox>
+               </content>
+            </TitledPane>
+            <TitledPane animated="false" text="Cadastro de Cliente">
+               <content>
+                  <VBox prefHeight="200.0" prefWidth="100.0">
+                     <children>
+                         <Label text="Para cadastrar um novo cliente, siga os passos abaixo:"/>
+                         <Label text="1. Acesse a tela de cadastro de clientes no sistema."/>
+                         <Label text="2. Preencha os seguintes campos obrigatórios:"/>
+                         <Label text="   a. Nome completo ou razão social"/>
+                         <Label text="   b. Endereço completo"/>
+                         <Label text="   c. Telefone de contato"/>
+                         <Label text="   d. CNPJ"/>
+                         <Label text="   e. E-mail (opcional)"/>
+                         <Label text="3. Verifique se todos os campos obrigatórios estão preenchidos corretamente."/>
+                         <Label text="4. Clique no botão 'Salvar' para concluir o cadastro."/>
+                         <Label text="5. O sistema exibirá uma mensagem de sucesso confirmando que o cliente foi cadastrado corretamente."/>
+                         <Label text="6. O cliente será armazenado no banco de dados e estará disponível para consulta e edição futura."/>
+                         <Label text="7. Permitir o registro de observações adicionais sobre o cliente, caso necessário."/>
+                     </children>
+                  </VBox>
+               </content>
+            </TitledPane>
+            <TitledPane animated="false" text="Cadastro de Produto">
+               <content>
+                  <VBox prefHeight="200.0" prefWidth="100.0">
+                     <children>
+                         <Label text="Para cadastrar um novo produto, siga os passos abaixo:"/>
+                         <Label text="1. Acesse a tela de cadastro de produtos no sistema."/>
+                         <Label text="2. Preencha os seguintes campos obrigatórios:"/>
+                         <Label text="   a. Nome do produto"/>
+                         <Label text="   b. Preço unitário"/>
+                         <Label text="3. Preencha os seguintes campos opcionais:"/>
+                         <Label text="   a. Custo"/>
+                         <Label text="   b. Quantidade inicial em estoque"/>
+                         <Label text="   c. Imagem do produto"/>
+                         <Label text="   d. Marca do produto"/>
+                         <Label text="   e. Linha do produto"/>
+                         <Label text="4. Verifique se todos os campos obrigatórios estão preenchidos corretamente."/>
+                         <Label text="5. Clique no botão 'Salvar' para concluir o cadastro."/>
+                         <Label text="6. O sistema exibirá uma mensagem de sucesso confirmando que o produto foi cadastrado corretamente."/>
+                         <Label text="7. O produto será armazenado no banco de dados e estará disponível para consulta, edição ou exclusão futura."/>
+                     </children>
+                  </VBox>
+               </content>
+            </TitledPane>
+            <TitledPane animated="false" text="Registro de Pedido">
+               <content>
+                  <VBox prefHeight="200.0" prefWidth="100.0">
+                     <children>
+                         <Label text="Para registrar um novo pedido, siga os passos abaixo:"/>
+                         <Label text="1. Acesse a tela de registro de pedidos no sistema."/>
+                         <Label text="2. Preencha os seguintes campos obrigatórios:"/>
+                         <Label text="   a. Cliente (selecionado a partir do cadastro existente)"/>
+                         <Label text="   b. Lista de produtos e suas respectivas quantidades"/>
+                         <Label text="   c. Endereço de entrega (pode ser o endereço padrão do cliente ou um endereço alternativo)"/>
+                         <Label text="   d. Valor recebido (Total ou parcial)"/>
+                         <Label text="   e. Forma de pagamento (PIX, cartão, dinheiro ou a prazo)"/>
+                         <Label text="   f. Status inicial do pedido (padrão: pendente)"/>
+                         <Label text="   g. Entregador"/>
+                         <Label text="3. O sistema calculará automaticamente o valor total do pedido com base nos produtos selecionados e suas quantidades."/>
+                         <Label text="4. Clique no botão 'Salvar' para concluir o registro do pedido."/>
+                         <Label text="5. O sistema exibirá uma mensagem de sucesso confirmando que o pedido foi registrado corretamente."/>
+                         <Label text="6. O pedido será armazenado no banco de dados e estará disponível para consulta na lista de pedidos."/>
+                         <Label text="7. Será possível associar o pedido a um entregador, mesmo que isso seja realizado em um momento posterior ao registro inicial."/>
+                     </children>
+                  </VBox>
+               </content>
+            </TitledPane>
+            <!-- Adicione mais TitledPane para outros tópicos de ajuda conforme necessário -->
+        </panes>
+      </Accordion>
+   </children>
+</StackPane>
