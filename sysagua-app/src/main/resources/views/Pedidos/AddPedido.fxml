@@ -17,7 +17,7 @@
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TableColumn?>
 <StackPane fx:id="rootPane" prefHeight="600.0" prefWidth="800.0" stylesheets="@../../styles/addPedidos.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.pies.sysaguaapp.controllers.Pedidos.AddPedidoController">
-    <BorderPane prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: white;">
+    <BorderPane prefHeight="100.0" prefWidth="100.0" style="-fx-background-color: white;">
         <top>
             <VBox style="-fx-border-color: #C8CBD9; -fx-border-width: 0 0 1px 0;">
                 <HBox alignment="CENTER_LEFT" prefHeight="100.0" spacing="30.0" style="-fx-padding: 10;" VBox.vgrow="SOMETIMES">
@@ -43,7 +43,7 @@
         </top>
         <center>
             <HBox spacing="20.0" BorderPane.alignment="CENTER">
-                <VBox maxWidth="700.0" spacing="20.0" BorderPane.alignment="CENTER" HBox.hgrow="SOMETIMES">
+                <VBox maxWidth="600.0" spacing="10.0" BorderPane.alignment="CENTER" HBox.hgrow="SOMETIMES">
                     <children>
                         <Label styleClass="switchDetails" text="DETALHES DO PEDIDO">
                             <font>
