@@ -1,48 +1,51 @@
 package edu.pies.sysaguaapp.models.Pedido;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import edu.pies.sysaguaapp.enumeration.PaymentMethod;
+import edu.pies.sysaguaapp.enumeration.PaymentStatus;
+
 import edu.pies.sysaguaapp.enumeration.Pedidos.PedidoStatus;
 import edu.pies.sysaguaapp.enumeration.Pedidos.PedidoStatusPagamento;
 import edu.pies.sysaguaapp.models.Clientes;
 import edu.pies.sysaguaapp.models.Entregador;
-import edu.pies.sysaguaapp.models.Produto;
-import lombok.AllArgsConstructor;
+
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@JsonIgnoreProperties(ignoreUnknown = true)
 
 public class Pedido {
     private Long id;
     private LocalDateTime dataPedido;
     private Clientes cliente;
     private Entregador entregador;
-    private List<Produto> produtos;
-    private PedidoStatus status;
-    private PedidoStatusPagamento statusPagamento;
+    private List<ItemPedido> items;
+    private PaymentMethod paymentMethod;
     private BigDecimal valorRecebido;
     private BigDecimal valorTotal;
-    private PaymentMethod tipoPagamento;
+    private BigDecimal balance;
+    private LocalDateTime entryAt;
     private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
     private LocalDateTime finishedAt;
     private LocalDateTime canceledAt;
+    private String description;
 
     private String enderecoEntrega;
     private boolean active;
 
-    public Pedido(LocalDateTime createdAt){
-        this.createdAt = createdAt;
+    public Pedido(){
+        items = new ArrayList<>();
+    }
+
+    public Pedido(LocalDateTime entryAt){
+       this.entryAt = entryAt;
+       items = new ArrayList<>();
     }
 
     public void setActive(boolean active){
