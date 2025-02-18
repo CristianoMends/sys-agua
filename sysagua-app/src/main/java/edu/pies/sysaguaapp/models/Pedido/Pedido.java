@@ -1,10 +1,10 @@
 package edu.pies.sysaguaapp.models.Pedido;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import edu.pies.sysaguaapp.enumeration.PaymentMethod;
 import edu.pies.sysaguaapp.enumeration.PaymentStatus;
 
 import edu.pies.sysaguaapp.enumeration.Pedidos.PedidoStatus;
-import edu.pies.sysaguaapp.enumeration.Pedidos.PedidoStatusPagamento;
 import edu.pies.sysaguaapp.models.Clientes;
 import edu.pies.sysaguaapp.models.Entregador;
 
@@ -18,34 +18,37 @@ import java.util.List;
 
 @Getter
 @Setter
-
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Pedido {
     private Long id;
-    private LocalDateTime dataPedido;
-    private Clientes cliente;
-    private Entregador entregador;
-    private List<ItemPedido> items;
-    private PaymentMethod paymentMethod;
-    private BigDecimal valorRecebido;
-    private BigDecimal valorTotal;
-    private BigDecimal balance;
+    private Clientes customer;
+    private Entregador deliveryPerson;
+    private List<ItemPedido> productOrders;
+    private PedidoStatus deliveryStatus;
+    private BigDecimal receivedAmount;
+    private BigDecimal totalAmount;
     private LocalDateTime entryAt;
+
+    private PaymentMethod paymentMethod;
+    private PaymentStatus paymentStatus;
+
     private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
     private LocalDateTime finishedAt;
     private LocalDateTime canceledAt;
+
     private String description;
+
 
     private String enderecoEntrega;
     private boolean active;
 
     public Pedido(){
-        items = new ArrayList<>();
+        productOrders = new ArrayList<>();
     }
 
     public Pedido(LocalDateTime entryAt){
        this.entryAt = entryAt;
-       items = new ArrayList<>();
+       productOrders = new ArrayList<>();
     }
 
     public void setActive(boolean active){
