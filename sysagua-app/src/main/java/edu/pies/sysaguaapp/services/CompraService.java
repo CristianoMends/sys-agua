@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import edu.pies.sysaguaapp.dtos.compra.SendCompraDto;
+import edu.pies.sysaguaapp.dtos.compra.SendPgtoCompraDto;
+import edu.pies.sysaguaapp.models.CompraTransaction;
 import edu.pies.sysaguaapp.models.compras.Compra;
 
 
@@ -123,6 +125,26 @@ public class CompraService {
             return null;
         } else {
             throw new Exception("Erro ao cancelar: " + response.body());
+        }
+    }
+
+    public Compra cadastrarPagamento(SendPgtoCompraDto pagamento, String token) throws Exception {
+        String compraJson = objectMapper.writeValueAsString(pagamento);
+        String urlPagamento = BASE_URL + "/payment?id=" + pagamento.getIdCompra();
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(urlPagamento))
+                .POST(HttpRequest.BodyPublishers.ofString(compraJson))
+                .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer " + token)
+                .build();
+
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() == 201) {
+            return null;
+        } else {
+            throw new Exception("Erro ao cadastrar: " + response.body());
         }
     }
 }
