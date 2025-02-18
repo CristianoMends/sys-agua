@@ -1,38 +1,60 @@
 package edu.pies.sysaguaapp.models.Pedido;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import edu.pies.sysaguaapp.enumeration.PaymentMethod;
+import edu.pies.sysaguaapp.enumeration.PaymentStatus;
+
+import edu.pies.sysaguaapp.enumeration.Pedidos.PedidoStatus;
 import edu.pies.sysaguaapp.models.Clientes;
 import edu.pies.sysaguaapp.models.Entregador;
-import edu.pies.sysaguaapp.models.MetodoPagamento;
-import edu.pies.sysaguaapp.models.Produto;
-import lombok.AllArgsConstructor;
+
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Pedido {
     private Long id;
-    private Long numeroPedido;
-    private Clientes cliente;
-    private Entregador entregador;
-    private List<Produto> produtos;
-    private PedidoStatus status;
+    private Clientes customer;
+    private Entregador deliveryPerson;
+    private List<ItemPedido> productOrders;
+    private PedidoStatus deliveryStatus;
+    private BigDecimal receivedAmount;
+    private BigDecimal totalAmount;
+    private LocalDateTime entryAt;
 
-    private LocalDateTime dataPedido;
+    private PaymentMethod paymentMethod;
+    private PaymentStatus paymentStatus;
 
-    private BigDecimal valorRecebido;
-    private BigDecimal valorTotal;
+    private LocalDateTime createdAt;
+    private LocalDateTime finishedAt;
+    private LocalDateTime canceledAt;
 
-    private MetodoPagamento tipoPagamento;
-    private PedidoStatusPagamento statusPagamento;
+    private String description;
 
+
+    private String enderecoEntrega;
     private boolean active;
 
+    public Pedido(){
+        productOrders = new ArrayList<>();
+    }
+
+    public Pedido(LocalDateTime entryAt){
+       this.entryAt = entryAt;
+       productOrders = new ArrayList<>();
+    }
+
+    public void setActive(boolean active){
+        this.active = active;
+    }
+    public boolean getActive(){
+        return active;
+    }
 }
