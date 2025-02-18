@@ -7,8 +7,8 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum PedidoStatus {
     PENDING("Pendente"),
-    FINISHED("Concluido"),
+    FINISHED("Finalizado"),
     CANCELED("Cancelado");
 
-    private final String descricao;
+    private final String description;
 }
