@@ -43,10 +43,10 @@
                     <children>
                         <HBox maxWidth="700.0" spacing="10.0">
                             <children>
-                                <VBox maxWidth="200.0" minWidth="100.0">
+                                <VBox maxWidth="300.0" minWidth="200.0">
                                     <children>
                                         <Label text="Intervalo de datas" />
-                                        <HBox spacing="10.0">
+                                        <HBox spacing="5.0">
                                             <children>
                                                 <DatePicker fx:id="datePickerInicio" promptText="Inicial" />
                                                 <DatePicker fx:id="datePickerFim" promptText="Final" />
@@ -54,34 +54,28 @@
                                         </HBox>
                                     </children>
                                 </VBox>
-                                <VBox maxWidth="300.0" minWidth="100.0">
-                                    <children>
-                                        <Label text="Status do Pedido" />
-                                        <ComboBox fx:id="comboStatusPedido" prefWidth="150.0" promptText="Selecione" />
-                                    </children>
-                                </VBox>
-                                <VBox maxWidth="300.0" minWidth="100.0">
+                                <VBox maxWidth="200.0" minWidth="150.0">
                                     <children>
                                         <Label text="Status do pagamento" />
-                                        <ComboBox fx:id="comboStatusPagamento" prefWidth="150.0" promptText="Selecione" />
+                                        <ComboBox fx:id="comboStatusPagamento" prefWidth="200.0" promptText="Selecione" />
                                     </children>
                                 </VBox>
-                                <VBox maxWidth="250.0" minWidth="100.0">
+                                <VBox maxWidth="200.0" minWidth="150.0">
                                     <children>
                                         <Label text="Cliente" />
-                                        <ComboBox fx:id="comboClientes" prefWidth="150.0" promptText="Selecione" />
+                                        <ComboBox fx:id="comboClientes" prefWidth="200.0" promptText="Selecione" />
                                     </children>
                                 </VBox>
-                                <VBox maxWidth="250.0" minWidth="100.0">
+                                <VBox maxWidth="200.0" minWidth="150.0">
                                     <children>
                                         <Label text="Entregador" />
-                                        <ComboBox fx:id="comboEntregador" prefWidth="150.0" promptText="Selecione" />
+                                        <ComboBox fx:id="comboEntregador" prefWidth="200.0" promptText="Selecione" />
                                     </children>
                                 </VBox>
 
                                 <VBox alignment="BOTTOM_CENTER" minWidth="120.0">
                                     <children>
-                                        <HBox alignment="BOTTOM_CENTER" spacing="10.0">
+                                        <HBox alignment="BOTTOM_CENTER" spacing="5.0">
                                             <children>
                                                 <Button fx:id="btnFiltrar" mnemonicParsing="false" onAction="#handleFiltrar" styleClass="menu-button" text="Filtrar">
                                                     <padding>
@@ -98,7 +92,7 @@
                                         </HBox>
                                     </children>
                                 </VBox>
-                                <VBox alignment="BOTTOM_CENTER" minWidth="120.0">
+                                <VBox alignment="BOTTOM_CENTER" minWidth="200.0">
                                     <children>
                                         <HBox alignment="CENTER" spacing="5.0">
                                             <children>
