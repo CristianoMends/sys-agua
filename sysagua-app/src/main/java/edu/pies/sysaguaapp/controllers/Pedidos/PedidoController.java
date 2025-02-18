@@ -147,13 +147,8 @@ public class PedidoController {
             try {
                 String token = TokenManager.getInstance().getToken();
                 pedidoService.cancelarPedido(pedidoSelecionado, token);
-                TreeItem<Pedido> treeItemSelecionado = tabelaPedido.getSelectionModel().getSelectedItem();
-                TreeItem<Pedido> parent = treeItemSelecionado.getParent();
-                if (parent != null) {
-                    parent.getChildren().remove(treeItemSelecionado);
-                } else {
-                    tabelaPedido.getRoot().getChildren().remove(treeItemSelecionado);
-                }
+
+                pedidoSelecionado.setDeliveryStatus(PedidoStatus.CANCELED);
                 tabelaPedido.refresh();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -202,6 +197,15 @@ public class PedidoController {
         colunaValorTotal.setCellValueFactory(param ->
                 new SimpleObjectProperty<>(param.getValue().getValue().getTotalAmount()));
 
+        TreeTableColumn<Pedido, String> colunaStatus = new TreeTableColumn<>("Status de Pagamento");
+        colunaStatus.setCellValueFactory(param-> {
+            Pedido pedido = param.getValue().getValue();
+            if(pedido.getPaymentStatus() != null){
+                return new SimpleObjectProperty<>(pedido.getPaymentStatus().getDescription());
+            }
+            return new SimpleObjectProperty<>("");
+        });
+
 
         TreeTableColumn<Pedido, String> colunaNomeEntregador = new TreeTableColumn<>("Nome do Entregador");
         colunaNomeEntregador.setCellValueFactory(param -> {
@@ -217,7 +221,7 @@ public class PedidoController {
 
         // Adiciona as colunas na TreeTableView
         tabelaPedido.getColumns().clear();
-        tabelaPedido.getColumns().addAll(colunaNumeroPedido, colunaNomeCliente, colunaData, colunaValorTotal, colunaNomeEntregador);
+        tabelaPedido.getColumns().addAll(colunaNumeroPedido, colunaNomeCliente, colunaData, colunaValorTotal, colunaStatus, colunaNomeEntregador);
 
         tabelaPedido.setRowFactory(tv -> {
             TreeTableRow<Pedido> row = new TreeTableRow<Pedido>() {
@@ -268,6 +272,16 @@ public class PedidoController {
                         .collect(Collectors.toList());
             }
 
+            if(comboStatusPagamento.getValue() != null) {
+                String statusPagamentoSelecionado = comboStatusPagamento.getValue().getDescription();
+                if (statusPagamentoSelecionado != null) {
+                    listaPedido = listaPedido.stream()
+                            .filter(pedio -> pedio.getPaymentStatus() != null &&
+                                    statusPagamentoSelecionado.equals(pedio.getPaymentStatus().getDescription()))
+                            .collect(Collectors.toList());
+                }
+            }
+
             if (comboClientes.getValue() != null) {
                 String nomeClienteSelecionado = comboClientes.getValue().getName();
                 if (nomeClienteSelecionado != null) {
@@ -290,10 +304,8 @@ public class PedidoController {
 
             // Reagrupar as compras filtradas por data
             agruparPedidos(listaPedido);
-
             btnClearFilter.setVisible(true);
             btnClearFilter.setManaged(true);
-
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -350,8 +362,11 @@ public class PedidoController {
     private void carregarPedidos() {
         try {
             List<Pedido> listaPedidos = pedidoService.buscarPedidos(token);
-
-            agruparPedidos(listaPedidos);
+            if (listaPedidos != null && !listaPedidos.isEmpty()) {
+                agruparPedidos(listaPedidos);
+            } else {
+                System.out.println("Nenhum pedido encontrado.");
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
