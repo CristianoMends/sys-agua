@@ -35,7 +35,7 @@
                      </font></Label>
                   <DatePicker fx:id="dateInicio" maxWidth="100.0" promptText="Inicio" />
                   <DatePicker fx:id="dateFim" maxWidth="100.0" promptText="Fim" />
-                  <Button mnemonicParsing="false" onAction="#handleInitialize" styleClass="menu-button" text="Recarragar" />
+                  <Button mnemonicParsing="false" onAction="#handleInitialize" styleClass="menu-button" text="Atualizar" />
                </children>
                <BorderPane.margin>
                   <Insets left="20.0" right="20.0" />
@@ -66,9 +66,26 @@
                                           <Font name="System Bold" size="16.0" />
                                        </font>
                                     </Label>
-                                    <Label text="R$ 0,00">
+                                    <Label fx:id="totalReceitasMes" text="R$ 0,00">
                                        <font>
                                           <Font name="System Bold" size="16.0" />
+                                       </font>
+                                    </Label>
+                                 </children>
+                                 <padding>
+                                    <Insets left="20.0" right="10.0" />
+                                 </padding>
+                              </HBox>
+                              <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
+                                 <children>
+                                    <Label fx:id="percentualReceitasMes" text="0%">
+                                       <font>
+                                          <Font size="14.0" />
+                                       </font>
+                                    </Label>
+                                    <Label text="em relação ao mês passado">
+                                       <font>
+                                          <Font size="14.0" />
                                        </font>
                                     </Label>
                                  </children>
@@ -93,7 +110,7 @@
                                  <children>
                                     <Label text="Vendas por Linha de Produtos" />
                                     <Region HBox.hgrow="SOMETIMES" />
-                                    <Button fx:id="btnAmpliarSecondGraph" mnemonicParsing="false" styleClass="maximize-button" text="Ampliar" />
+                                    <Button fx:id="btnAmpliarSecondGraph" mnemonicParsing="false" onAction="#handleLineChartMaximization" styleClass="maximize-button" text="Ampliar" />
                                  </children>
                                  <padding>
                                     <Insets left="20.0" right="10.0" />
