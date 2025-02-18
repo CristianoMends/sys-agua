@@ -3,6 +3,7 @@ package edu.pies.sysaguaapp.controllers.Usuarios;
 import edu.pies.sysaguaapp.models.Usuario;
 import edu.pies.sysaguaapp.services.FornecedorService;
 import edu.pies.sysaguaapp.services.TokenManager;
+import edu.pies.sysaguaapp.services.UsuarioService;
 import javafx.animation.PauseTransition;
 import javafx.beans.property.*;
 import javafx.collections.*;
@@ -40,7 +41,7 @@ public class UsuarioController {
     @FXML
     private CheckBox exibirInativosCheckBox;
 
-    private ObservableList<Usuario> fornecedorObservable;
+    private ObservableList<Usuario> usuarioObservable;
     private int paginaAtual = 0;
     private final int itensPorPagina = 18;
     private int totalPaginas;
@@ -48,7 +49,7 @@ public class UsuarioController {
     public UsuarioController() {
         this.usuarioService = new UsuarioService();
         token = TokenManager.getInstance().getToken();
-        this.fornecedorObservable = FXCollections.observableArrayList();
+        this.usuarioObservable = FXCollections.observableArrayList();
     }
 
     @FXML
