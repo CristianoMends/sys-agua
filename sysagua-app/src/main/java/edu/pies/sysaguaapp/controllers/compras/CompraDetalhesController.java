@@ -3,13 +3,11 @@ package edu.pies.sysaguaapp.controllers.compras;
 import edu.pies.sysaguaapp.dtos.compra.SendPgtoCompraDto;
 import edu.pies.sysaguaapp.enumeration.PaymentMethod;
 import edu.pies.sysaguaapp.enumeration.TransactionType;
-import edu.pies.sysaguaapp.models.Transaction;
 import edu.pies.sysaguaapp.models.TransactionCompra;
 import edu.pies.sysaguaapp.models.compras.Compra;
 import edu.pies.sysaguaapp.models.compras.ItemCompra;
 import edu.pies.sysaguaapp.services.CompraService;
 import edu.pies.sysaguaapp.services.TransactionCompraService;
-import edu.pies.sysaguaapp.services.TransactionService;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -126,19 +124,19 @@ public class CompraDetalhesController {
     private void handleInserirPagamento() {
         if (validarFormItem()) {
             try {
-                SendPgtoCompraDto novoPagamento = new SendPgtoCompraDto();
-
                 BigDecimal valor = new BigDecimal(valorField.getText().replace(",", "."));
+
+                SendPgtoCompraDto novoPagamento = new SendPgtoCompraDto();
                 novoPagamento.setAmount(valor);
                 novoPagamento.setPaymentMethod(metodoPagamento.getValue());
                 novoPagamento.setDescription("Pagamento via " + metodoPagamento.getValue() + " em: " + LocalDateTime.now());
                 Long idCompra = compra.getId();
 
                 compraService.cadastrarPagamento(novoPagamento, idCompra, token);
-//                Transaction transacao = transactionService.buscarTransacaoId(novoPagamento, token);
-//                pagamentosAddList.add(transacao);
-//                pagamentosTableView.refresh();
                 limparCampos();
+                obterPagamentos();
+                atualizaCompra();
+                atualizarTotais();
                 pagamentosTableView.refresh();
 
             } catch (Exception e) {
@@ -152,8 +150,7 @@ public class CompraDetalhesController {
         numeroNfe.setText(compra.getNfe());
         fornecedorSocialReason.setText(compra.getSupplier().getSocialReason());
         dataEntrada.setText(compra.getEntryAt().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-        saldoLabel.setText("R$ " + compra.getBalance().setScale(2, RoundingMode.HALF_UP).toString().replace(".", ","));
-        pagoLabel.setText("R$ " + compra.getPaidAmount().setScale(2, RoundingMode.HALF_UP).toString().replace(".", ","));
+
     }
 
     private void carregarTela(String caminho) {
@@ -195,6 +192,18 @@ public class CompraDetalhesController {
         totalLabel.setText("R$ " + total.setScale(2, RoundingMode.HALF_UP));
         totalItensLabel.setText(String.valueOf(itens));
 
+        saldoLabel.setText("R$ " + compra.getBalance().setScale(2, RoundingMode.HALF_UP).toString().replace(".", ","));
+        pagoLabel.setText("R$ " + compra.getPaidAmount().setScale(2, RoundingMode.HALF_UP).toString().replace(".", ","));
+
+    }
+
+    private void atualizaCompra() {
+        try {
+            this.compra = compraService.buscarCompraId(this.compra.getId(), token);
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Erro ao atualizar compra" + e.getMessage());
+        }
     }
 
     private void validarCampos() {
@@ -215,7 +224,7 @@ public class CompraDetalhesController {
         }
 
         if (valorField.getText().trim().isEmpty()) {
-            valorErrorLabel.setText("Valor é obrigatória.");
+            valorErrorLabel.setText("Valor é obrigatório.");
             valorErrorLabel.setVisible(true);
             valorErrorLabel.setManaged(true);
             isValid = false;
@@ -224,14 +233,25 @@ public class CompraDetalhesController {
             valorErrorLabel.setManaged(false);
         }
 
-        BigDecimal preco = new BigDecimal(valorField.getText().replace(",", "."));
+        BigDecimal valor = new BigDecimal(valorField.getText().replace(",", "."));
 
-        if (preco.compareTo(BigDecimal.ZERO) == 0) {
+        if (valor.compareTo(BigDecimal.ZERO) == 0) {
             valorErrorLabel.setText("Campo não pode ser zero.");
             valorErrorLabel.setVisible(true);
             valorErrorLabel.setManaged(true);
             isValid = false;
         } else {
+            valorErrorLabel.setVisible(false);
+            valorErrorLabel.setManaged(false);
+        }
+
+        if (valor.compareTo(compra.getBalance()) > 0) {
+            valorErrorLabel.setText("Valor não permitido maior que o saldo.");
+            valorErrorLabel.setVisible(true);
+            valorErrorLabel.setManaged(true);
+            isValid = false;
+        }
+        else{
             valorErrorLabel.setVisible(false);
             valorErrorLabel.setManaged(false);
         }

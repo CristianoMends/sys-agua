@@ -82,7 +82,7 @@ public class CompraService {
         }
     }
 
-    public Compra buscarCompraId(String id, String token) throws Exception {
+    public Compra buscarCompraId(Long id, String token) throws Exception {
         String urlComId = BASE_URL + "?id=" + id;
 
         HttpRequest request = HttpRequest.newBuilder()
