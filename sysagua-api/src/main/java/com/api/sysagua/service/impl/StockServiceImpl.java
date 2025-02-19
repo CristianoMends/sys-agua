@@ -32,12 +32,13 @@ public class StockServiceImpl implements StockService, StockSubject {
     @Autowired
     private UserService userService;
     @Autowired
-    private StockHistoryServiceImpl stockHistoryService;
+    private StockObserver stockObserver;
 
     @PostConstruct
     public void init() {
-        addObserver(stockHistoryService);
+        addObserver(stockObserver);
     }
+
     @Override
     public void addObserver(StockObserver observer) {
         if (!observers.contains(observer)) {
