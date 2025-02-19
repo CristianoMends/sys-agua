@@ -18,8 +18,6 @@ public abstract class Transactable {
     private BigDecimal totalAmount;
     private BigDecimal balance;
 
-    private BigDecimal paidAmount;
-
     @Enumerated(EnumType.STRING)
     private PaymentMethod paymentMethod;
 

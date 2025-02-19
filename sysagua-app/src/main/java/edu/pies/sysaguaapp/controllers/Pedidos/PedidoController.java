@@ -158,17 +158,16 @@ public class PedidoController {
     /* --------------------- tabela -------------*/
 
     private void configurarTabela() {
-
-        TreeTableColumn<Pedido, Long> colunaNumeroPedido = new TreeTableColumn<>("Número do Pedido");
-        colunaNumeroPedido.setCellValueFactory(param -> {
-            Long id = param.getValue().getValue().getId();
-            if(id != null && id >= 0){
-                return new SimpleLongProperty(id).asObject();
+        TreeTableColumn<Pedido, String> colunaData = new TreeTableColumn<>("Data");
+        colunaData.setCellValueFactory(param -> {
+            LocalDateTime createAt = param.getValue().getValue().getCreatedAt();
+            if (createAt != null) {
+                return new SimpleStringProperty(createAt.toLocalDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
             }
-            return new SimpleLongProperty(0).asObject();
+            return new SimpleStringProperty("");
         });
 
-        TreeTableColumn<Pedido, String> colunaNomeCliente = new TreeTableColumn<>("Nome do Cliente");
+        TreeTableColumn<Pedido, String> colunaNomeCliente = new TreeTableColumn<>("Cliente");
         colunaNomeCliente.setCellValueFactory(param -> {
             Pedido pedido = param.getValue().getValue();
 
@@ -180,21 +179,11 @@ public class PedidoController {
         });
 
 
-
-        TreeTableColumn<Pedido, String> colunaData = new TreeTableColumn<>("Data do Pedido");
-        colunaData.setCellValueFactory(param -> {
-            LocalDateTime createAt = param.getValue().getValue().getCreatedAt();
-            if (createAt != null) {
-                return new SimpleStringProperty(createAt.toLocalDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-            }
-            return new SimpleStringProperty("");
-        });
-
         TreeTableColumn<Pedido, BigDecimal> colunaValorTotal = new TreeTableColumn<>("Valor Total");
         colunaValorTotal.setCellValueFactory(param ->
                 new SimpleObjectProperty<>(param.getValue().getValue().getTotalAmount()));
 
-        TreeTableColumn<Pedido, String> colunaStatus = new TreeTableColumn<>("Status de Pagamento");
+        TreeTableColumn<Pedido, String> colunaStatus = new TreeTableColumn<>("Pagamento");
         colunaStatus.setCellValueFactory(param-> {
             Pedido pedido = param.getValue().getValue();
             if (pedido.getDeliveryStatus() == PedidoStatus.CANCELED) {
@@ -207,7 +196,7 @@ public class PedidoController {
         });
 
 
-        TreeTableColumn<Pedido, String> colunaNomeEntregador = new TreeTableColumn<>("Nome do Entregador");
+        TreeTableColumn<Pedido, String> colunaNomeEntregador = new TreeTableColumn<>("Entregador");
         colunaNomeEntregador.setCellValueFactory(param -> {
             Pedido pedido = param.getValue().getValue();
 
@@ -221,7 +210,7 @@ public class PedidoController {
 
         // Adiciona as colunas na TreeTableView
         tabelaPedido.getColumns().clear();
-        tabelaPedido.getColumns().addAll(colunaNumeroPedido, colunaNomeCliente, colunaData, colunaValorTotal, colunaStatus, colunaNomeEntregador);
+        tabelaPedido.getColumns().addAll(colunaData, colunaNomeCliente , colunaValorTotal, colunaStatus, colunaNomeEntregador);
 
         tabelaPedido.setRowFactory(tv -> {
             TreeTableRow<Pedido> row = new TreeTableRow<Pedido>() {
