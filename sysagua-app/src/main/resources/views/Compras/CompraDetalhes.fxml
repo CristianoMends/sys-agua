@@ -116,14 +116,14 @@
                                     <Font name="System Bold" size="12.0" />
                                  </font>
                               </Label>
-                              <Label minWidth="50.0" text="R$ 0,00" textFill="#f99c30">
+                              <Label fx:id="saldoLabel" minWidth="50.0" text="R$ 0,00" textFill="#f99c30">
                                  <font>
                                     <Font name="System Bold" size="12.0" />
                                  </font>
                               </Label>
                               <Region HBox.hgrow="ALWAYS" />
                               <Label minWidth="80.0" text="Total pago" />
-                              <Label minWidth="80.0" text="R$ 0,00" />
+                              <Label fx:id="pagoLabel" minWidth="80.0" text="R$ 0,00" />
                            </children>
                         </HBox>
                      </children>

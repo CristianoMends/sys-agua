@@ -2,10 +2,13 @@ package edu.pies.sysaguaapp.controllers.compras;
 
 import edu.pies.sysaguaapp.dtos.compra.SendPgtoCompraDto;
 import edu.pies.sysaguaapp.enumeration.PaymentMethod;
+import edu.pies.sysaguaapp.enumeration.TransactionType;
 import edu.pies.sysaguaapp.models.Transaction;
+import edu.pies.sysaguaapp.models.TransactionCompra;
 import edu.pies.sysaguaapp.models.compras.Compra;
 import edu.pies.sysaguaapp.models.compras.ItemCompra;
 import edu.pies.sysaguaapp.services.CompraService;
+import edu.pies.sysaguaapp.services.TransactionCompraService;
 import edu.pies.sysaguaapp.services.TransactionService;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -23,10 +26,11 @@ import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class CompraDetalhesController {
     private final CompraService compraService;
-    private final TransactionService transactionService;
+    private final TransactionCompraService transactionService;
     private final String token;
     private Compra compra;
 
@@ -37,10 +41,10 @@ public class CompraDetalhesController {
     private ObservableList<ItemCompra> produtosAddList;
 
     @FXML
-    private ObservableList<Transaction> pagamentosAddList;
+    private ObservableList<TransactionCompra> pagamentosAddList;
 
     @FXML
-    private TableView<Transaction> pagamentosTableView;
+    private TableView<TransactionCompra> pagamentosTableView;
 
     @FXML
     private TableView<ItemCompra> produtosTableView;
@@ -49,7 +53,7 @@ public class CompraDetalhesController {
     private TableColumn<ItemCompra, String> produtoColumn, precoColumn, codigoColumn;
 
     @FXML
-    private TableColumn<Transaction, String> dataColumn, tipoColumn, valorColumn;
+    private TableColumn<TransactionCompra, String> dataColumn, tipoColumn, valorColumn;
 
     @FXML
     private TableColumn<ItemCompra, Integer> quantidadeColumn;
@@ -68,7 +72,7 @@ public class CompraDetalhesController {
 
     public CompraDetalhesController(CompraService compraService, String token, Compra compra) {
         this.compraService = compraService;
-        transactionService = new TransactionService();
+        transactionService = new TransactionCompraService();
         this.token = token;
         this.compra = compra;
         produtosAddList = FXCollections.observableArrayList();
@@ -93,8 +97,8 @@ public class CompraDetalhesController {
         });
 
         pagamentosTableView.setItems(pagamentosAddList);
-        dataColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getCreatedAt().toLocalDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))));
-        tipoColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getPurchase().getPaymentMethod().getDescription()));
+        dataColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getCreatedAt().toLocalDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyyy"))));
+        tipoColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getPaymentMethod().getDescription()));
         valorColumn.setCellValueFactory(cellData -> {
             BigDecimal valor = cellData.getValue().getAmount();
             return new SimpleStringProperty(valor != null ? "R$ " + valor.setScale(2, RoundingMode.HALF_UP).toString().replace(".", ",") : "");
@@ -134,6 +138,8 @@ public class CompraDetalhesController {
 //                Transaction transacao = transactionService.buscarTransacaoId(novoPagamento, token);
 //                pagamentosAddList.add(transacao);
 //                pagamentosTableView.refresh();
+                limparCampos();
+                pagamentosTableView.refresh();
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -146,6 +152,8 @@ public class CompraDetalhesController {
         numeroNfe.setText(compra.getNfe());
         fornecedorSocialReason.setText(compra.getSupplier().getSocialReason());
         dataEntrada.setText(compra.getEntryAt().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+        saldoLabel.setText("R$ " + compra.getBalance().setScale(2, RoundingMode.HALF_UP).toString().replace(".", ","));
+        pagoLabel.setText("R$ " + compra.getPaidAmount().setScale(2, RoundingMode.HALF_UP).toString().replace(".", ","));
     }
 
     private void carregarTela(String caminho) {
@@ -162,10 +170,15 @@ public class CompraDetalhesController {
 
     private void obterPagamentos() {
         try {
-            List<Transaction> transacoes = transactionService.buscarTransacaoCompraId(compra.getId(), token);
+            List<TransactionCompra> transacoes = transactionService.buscarTransacaoCompraId(compra.getId(), token);
             if (transacoes != null) {
-                pagamentosAddList.setAll(transacoes);
+                pagamentosAddList.setAll(transacoes.stream()
+                    .filter(transacao -> transacao.getType() == TransactionType.EXPENSE && transacao.getTransactable().getId().equals(compra.getId()))
+                    .collect(Collectors.toList()));
+                pagamentosTableView.refresh();
             }
+
+
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("Erro ao obter pagamentos " + e.getMessage());
@@ -240,5 +253,10 @@ public class CompraDetalhesController {
             return null; // Rejeita mudanças inválidas
         });
         textField.setTextFormatter(formatter);
+    }
+
+    private void limparCampos() {
+        metodoPagamento.getSelectionModel().clearSelection();
+        valorField.clear();
     }
 }
