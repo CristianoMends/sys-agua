@@ -59,6 +59,8 @@ public class PurchaseServiceImpl implements PurchaseService {
         purchase.setPaidAmount(dto.getPaidAmount());
         purchase.setPaymentStatus(PaymentStatus.PENDING);
 
+        checkPaimentValue(purchase);
+
         if (isPaid(purchase)) {
             purchase.setPaymentStatus(PaymentStatus.PAID);
             purchase.setFinishedAt(LocalDateTime.now());
@@ -69,18 +71,21 @@ public class PurchaseServiceImpl implements PurchaseService {
         var saved = this.purchaseRepository.save(purchase);
 
         if (dto.getPaidAmount() != null) {
-            createTransaction(saved, dto.getPaidAmount().negate(), dto.getPaymentMethod(),"Compra registrada");
+            createTransaction(saved, dto.getPaidAmount().negate(), dto.getPaymentMethod(), "Compra registrada");
         }
 
         processProductsOnStock(saved);
     }
 
     @Override
+    @Transactional
     public void addPayment(Long id, CreateTransactionDto dto) {
         var purchase = this.purchaseRepository.findById(id).orElseThrow(() -> new BusinessException("Purchase not found", HttpStatus.NOT_FOUND));
         if (!purchase.getActive() || isPaid(purchase)) return;
 
         purchase.setPaidAmount(purchase.getPaidAmount().add(dto.getAmount()));
+
+        checkPaimentValue(purchase);
 
         if (isPaid(purchase)) {
             purchase.setPaymentStatus(PaymentStatus.PAID);
@@ -89,7 +94,7 @@ public class PurchaseServiceImpl implements PurchaseService {
         }
 
         var saved = this.purchaseRepository.save(purchase);
-        createTransaction(saved, dto.getAmount().negate(), dto.getPaymentMethod(),dto.getDescription());
+        createTransaction(saved, dto.getAmount().negate(), dto.getPaymentMethod(), dto.getDescription());
     }
 
     @Override
@@ -101,7 +106,7 @@ public class PurchaseServiceImpl implements PurchaseService {
 
         var saved = this.purchaseRepository.save(purchase);
 
-        createTransaction(purchase, purchase.getPaidAmount(), PaymentMethod.UNDEFINED,"Estorno de pagamentos");
+        createTransaction(purchase, purchase.getPaidAmount(), PaymentMethod.UNDEFINED, "Estorno de pagamentos");
         processProductRefunds(saved);
     }
 
@@ -152,6 +157,13 @@ public class PurchaseServiceImpl implements PurchaseService {
         ).stream().map(Purchase::toView).toList();
     }
 
+    private void checkPaimentValue(Purchase purchase) {
+        purchase.calculateTotalAmount();
+        if (purchase.getPaidAmount().compareTo(purchase.getTotalAmount()) > 0) {
+            throw new BusinessException("Amount paid is greater than the total purchase amount");
+        }
+    }
+
     private boolean isPaid(Purchase purchase) {
         if (purchase.getTotalAmount() == null) purchase.calculateTotalAmount();
 
@@ -198,7 +210,7 @@ public class PurchaseServiceImpl implements PurchaseService {
                 .forEach(p -> remEntriesProductOnStock(p.getQuantity(), p.getProduct()));
     }
 
-    private void createTransaction(Purchase purchase, BigDecimal amount, PaymentMethod paymentMethod,String description) {
+    private void createTransaction(Purchase purchase, BigDecimal amount, PaymentMethod paymentMethod, String description) {
 
         var user = this.userService.getLoggedUser();
         var t = new Transaction(

@@ -1,6 +1,8 @@
 package com.api.sysagua.model;
 
+import com.api.sysagua.dto.transaction.ViewTransactableDto;
 import com.api.sysagua.dto.transaction.ViewTransactionDto;
+import com.api.sysagua.dto.user.ViewUserDto;
 import com.api.sysagua.enumeration.PaymentMethod;
 import com.api.sysagua.enumeration.TransactionType;
 import jakarta.persistence.*;
@@ -56,7 +58,7 @@ public class Transaction {
     private Purchase purchase;
 
 
-    public Transaction(BigDecimal amount, TransactionType type, PaymentMethod paymentMethod,String description, User responsibleUser, Transactable transactable) {
+    public Transaction(BigDecimal amount, TransactionType type, PaymentMethod paymentMethod, String description, User responsibleUser, Transactable transactable) {
         this.amount = amount;
         this.type = type;
         this.description = description;
@@ -83,8 +85,16 @@ public class Transaction {
                 getType(),
                 getPaymentMethod(),
                 getDescription(),
-                getResponsibleUser() != null ? getResponsibleUser().toView() : null,
-                purchase != null ? purchase.toView() : order != null ? order.toView() : null
+                getViewResponsibleUser(),
+                getViewTransactable()
         );
+    }
+
+    public ViewUserDto getViewResponsibleUser() {
+        return getResponsibleUser() != null ? getResponsibleUser().toView() : null;
+    }
+
+    ViewTransactableDto getViewTransactable() {
+        return purchase != null ? purchase.toView() : order != null ? order.toView() : null;
     }
 }

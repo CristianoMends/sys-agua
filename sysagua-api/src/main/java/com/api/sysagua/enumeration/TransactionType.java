@@ -7,7 +7,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum TransactionType {
 
-    INCOME("Renda"),
+    INCOME("Receita"),
     EXPENSE("Despesa");
 
     private final String description;
