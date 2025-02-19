@@ -1,10 +1,9 @@
 package edu.pies.sysaguaapp.controllers.compras;
 
-import edu.pies.sysaguaapp.enumeration.PaymentMethod;
 import edu.pies.sysaguaapp.enumeration.PaymentStatus;
 import edu.pies.sysaguaapp.models.Fornecedor;
 import edu.pies.sysaguaapp.models.compras.Compra;
-import edu.pies.sysaguaapp.services.CompraService;
+import edu.pies.sysaguaapp.services.compra.CompraService;
 import edu.pies.sysaguaapp.services.FornecedorService;
 import edu.pies.sysaguaapp.services.TokenManager;
 import javafx.animation.PauseTransition;

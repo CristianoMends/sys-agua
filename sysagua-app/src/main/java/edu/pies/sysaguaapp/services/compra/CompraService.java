@@ -1,4 +1,4 @@
-package edu.pies.sysaguaapp.services;
+package edu.pies.sysaguaapp.services.compra;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;

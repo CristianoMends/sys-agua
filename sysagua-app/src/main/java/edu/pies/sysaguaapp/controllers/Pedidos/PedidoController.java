@@ -2,18 +2,14 @@ package edu.pies.sysaguaapp.controllers.Pedidos;
 
 import edu.pies.sysaguaapp.enumeration.PaymentStatus;
 import edu.pies.sysaguaapp.enumeration.Pedidos.PedidoStatus;
-import edu.pies.sysaguaapp.enumeration.Pedidos.PedidoStatusPagamento;
 import edu.pies.sysaguaapp.models.Clientes;
 import edu.pies.sysaguaapp.models.Entregador;
-import edu.pies.sysaguaapp.models.Estoque;
 import edu.pies.sysaguaapp.models.Pedido.Pedido;
-import edu.pies.sysaguaapp.models.Produto;
 import edu.pies.sysaguaapp.services.ClientesService;
-import edu.pies.sysaguaapp.services.PedidoService;
+import edu.pies.sysaguaapp.services.pedido.PedidoService;
 import edu.pies.sysaguaapp.services.EntregadorService;
 import edu.pies.sysaguaapp.services.TokenManager;
 import javafx.animation.PauseTransition;
-import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -22,16 +18,19 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Cursor;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.util.StringConverter;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalDateTime.*;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -233,12 +232,40 @@ public class PedidoController {
                     }
                 }
             };
+
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && !row.isEmpty()) {
+                    Pedido pedidoSelecionado = row.getItem();
+                    if (pedidoSelecionado != null && row.getTreeItem().getParent() != null) {
+                        abrirDetalhesPedido(pedidoSelecionado);
+                    }
+                }
+            });
+
             return row;
         });
 
         // Define o root inicial (vazio)
         tabelaPedido.setRoot(new TreeItem<>(new Pedido()));
         tabelaPedido.setShowRoot(false);
+    }
+
+    private void abrirDetalhesPedido(Pedido pedido) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/Pedidos/PedidoDetalhes.fxml"));
+            PedidoDetalhesController controller = new PedidoDetalhesController(pedidoService, token, pedido);
+            loader.setController(controller);
+
+            Parent root = loader.load();
+            Stage stage = new Stage();
+            stage.setTitle("Detalhes do Pedido");
+            stage.setScene(new Scene(root, 800, 600));
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println("Erro ao abrir detalhes: " + e.getMessage());
+        }
     }
 
     @FXML

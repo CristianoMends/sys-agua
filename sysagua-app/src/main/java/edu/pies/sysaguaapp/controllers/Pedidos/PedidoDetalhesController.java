@@ -1,13 +1,17 @@
-package edu.pies.sysaguaapp.controllers.compras;
+package edu.pies.sysaguaapp.controllers.Pedidos;
 
 import edu.pies.sysaguaapp.dtos.compra.SendPgtoCompraDto;
+import edu.pies.sysaguaapp.dtos.pedido.SendPgtoPedidoDto;
 import edu.pies.sysaguaapp.enumeration.PaymentMethod;
 import edu.pies.sysaguaapp.enumeration.TransactionType;
+import edu.pies.sysaguaapp.models.Pedido.ItemPedido;
+import edu.pies.sysaguaapp.models.Pedido.Pedido;
+import edu.pies.sysaguaapp.models.Pedido.TransactionPedido;
 import edu.pies.sysaguaapp.models.compras.TransactionCompra;
 import edu.pies.sysaguaapp.models.compras.Compra;
-import edu.pies.sysaguaapp.models.compras.ItemCompra;
-import edu.pies.sysaguaapp.services.compra.CompraService;
+import edu.pies.sysaguaapp.services.pedido.PedidoService;
 import edu.pies.sysaguaapp.services.compra.TransactionCompraService;
+import edu.pies.sysaguaapp.services.pedido.TransactionPedidoService;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -26,35 +30,35 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class CompraDetalhesController {
-    private final CompraService compraService;
-    private final TransactionCompraService transactionService;
+public class PedidoDetalhesController {
+    private final PedidoService pedidoService;
+    private final TransactionPedidoService transactionService;
     private final String token;
-    private Compra compra;
+    private Pedido pedido;
 
     @FXML
     private StackPane rootPane;
 
     @FXML
-    private ObservableList<ItemCompra> produtosAddList;
+    private ObservableList<ItemPedido> produtosAddList;
 
     @FXML
-    private ObservableList<TransactionCompra> pagamentosAddList;
+    private ObservableList<TransactionPedido> pagamentosAddList;
 
     @FXML
-    private TableView<TransactionCompra> pagamentosTableView;
+    private TableView<TransactionPedido> pagamentosTableView;
 
     @FXML
-    private TableView<ItemCompra> produtosTableView;
+    private TableView<ItemPedido> produtosTableView;
 
     @FXML
-    private TableColumn<ItemCompra, String> produtoColumn, precoColumn, codigoColumn;
+    private TableColumn<ItemPedido, String> produtoColumn, precoColumn, codigoColumn;
 
     @FXML
-    private TableColumn<TransactionCompra, String> dataColumn, tipoColumn, valorColumn;
+    private TableColumn<TransactionPedido, String> dataColumn, tipoColumn, valorColumn;
 
     @FXML
-    private TableColumn<ItemCompra, Integer> quantidadeColumn;
+    private TableColumn<ItemPedido, Integer> quantidadeColumn;
 
     @FXML
     private ComboBox<PaymentMethod> metodoPagamento;
@@ -66,20 +70,20 @@ public class CompraDetalhesController {
     private Label totalLabel, totalItensLabel, saldoLabel, pagoLabel;
 
     @FXML
-    private Label numeroNfe, fornecedorSocialReason, dataEntrada, pagamentoErrorLabel, valorErrorLabel;
+    private Label entregadorLabel, clienteLabel, dataEntrada, pagamentoErrorLabel, valorErrorLabel;
 
-    public CompraDetalhesController(CompraService compraService, String token, Compra compra) {
-        this.compraService = compraService;
-        transactionService = new TransactionCompraService();
+    public PedidoDetalhesController(PedidoService pedidoService, String token, Pedido pedido) {
+        this.pedidoService = pedidoService;
+        transactionService = new TransactionPedidoService();
         this.token = token;
-        this.compra = compra;
+        this.pedido = pedido;
         produtosAddList = FXCollections.observableArrayList();
         pagamentosAddList = FXCollections.observableArrayList();
     }
 
     @FXML
     public void initialize() {
-        produtosAddList.addAll(compra.getItems());
+        produtosAddList.addAll(pedido.getProductOrders());
         preencherCampos();
         atualizarTotais();
         validarCampos();
@@ -90,7 +94,7 @@ public class CompraDetalhesController {
         produtoColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getProduct().getName()));
         quantidadeColumn.setCellValueFactory(cellData -> new SimpleIntegerProperty(cellData.getValue().getQuantity()).asObject());
         precoColumn.setCellValueFactory(cellData -> {
-            BigDecimal preco = cellData.getValue().getPurchasePrice();
+            BigDecimal preco = cellData.getValue().getUnitPrice();
             return new SimpleStringProperty(preco != null ? "R$ " + preco.setScale(2, RoundingMode.HALF_UP).toString().replace(".", ",") : "");
         });
 
@@ -126,16 +130,15 @@ public class CompraDetalhesController {
             try {
                 BigDecimal valor = new BigDecimal(valorField.getText().replace(",", "."));
 
-                SendPgtoCompraDto novoPagamento = new SendPgtoCompraDto();
-                novoPagamento.setAmount(valor);
-                novoPagamento.setPaymentMethod(metodoPagamento.getValue());
-                novoPagamento.setDescription("Pagamento via " + metodoPagamento.getValue() + " em: " + LocalDateTime.now());
-                Long idCompra = compra.getId();
+                SendPgtoPedidoDto novoPagamento = new SendPgtoPedidoDto();
+                novoPagamento.setReceivedAmount(valor);
+                novoPagamento.setPaymentMethod(PaymentMethod.PIX);
+                Long idCompra = pedido.getId();
 
-                compraService.cadastrarPagamento(novoPagamento, idCompra, token);
+                pedidoService.cadastrarPagamento(novoPagamento, idCompra, token);
                 limparCampos();
                 obterPagamentos();
-                atualizaCompra();
+                atualizaPedido();
                 atualizarTotais();
                 pagamentosTableView.refresh();
 
@@ -147,9 +150,9 @@ public class CompraDetalhesController {
     }
 
     private void preencherCampos() {
-        numeroNfe.setText(compra.getNfe());
-        fornecedorSocialReason.setText(compra.getSupplier().getSocialReason());
-        dataEntrada.setText(compra.getEntryAt().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+        entregadorLabel.setText(pedido.getDeliveryPerson().getName());
+        clienteLabel.setText(pedido.getCustomer().getName());
+        dataEntrada.setText(pedido.getCreatedAt().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
 
     }
 
@@ -167,13 +170,13 @@ public class CompraDetalhesController {
 
     private void obterPagamentos() {
         try {
-            List<TransactionCompra> transacoes = transactionService.buscarTransacoes(token);
+            List<TransactionPedido> transacoes = transactionService.buscarTransacoes(token);
             if (transacoes != null) {
                 pagamentosAddList.setAll(transacoes.stream()
-                    .filter(transacao -> transacao.getType() == TransactionType.EXPENSE && 
-                                         transacao.getTransactable() != null && 
-                                         transacao.getTransactable().getId().equals(compra.getId()))
-                    .collect(Collectors.toList()));
+                        .filter(transacao -> transacao.getType() == TransactionType.EXPENSE &&
+                                transacao.getTransactable() != null &&
+                                transacao.getTransactable().getId().equals(pedido.getId()))
+                        .collect(Collectors.toList()));
                 pagamentosTableView.refresh();
             }
         } catch (Exception e) {
@@ -184,7 +187,7 @@ public class CompraDetalhesController {
 
     private void atualizarTotais() {
         BigDecimal total = produtosAddList.stream()
-                .map(item -> item.getPurchasePrice().multiply(BigDecimal.valueOf(item.getQuantity())))
+                .map(item -> item.getUnitPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         int itens = produtosAddList.size();
@@ -192,14 +195,14 @@ public class CompraDetalhesController {
         totalLabel.setText("R$ " + total.setScale(2, RoundingMode.HALF_UP));
         totalItensLabel.setText(String.valueOf(itens));
 
-        saldoLabel.setText("R$ " + compra.getBalance().setScale(2, RoundingMode.HALF_UP).toString().replace(".", ","));
-        pagoLabel.setText("R$ " + compra.getPaidAmount().setScale(2, RoundingMode.HALF_UP).toString().replace(".", ","));
+        saldoLabel.setText("R$ " + pedido.getBalance().setScale(2, RoundingMode.HALF_UP).toString().replace(".", ","));
+        pagoLabel.setText("R$ " + pedido.getReceivedAmount().setScale(2, RoundingMode.HALF_UP).toString().replace(".", ","));
 
     }
 
-    private void atualizaCompra() {
+    private void atualizaPedido() {
         try {
-            this.compra = compraService.buscarCompraId(this.compra.getId(), token);
+            this.pedido = pedidoService.buscarPedidoId(this.pedido.getId(), token);
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("Erro ao atualizar compra" + e.getMessage());
@@ -245,7 +248,7 @@ public class CompraDetalhesController {
             valorErrorLabel.setManaged(false);
         }
 
-        if (valor.compareTo(compra.getBalance()) > 0) {
+        if (valor.compareTo(pedido.getBalance()) > 0) {
             valorErrorLabel.setText("Valor não permitido maior que o saldo.");
             valorErrorLabel.setVisible(true);
             valorErrorLabel.setManaged(true);

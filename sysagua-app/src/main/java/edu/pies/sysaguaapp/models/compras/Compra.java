@@ -2,7 +2,11 @@ package edu.pies.sysaguaapp.models.compras;
 
 import edu.pies.sysaguaapp.enumeration.PaymentMethod;
 import edu.pies.sysaguaapp.enumeration.PaymentStatus;
+import edu.pies.sysaguaapp.enumeration.Pedidos.PedidoStatus;
+import edu.pies.sysaguaapp.models.Clientes;
+import edu.pies.sysaguaapp.models.Entregador;
 import edu.pies.sysaguaapp.models.Fornecedor;
+import edu.pies.sysaguaapp.models.Pedido.ItemPedido;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -33,6 +37,14 @@ public class Compra {
     private String nfe;
     private String description;
     private String type;
+
+    //pedidos
+    private Clientes customer;
+    private Entregador deliveryPerson;
+    private List<ItemPedido> productOrders;
+    private PedidoStatus deliveryStatus;
+    private BigDecimal receivedAmount;
+    private String enderecoEntrega;
 
 
     public Compra() {

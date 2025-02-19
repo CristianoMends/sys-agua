@@ -8,6 +8,8 @@ import edu.pies.sysaguaapp.enumeration.Pedidos.PedidoStatus;
 import edu.pies.sysaguaapp.models.Clientes;
 import edu.pies.sysaguaapp.models.Entregador;
 
+import edu.pies.sysaguaapp.models.Fornecedor;
+import edu.pies.sysaguaapp.models.compras.ItemCompra;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,7 +20,6 @@ import java.util.List;
 
 @Getter
 @Setter
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class Pedido {
     private Long id;
     private Clientes customer;
@@ -27,20 +28,26 @@ public class Pedido {
     private PedidoStatus deliveryStatus;
     private BigDecimal receivedAmount;
     private BigDecimal totalAmount;
-    private LocalDateTime entryAt;
-
+    private BigDecimal balance;
     private PaymentMethod paymentMethod;
     private PaymentStatus paymentStatus;
-
     private LocalDateTime createdAt;
     private LocalDateTime finishedAt;
     private LocalDateTime canceledAt;
-
-    private String description;
-
-
     private String enderecoEntrega;
     private boolean active;
+    private String type;
+
+
+    //compras
+    private LocalDateTime updatedAt;
+    private List<ItemCompra> items;
+    private Fornecedor supplier;
+    private String nfe;
+    private LocalDateTime entryAt;
+    private BigDecimal paidAmount;
+    private String description;
+
 
     public Pedido(){
         productOrders = new ArrayList<>();
@@ -51,9 +58,6 @@ public class Pedido {
        productOrders = new ArrayList<>();
     }
 
-    public void setActive(boolean active){
-        this.active = active;
-    }
     public boolean getActive(){
         return active;
     }

@@ -15,7 +15,9 @@ import java.math.BigDecimal;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ItemPedido {
     private Long id;
+    private Pedido order;
     private Produto product;
     private Integer quantity;
-    private BigDecimal purchasePrice;
+    private BigDecimal unitPrice;
+    private BigDecimal totalPrice;
 }

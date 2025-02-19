@@ -7,7 +7,6 @@
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TreeTableView?>
-<?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
@@ -82,7 +81,7 @@
                                                         <Insets left="10.0" />
                                                     </padding>
                                                 </Button>
-                                                <Button fx:id="btnClearFilter" visible="false" managed="false" minHeight="28.0" minWidth="28.0" mnemonicParsing="false" onAction="#handleLimparFiltros" style="-fx-background-color: transparent;">
+                                                <Button fx:id="btnClearFilter" managed="false" minHeight="28.0" minWidth="28.0" mnemonicParsing="false" onAction="#handleLimparFiltros" style="-fx-background-color: transparent;" visible="false">
                                                     <graphic>
                                                         <ImageView fitHeight="28" fitWidth="28" pickOnBounds="true" preserveRatio="true">
                                                         </ImageView>
@@ -107,7 +106,7 @@
                         <Region HBox.hgrow="ALWAYS" />
                         <HBox alignment="BOTTOM_CENTER">
                             <children>
-                                <Button fx:id="btnAdicionar" mnemonicParsing="false" onAction="#handleAddPedido" styleClass="menu-button" text="Adicionar">
+                                <Button fx:id="btnAdicionar" minWidth="80.0" mnemonicParsing="false" onAction="#handleAddPedido" styleClass="menu-button" text="Adicionar">
                                     <padding>
                                         <Insets left="10.0" />
                                     </padding></Button>

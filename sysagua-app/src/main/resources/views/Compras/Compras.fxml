@@ -7,8 +7,6 @@
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TreeTableView?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.StackPane?>
@@ -75,13 +73,7 @@
                                           <Insets left="10.0" />
                                        </padding>
                                     </Button>
-                                     <Button fx:id="btnClearFilter" visible="false" managed="false" minHeight="28.0" minWidth="28.0" mnemonicParsing="false" onAction="#handleLimparFiltros" style="-fx-background-color: transparent;">
-                                         <graphic>
-                                             <ImageView fitHeight="28" fitWidth="28" pickOnBounds="true" preserveRatio="true">
-                                                 <Image url="@../../icons/compras/cancel.png" />
-                                             </ImageView>
-                                         </graphic>
-                                     </Button>
+                                     <Button fx:id="btnClearFilter" managed="false" minHeight="28.0" minWidth="28.0" mnemonicParsing="false" onAction="#handleLimparFiltros" style="-fx-background-color: transparent;" visible="false" />
                                  </children>
                               </HBox>
                            </children>

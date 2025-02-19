@@ -1,13 +1,16 @@
-package edu.pies.sysaguaapp.services;
+package edu.pies.sysaguaapp.services.pedido;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import edu.pies.sysaguaapp.dtos.compra.SendPgtoCompraDto;
 import edu.pies.sysaguaapp.dtos.pedido.SendPedidoDto;
+import edu.pies.sysaguaapp.dtos.pedido.SendPgtoPedidoDto;
 import edu.pies.sysaguaapp.enumeration.Pedidos.PedidoStatus;
 import edu.pies.sysaguaapp.models.Pedido.Pedido;
-import java.io.IOException;
+import edu.pies.sysaguaapp.models.compras.Compra;
+
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -59,9 +62,6 @@ public class PedidoService {
         } else {
             throw new Exception("Erro ao cadastrar: " + response.body());
         }
-
-
-
     }
 
     public static Pedido cancelarPedido(Pedido pedido, String token) throws Exception {
@@ -97,6 +97,54 @@ public class PedidoService {
             return pedido;
         } else {
             throw new Exception("Erro ao cancelar: " + response.body());
+        }
+    }
+
+    public Pedido buscarPedidoId(Long id, String token) throws Exception {
+        String urlComId = BASE_URL + "?id=" + id;
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(urlComId))
+                .GET()
+                .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer " + token)
+                .build();
+
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() == 200) {
+            if (response.body().isEmpty()) {
+                return null;
+            }
+            List<Pedido> pedidos = objectMapper.readValue(response.body(), new TypeReference<List<Pedido>>() {});
+            if (!pedidos.isEmpty()) {
+                return pedidos.get(0);
+            }
+            return null;
+        } else {
+            throw new Exception("Erro ao buscar pedido: " + response.body());
+        }
+    }
+
+    public Pedido cadastrarPagamento(SendPgtoPedidoDto pagamento, Long idPedido, String token) throws Exception {
+        String pedidoJson = objectMapper.writeValueAsString(pagamento);
+        String urlPagamento = BASE_URL + "/" + idPedido;
+        System.out.println(pedidoJson);
+        System.out.println(urlPagamento);
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(urlPagamento))
+                .PUT(HttpRequest.BodyPublishers.ofString(pedidoJson))
+                .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer " + token)
+                .build();
+
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() == 204) {
+            return null;
+        } else {
+            throw new Exception("Erro ao cadastrar pagamento: " + response.body());
         }
     }
 

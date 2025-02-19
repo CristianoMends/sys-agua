@@ -1,9 +1,8 @@
-package edu.pies.sysaguaapp.models;
+package edu.pies.sysaguaapp.models.compras;
 
 import edu.pies.sysaguaapp.enumeration.PaymentMethod;
 import edu.pies.sysaguaapp.enumeration.TransactionType;
-import edu.pies.sysaguaapp.models.Pedido.Pedido;
-import edu.pies.sysaguaapp.models.compras.Compra;
+import edu.pies.sysaguaapp.models.User;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

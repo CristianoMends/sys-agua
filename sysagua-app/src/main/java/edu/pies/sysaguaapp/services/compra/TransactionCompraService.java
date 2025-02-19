@@ -1,10 +1,10 @@
-package edu.pies.sysaguaapp.services;
+package edu.pies.sysaguaapp.services.compra;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import edu.pies.sysaguaapp.models.Transaction;
-import edu.pies.sysaguaapp.models.TransactionCompra;
+import edu.pies.sysaguaapp.models.compras.TransactionCompra;
 
 import java.net.URI;
 import java.net.http.HttpClient;

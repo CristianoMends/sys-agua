@@ -5,13 +5,13 @@ import edu.pies.sysaguaapp.dtos.pedido.ItemPedidoDto;
 import edu.pies.sysaguaapp.dtos.pedido.SendPedidoDto;
 import edu.pies.sysaguaapp.enumeration.PaymentMethod;
 import edu.pies.sysaguaapp.enumeration.PaymentStatus;
-import edu.pies.sysaguaapp.enumeration.Pedidos.PedidoStatus;
 import edu.pies.sysaguaapp.models.Clientes;
 import edu.pies.sysaguaapp.models.Entregador;
 import edu.pies.sysaguaapp.models.Estoque;
 import edu.pies.sysaguaapp.models.Pedido.ItemPedido;
 import edu.pies.sysaguaapp.models.Produto;
 import edu.pies.sysaguaapp.services.*;
+import edu.pies.sysaguaapp.services.pedido.PedidoService;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -36,9 +36,7 @@ public class AddPedidoController {
 
     private final PedidoService pedidoService;
     private final ClientesService clientesService;
-
     private final EntregadorService entregadorService;
-
     private final EstoqueService estoqueService;
     private final String token;
 
@@ -49,10 +47,7 @@ public class AddPedidoController {
     private DatePicker dataPedido;
 
     @FXML
-    private TextField valorRecebidoField, precoField, quantidadeField;
-
-    @FXML
-    private Label valorRecebidoErrorLabel;
+    private TextField precoField, quantidadeField;
 
     @FXML
     private ComboBox<Clientes> clientesComboBox;
@@ -65,9 +60,6 @@ public class AddPedidoController {
 
     @FXML
     private ComboBox<PaymentMethod> metodoPagamento;
-
-    @FXML
-    private ComboBox<PaymentStatus> statusPagamento;
 
     @FXML
     private ObservableList<ItemPedido> produtosAddList;
@@ -120,7 +112,7 @@ public class AddPedidoController {
         produtoColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getProduct().getName()));
         quantidadeColumn.setCellValueFactory(cellData -> new SimpleIntegerProperty(cellData.getValue().getQuantity()).asObject());
         precoColumn.setCellValueFactory(cellData -> {
-            BigDecimal preco = cellData.getValue().getPurchasePrice();
+            BigDecimal preco = cellData.getValue().getUnitPrice();
             return new SimpleStringProperty(preco != null ? "R$ " + preco.setScale(2, RoundingMode.HALF_UP).toString().replace(".", ",") : "");
         });
 
@@ -137,22 +129,6 @@ public class AddPedidoController {
             @Override
             public PaymentMethod fromString(String string) {
                 for (PaymentMethod metodo : PaymentMethod.values()) {
-                    if (metodo.getDescription().equals(string)) {
-                        return metodo;
-                    }
-                }
-                return null;
-            }
-        });
-        statusPagamento.setItems(FXCollections.observableArrayList(PaymentStatus.values()));
-        statusPagamento.setConverter(new StringConverter<PaymentStatus>() {
-            @Override
-            public String toString(PaymentStatus metodo) {
-                return metodo != null ? metodo.getDescription() : "";
-            }
-            @Override
-            public PaymentStatus fromString(String string) {
-                for (PaymentStatus metodo : PaymentStatus.values()) {
                     if (metodo.getDescription().equals(string)) {
                         return metodo;
                     }
@@ -195,7 +171,7 @@ public class AddPedidoController {
         if (produtoSelecionado != null) {
             novoItemPedido.setProduct(produtoSelecionado);
             novoItemPedido.setQuantity(quantidade);
-            novoItemPedido.setPurchasePrice(preco);
+            novoItemPedido.setUnitPrice(preco);
         }
 
         return novoItemPedido;
@@ -215,16 +191,16 @@ public class AddPedidoController {
                             ItemPedidoDto dto = new ItemPedidoDto();
                             dto.setProductId(item.getProduct().getId());
                             dto.setQuantity(item.getQuantity());
-                            dto.setPurchasePrice(item.getPurchasePrice());
+                            dto.setPurchasePrice(item.getUnitPrice());
                             return dto;
                         })
                         .collect(Collectors.toList());
                 novoPedido.setProductOrders(itensDto);
 
-                BigDecimal valorRecebido = new BigDecimal(valorRecebidoField.getText().replace(",", "."));
-                novoPedido.setReceivedAmount(valorRecebido);
+                novoPedido.setReceivedAmount(BigDecimal.ZERO);
+
                 BigDecimal totalAmount = produtosAddList.stream()
-                        .map(item -> item.getPurchasePrice().multiply(BigDecimal.valueOf(item.getQuantity())))
+                        .map(item -> item.getUnitPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
                         .reduce(BigDecimal.ZERO, BigDecimal::add);
                 novoPedido.setTotalAmount(totalAmount);
                 novoPedido.setPaymentMethod(metodoPagamento.getValue());
@@ -279,7 +255,7 @@ public class AddPedidoController {
 
     private void preencherCampos(ItemPedido itemSelecionado) {
         produtoComboBox.setValue(itemSelecionado.getProduct());
-        precoField.setText(itemSelecionado.getPurchasePrice().toString().replace(".",","));
+        precoField.setText(itemSelecionado.getUnitPrice().toString().replace(".",","));
         quantidadeField.setText(itemSelecionado.getQuantity().toString());
     }
 
@@ -428,7 +404,7 @@ public class AddPedidoController {
 
     private void atualizarTotais() {
         BigDecimal total = produtosAddList.stream()
-                .map(item -> item.getPurchasePrice().multiply(BigDecimal.valueOf(item.getQuantity())))
+                .map(item -> item.getUnitPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         int itens = produtosAddList.size();
