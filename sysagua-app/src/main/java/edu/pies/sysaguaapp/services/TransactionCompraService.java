@@ -23,7 +23,7 @@ public class TransactionCompraService {
         this.objectMapper.registerModule(new JavaTimeModule());
     }
 
-    public List<Transaction> buscarTransacoes(String token) throws Exception {
+    public List<TransactionCompra> buscarTransacoes(String token) throws Exception {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(BASE_URL))
                 .GET()
@@ -34,7 +34,7 @@ public class TransactionCompraService {
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
         if (response.statusCode() == 200) {
-            return objectMapper.readValue(response.body(), new TypeReference<List<Transaction>>() {
+            return objectMapper.readValue(response.body(), new TypeReference<List<TransactionCompra>>() {
             });
         } else {
             throw new Exception("Erro ao buscar: " + response.body());

@@ -99,7 +99,7 @@ public class CompraDetalhesController {
         tipoColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getPaymentMethod().getDescription()));
         valorColumn.setCellValueFactory(cellData -> {
             BigDecimal valor = cellData.getValue().getAmount();
-            return new SimpleStringProperty(valor != null ? "R$ " + valor.setScale(2, RoundingMode.HALF_UP).toString().replace(".", ",") : "");
+            return new SimpleStringProperty(valor != null ? "R$ " + valor.negate().setScale(2, RoundingMode.HALF_UP).toString().replace(".", ",") : "");
         });
 
         metodoPagamento.setItems(FXCollections.observableArrayList(PaymentMethod.values()));
@@ -167,15 +167,15 @@ public class CompraDetalhesController {
 
     private void obterPagamentos() {
         try {
-            List<TransactionCompra> transacoes = transactionService.buscarTransacaoCompraId(compra.getId(), token);
+            List<TransactionCompra> transacoes = transactionService.buscarTransacoes(token);
             if (transacoes != null) {
                 pagamentosAddList.setAll(transacoes.stream()
-                    .filter(transacao -> transacao.getType() == TransactionType.EXPENSE && transacao.getTransactable().getId().equals(compra.getId()))
+                    .filter(transacao -> transacao.getType() == TransactionType.EXPENSE && 
+                                         transacao.getTransactable() != null && 
+                                         transacao.getTransactable().getId().equals(compra.getId()))
                     .collect(Collectors.toList()));
                 pagamentosTableView.refresh();
             }
-
-
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("Erro ao obter pagamentos " + e.getMessage());
