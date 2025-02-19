@@ -52,6 +52,8 @@ public class Purchase extends Transactable {
     @PreUpdate
     private void preUpdate(){
         setActive(true);
+        calculateTotalAmount();
+        setBalance(totalAmount.subtract(paidAmount));
     }
 
     @Override

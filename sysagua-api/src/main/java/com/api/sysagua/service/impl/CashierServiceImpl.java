@@ -90,7 +90,7 @@ public class CashierServiceImpl implements CashierService {
         var user = this.userService.getLoggedUser();
         var t = new Transaction(
                 amount,
-                TransactionType.EXPENSE,
+                TransactionType.INCOME,
                 PaymentMethod.UNDEFINED,
                 description,
                 user,
