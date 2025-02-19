@@ -13,14 +13,13 @@ import java.time.LocalDateTime;
 
 @Getter @Setter
 @NoArgsConstructor
-public class Transaction {
+public class TransactionCompra {
     private Long id;
     private LocalDateTime createdAt;
     private BigDecimal amount;
     private TransactionType type;
     private String description;
     private User responsibleUser;
-    private Pedido order;
-    private Compra purchase;
+    private Compra transactable;
     private PaymentMethod paymentMethod;
 }

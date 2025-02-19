@@ -219,7 +219,7 @@ public class ProdutoController {
 
         TableColumn<Produto, String> colunaCusto = new TableColumn<>("Custo");
         colunaCusto.setCellValueFactory(cellData -> {
-            BigDecimal custo = cellData.getValue().getPrice();
+            BigDecimal custo = cellData.getValue().getCost();
             return new SimpleStringProperty(custo != null ? "R$ " + custo.setScale(4, RoundingMode.HALF_UP).toString() : "");
         });
         colunaCusto.setStyle("-fx-alignment: CENTER;");

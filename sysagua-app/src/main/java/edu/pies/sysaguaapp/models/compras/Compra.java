@@ -32,6 +32,7 @@ public class Compra {
     private PaymentStatus paymentStatus;
     private String nfe;
     private String description;
+    private String type;
 
 
     public Compra() {

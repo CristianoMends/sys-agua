@@ -17,26 +17,6 @@
 
 <StackPane fx:id="rootPane" prefHeight="600.0" prefWidth="800.0" stylesheets="@../../styles/addCompra.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1">
     <BorderPane prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: white;">
-        <top>
-            <VBox style="-fx-border-color: #C8CBD9; -fx-border-width: 0 0 1px 0;">
-                <HBox alignment="CENTER_LEFT" prefHeight="100.0" spacing="30.0" style="-fx-padding: 10;" VBox.vgrow="SOMETIMES">
-                    <children>
-                        <Label text="Detalhes da compra">
-                            <font>
-                                <Font size="18.0" />
-                            </font>
-                     <padding>
-                        <Insets left="5.0" />
-                     </padding>
-                        </Label>
-                    </children>
-                </HBox>
-                <padding>
-                    <Insets right="50.0" />
-                </padding>
-            </VBox>
-
-        </top>
         <center>
             <HBox spacing="20.0" BorderPane.alignment="CENTER">
                 <VBox maxWidth="700.0" spacing="10.0" BorderPane.alignment="CENTER" HBox.hgrow="SOMETIMES">
@@ -64,7 +44,7 @@
                         <Label fx:id="numeroNfe" minWidth="120.0" styleClass="label-field" />
                               </children>
                           </HBox>
-                  <VBox prefHeight="200.0" prefWidth="100.0" spacing="10.0">
+                  <VBox prefHeight="200.0" prefWidth="100.0" spacing="10.0" VBox.vgrow="SOMETIMES">
                      <children>
                         <Label styleClass="switchDetails" text="PAGAMENTOS">
                            <font>
@@ -82,7 +62,7 @@
                                           <ComboBox fx:id="metodoPagamento" prefWidth="150.0" />
                                        </children>
                                     </HBox>
-                                    <Label fx:id="pagamentoErrorLabel" text="Campo inválido" visible="false" managed="false" />
+                                    <Label fx:id="pagamentoErrorLabel" managed="false" text="Campo inválido" visible="false" />
                                  </children>
                               </VBox>
                               <VBox>
@@ -93,13 +73,13 @@
                                           <TextField fx:id="valorField" minWidth="80.0" />
                                        </children>
                                     </HBox>
-                                    <Label fx:id="valorErrorLabel" text="Campo inválido" visible="false" managed="false" />
+                                    <Label fx:id="valorErrorLabel" managed="false" text="Campo inválido" visible="false" />
                                  </children>
                               </VBox>
                               <Button minWidth="70.0" mnemonicParsing="false" onAction="#handleInserirPagamento" styleClass="menu-button" text="Adicionar" />
                            </children>
                         </HBox>
-                        <TableView fx:id="pagamentosTableView">
+                        <TableView fx:id="pagamentosTableView" VBox.vgrow="SOMETIMES">
                            <columns>
                               <TableColumn fx:id="dataColumn" text="Data" />
                               <TableColumn fx:id="tipoColumn" text="Tipo" />
@@ -116,14 +96,14 @@
                                     <Font name="System Bold" size="12.0" />
                                  </font>
                               </Label>
-                              <Label minWidth="50.0" text="R$ 0,00" textFill="#f99c30">
+                              <Label fx:id="saldoLabel" minWidth="50.0" text="R$ 0,00" textFill="#f99c30">
                                  <font>
                                     <Font name="System Bold" size="12.0" />
                                  </font>
                               </Label>
                               <Region HBox.hgrow="ALWAYS" />
                               <Label minWidth="80.0" text="Total pago" />
-                              <Label minWidth="80.0" text="R$ 0,00" />
+                              <Label fx:id="pagoLabel" minWidth="80.0" text="R$ 0,00" />
                            </children>
                         </HBox>
                      </children>
