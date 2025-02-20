@@ -60,8 +60,7 @@ public class HomeController implements Initializable {
 
     @FXML
     private void handleUsuario() {
-        // Lógica para abrir configurações
-        showMessage("Abrir Configurações");
+        loadView("/views/Usuario/Usuario.fxml");
     }
 
     @FXML

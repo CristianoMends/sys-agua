@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.PasswordField?>
+<StackPane fx:id="rootPane" prefHeight="600.0" prefWidth="800.0" stylesheets="@../../styles/addUsuario.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.pies.sysaguaapp.controllers.Usuarios.AddUsuarioController">
+    <BorderPane prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: white;">
+        <top>
+            <VBox style="-fx-border-color: #C8CBD9; -fx-border-width: 0 0 1px 0;">
+                <HBox alignment="CENTER_LEFT" prefHeight="100.0" spacing="30.0" style="-fx-padding: 10;" VBox.vgrow="SOMETIMES">
+                    <children>
+                        <Label text="Novo Usuário">
+                            <font>
+                                <Font size="18.0" />
+                            </font>
+                            <padding>
+                                <Insets left="30.0" />
+                            </padding>
+                        </Label>
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Button fx:id="btnCancelar" onAction="#handleCancelar" style="-fx-background-color: #FEBAC6; -fx-text-fill: #F2383A;" styleClass="menu-button" text="Cancelar" />
+                        <Button fx:id="btnSalvar" onAction="#handleSalvar" style="-fx-background-color: #DDE4F0; -fx-text-fill: #5A6ACF;" styleClass="menu-button" text="Salvar" />
+                    </children>
+                </HBox>
+                <padding>
+                    <Insets right="50.0" />
+                </padding>
+            </VBox>
+
+        </top>
+        <center>
+            <HBox BorderPane.alignment="CENTER">
+                <VBox maxWidth="700.0" spacing="20.0" BorderPane.alignment="CENTER" HBox.hgrow="SOMETIMES">
+                    <children>
+                        <Label styleClass="switchDetails" text="Usuário" />
+                        <Separator prefWidth="200.0" />
+                        <VBox alignment="CENTER" spacing="5.0">
+                            <children>
+                                <HBox spacing="10.0">
+                                    <children>
+                                        <Label minWidth="120.0" styleClass="label-field" text="NOME" />
+                                        <TextField fx:id="nomeField" styleClass="text-field" HBox.hgrow="ALWAYS" />
+                                    </children>
+                                </HBox>
+                                <Label fx:id="nomeErrorLabel" managed="false" style="-fx-text-fill: red;" text="Campo inválido" visible="false" />
+                            </children>
+                        </VBox>
+                        <VBox alignment="CENTER" spacing="5.0">
+                            <children>
+                                <HBox spacing="10.0">
+                                    <children>
+                                        <Label minWidth="120.0" styleClass="label-field" text="SOBRENOME" />
+                                        <TextField fx:id="surnameField" styleClass="text-field" HBox.hgrow="ALWAYS" />
+                                    </children>
+                                </HBox>
+                                <Label fx:id="surnameErrorLabel" managed="false" style="-fx-text-fill: red;" text="Campo inválido" visible="false" />
+                            </children>
+                        </VBox>
+                        <VBox alignment="CENTER" spacing="5.0">
+                            <children>
+                                <HBox spacing="10.0">
+                                    <children>
+                                        <Label minWidth="120.0" styleClass="label-field" text="TELEFONE" />
+                                        <TextField fx:id="phoneField" maxWidth="1.7976931348623157E308" styleClass="text-field" HBox.hgrow="ALWAYS" />
+                                    </children>
+                                </HBox>
+                                <Label fx:id="phoneErrorLabel" managed="false" style="-fx-text-fill: red;" text="Campo inválido" visible="false" />
+                            </children>
+                        </VBox>
+                        <VBox alignment="CENTER" spacing="5.0">
+                            <children>
+                                <HBox alignment="CENTER_LEFT" spacing="10.0" VBox.vgrow="SOMETIMES">
+                                    <children>
+                                        <Label minWidth="120.0" styleClass="label-field" text="CARGO" />
+                                        <ComboBox fx:id="acessComboBox" promptText="Cargo" styleClass="combo-box" HBox.hgrow="ALWAYS" />
+                                    </children>
+                                </HBox>
+                            </children>
+                        </VBox>
+                        <VBox alignment="CENTER" spacing="5.0">
+                            <children>
+                                <HBox spacing="10.0">
+                                    <children>
+                                        <Label minWidth="120.0" styleClass="label-field" text="E-MAIL" />
+                                        <TextField fx:id="emailField" styleClass="text-field" HBox.hgrow="ALWAYS" />
+                                    </children>
+                                </HBox>
+                                <Label fx:id="emailErrorLabel" managed="false" style="-fx-text-fill: red;" text="Campo inválido" visible="false" />
+                            </children>
+                        </VBox>
+                        <VBox alignment="CENTER" spacing="5.0">
+                            <children>
+                                <HBox spacing="10.0">
+                                    <children>
+                                        <Label minWidth="120.0" styleClass="label-field" text="SENHA" />
+                                        <TextField fx:id="senhaField" styleClass="text-field" HBox.hgrow="ALWAYS" />
+                                    </children>
+                                </HBox>
+                                <Label fx:id="senhaErrorLabel" managed="false" style="-fx-text-fill: red;" text="A senha deve ter pelo menos 8 caracteres, incluir uma letra maiúscula, uma minúscula, um número e um caractere especial." visible="false" wrapText="true" maxWidth="300"/>
+                            </children>
+                        </VBox>
+                    </children>
+                    <padding>
+                        <Insets left="55.0" />
+                    </padding>
+                    <opaqueInsets>
+                        <Insets top="100.0" />
+                    </opaqueInsets>
+                </VBox>
+
+                <padding>
+                    <Insets right="50.0" top="30.0" />
+                </padding>
+                <opaqueInsets>
+                    <Insets />
+                </opaqueInsets>
+            </HBox>
+        </center>
+    </BorderPane>
+</StackPane>
