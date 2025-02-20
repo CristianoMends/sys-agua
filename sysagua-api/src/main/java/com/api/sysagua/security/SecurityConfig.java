@@ -63,7 +63,7 @@ public class SecurityConfig {
     }
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return PasswordEncoderSingleton.getEncoder();
+        return PasswordEncoderSingleton.getInstance().getEncoder();
     }
 
 }
