@@ -17,7 +17,7 @@ public interface StockHistoryRepository extends JpaRepository<StockHistory, Long
             and (:type is null or s.type = :type ) 
             and ((:quantityStart is null or :quantityEnd is null) or s.quantity between :quantityStart and :quantityEnd ) 
             and ((CAST(:dateStart AS TIMESTAMP) is null or CAST(:dateEnd AS TIMESTAMP) is null) or s.date between :dateStart and :dateEnd ) 
-            and (:description is null or s.description like concat('%', :description, '%') ) 
+            and ((:description is null or :description = '') or s.description like concat('%', :description, '%') ) 
             and (:responsibleUserId is null or s.responsibleUser.id = :responsibleUserId ) 
             and (:stockId is null or s.stock.id = :stockId )
             and (:productId is null or s.stock.product.id = :productId )

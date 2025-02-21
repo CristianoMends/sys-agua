@@ -18,7 +18,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
             where (:id is null or t.id = :id) 
             and ((:amountStart is null or :amountEnd is null) or t.amount between :amountStart and :amountEnd) 
             and (:type is null or t.type = :type) 
-            and (:description is null or t.description like concat('%', :description, '%')) 
+            and ((:description is null or :description = '') or t.description like concat('%', :description, '%')) 
             and (:orderId is null or t.order.id = :orderId)
             and (:purchaseId is null or t.purchase.id = :purchaseId)
             and (:responsibleUserId is null or t.responsibleUser.id = :responsibleUserId )            
