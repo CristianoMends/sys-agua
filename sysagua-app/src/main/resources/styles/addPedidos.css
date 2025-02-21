@@ -125,6 +125,6 @@
 
 /*---------- pagination ----------*/
 
-#tabelaCompra .agrupamento {
+#tabelaPedido .agrupamento {
     -fx-background-color: red; /* Cor de fundo do agrupamento */
 }

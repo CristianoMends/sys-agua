@@ -44,9 +44,6 @@ public class AddPedidoController {
     private StackPane rootPane;
 
     @FXML
-    private DatePicker dataPedido;
-
-    @FXML
     private TextField precoField, quantidadeField;
 
     @FXML
@@ -163,15 +160,20 @@ public class AddPedidoController {
 
     private ItemPedido criarItemPedido() {
         Produto produtoSelecionado = produtoComboBox.getValue();
-        BigDecimal preco = new BigDecimal(precoField.getText().replace(",", "."));
         int quantidade = Integer.parseInt(quantidadeField.getText());
+        String precoDigitado = precoField.getText().replace(",", ".");
 
         ItemPedido novoItemPedido = new ItemPedido();
-
         if (produtoSelecionado != null) {
             novoItemPedido.setProduct(produtoSelecionado);
             novoItemPedido.setQuantity(quantidade);
-            novoItemPedido.setUnitPrice(preco);
+
+            if (precoDigitado != null && !precoDigitado.trim().isEmpty()) {
+                BigDecimal preco = new BigDecimal(precoDigitado);
+                novoItemPedido.setUnitPrice(preco);
+            } else {
+                novoItemPedido.setUnitPrice(produtoSelecionado.getPrice());
+            }
         }
 
         return novoItemPedido;
@@ -183,9 +185,10 @@ public class AddPedidoController {
         if (validarFormPedido()){
             try {
                 SendPedidoDto novoPedido = new SendPedidoDto();
-                novoPedido.setDataPedido(dataPedido.getValue());
+
                 novoPedido.setCustomerId(clientesComboBox.getValue().getId());
                 novoPedido.setDeliveryPersonId(entregadorComboBox.getValue().getId());
+
                 List<ItemPedidoDto> itensDto = produtosAddList.stream()
                         .map(item -> {
                             ItemPedidoDto dto = new ItemPedidoDto();
@@ -203,8 +206,10 @@ public class AddPedidoController {
                         .map(item -> item.getUnitPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
                         .reduce(BigDecimal.ZERO, BigDecimal::add);
                 novoPedido.setTotalAmount(totalAmount);
+
                 novoPedido.setPaymentMethod(metodoPagamento.getValue());
                 novoPedido.setDescription("Sem descrição");
+
                 pedidoService.criarPedido(novoPedido, token);
                 clearAllForm();
                 carregarTela("/views/Pedidos/Pedido.fxml");
@@ -430,15 +435,6 @@ public class AddPedidoController {
             produtoErrorLabel.setManaged(false);
         }
 
-        if (precoField.getText().trim().isEmpty()) {
-            precoErrorLabel.setText("Preço é obrigatória.");
-            precoErrorLabel.setVisible(true);
-            precoErrorLabel.setManaged(true);
-            isValid = false;
-        } else {
-            precoErrorLabel.setVisible(false);
-            precoErrorLabel.setManaged(false);
-        }
 
         if (quantidadeField.getText().trim().isEmpty()) {
             quantidadeErrorLabel.setText("Quantidade é obrigatório.");
@@ -448,18 +444,6 @@ public class AddPedidoController {
         } else {
             quantidadeErrorLabel.setVisible(false);
             quantidadeErrorLabel.setManaged(false);
-        }
-
-        BigDecimal preco = new BigDecimal(precoField.getText().replace(",", "."));
-
-        if (preco.compareTo(BigDecimal.ZERO) == 0) {
-            precoErrorLabel.setText("Campo não pode ser zero.");
-            precoErrorLabel.setVisible(true);
-            precoErrorLabel.setManaged(true);
-            isValid = false;
-        } else {
-            precoErrorLabel.setVisible(false);
-            precoErrorLabel.setManaged(false);
         }
 
         if (Integer.parseInt(quantidadeField.getText().trim()) == 0) {
@@ -525,21 +509,6 @@ public class AddPedidoController {
         } else {
             entregadorErrorLabel.setVisible(false);
             entregadorErrorLabel.setManaged(false);
-        }
-
-        if (dataPedido.getValue() == null) {
-            dataErrorLabel.setText("Data é obrigatória.");
-            dataErrorLabel.setVisible(true);
-            dataErrorLabel.setManaged(true);
-            isValid = false;
-        } else if (dataPedido.getValue().isAfter(LocalDate.now())) {
-            dataErrorLabel.setText("Data do Pedido não pode ser uma data futura.");
-            dataErrorLabel.setVisible(true);
-            dataErrorLabel.setManaged(true);
-            isValid = false;
-        } else {
-            dataErrorLabel.setVisible(false);
-            dataErrorLabel.setManaged(false);
         }
 
         return isValid;
