@@ -10,7 +10,7 @@ import edu.pies.sysaguaapp.models.Estoque;
 import edu.pies.sysaguaapp.models.Pedido.ItemPedido;
 import edu.pies.sysaguaapp.models.produto.Produto;
 import edu.pies.sysaguaapp.services.*;
-import edu.pies.sysaguaapp.services.pedido.PedidoService;
+import edu.pies.sysaguaapp.services.PedidoService;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;

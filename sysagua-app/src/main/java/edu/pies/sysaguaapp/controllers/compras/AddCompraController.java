@@ -7,7 +7,7 @@ import edu.pies.sysaguaapp.enumeration.PaymentMethod;
 import edu.pies.sysaguaapp.models.Fornecedor;
 import edu.pies.sysaguaapp.models.produto.Produto;
 import edu.pies.sysaguaapp.models.compras.ItemCompra;
-import edu.pies.sysaguaapp.services.compra.CompraService;
+import edu.pies.sysaguaapp.services.CompraService;
 import edu.pies.sysaguaapp.services.FornecedorService;
 import edu.pies.sysaguaapp.services.TokenManager;
 import edu.pies.sysaguaapp.services.produto.ProdutoService;
