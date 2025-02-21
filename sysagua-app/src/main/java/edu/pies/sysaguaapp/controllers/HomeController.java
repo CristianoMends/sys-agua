@@ -95,7 +95,7 @@ public class HomeController implements Initializable {
 
     @FXML
     private void handleFinanceiro() {
-        showMessage("Caixa");
+        loadView("/views/Financeiro.fxml");
     }
 
     @FXML
