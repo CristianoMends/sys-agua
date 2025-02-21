@@ -1,5 +1,6 @@
 package com.api.sysagua.dto.purchase;
 
+import com.api.sysagua.dto.productItem.ViewProductItemDto;
 import com.api.sysagua.dto.transaction.ViewTransactableDto;
 import com.api.sysagua.enumeration.PaymentMethod;
 import com.api.sysagua.enumeration.PaymentStatus;
@@ -60,12 +61,11 @@ public class ViewPurchaseDto extends ViewTransactableDto {
     @Schema(description = "Se a compra está ativa no sistema", example = "2025-01-14T10:00:00Z")
     private Boolean active;
 
-    @Schema(description = "Lista de itens comprados com os detalhes do produto",
-            implementation = ViewProductPurchaseDto.class)
-    private List<ViewProductPurchaseDto> items;
-
     @Schema(description = "Fornecedor da compra", implementation = Supplier.class)
     private Supplier supplier;
 
+    @Schema(description = "Lista de itens comprados com os detalhes do produto",
+            implementation = ViewProductItemDto.class)
+    private List<ViewProductItemDto> items;
 
 }

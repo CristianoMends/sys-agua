@@ -1,12 +1,10 @@
 package com.api.sysagua.service;
 
 import com.api.sysagua.dto.purchase.CreatePurchaseDto;
-import com.api.sysagua.dto.purchase.UpdatePurchaseDto;
 import com.api.sysagua.dto.purchase.ViewPurchaseDto;
 import com.api.sysagua.dto.transaction.CreateTransactionDto;
 import com.api.sysagua.enumeration.PaymentMethod;
 import com.api.sysagua.enumeration.PaymentStatus;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
