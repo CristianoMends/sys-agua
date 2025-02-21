@@ -10,6 +10,7 @@ import edu.pies.sysaguaapp.models.Entregador;
 
 import edu.pies.sysaguaapp.models.Fornecedor;
 import edu.pies.sysaguaapp.models.compras.ItemCompra;
+import edu.pies.sysaguaapp.models.Transactable;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -20,7 +21,8 @@ import java.util.List;
 
 @Getter
 @Setter
-public class Pedido {
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class Pedido extends Transactable {
     private Long id;
     private Clientes customer;
     private Entregador deliveryPerson;
@@ -36,17 +38,7 @@ public class Pedido {
     private LocalDateTime canceledAt;
     private String enderecoEntrega;
     private boolean active;
-    private String type;
-
-
-    //compras
-    private LocalDateTime updatedAt;
-    private List<ItemCompra> items;
-    private Fornecedor supplier;
-    private String nfe;
-    private LocalDateTime entryAt;
-    private BigDecimal paidAmount;
-    private String description;
+    private final String type = "order";
 
 
     public Pedido(){
@@ -60,5 +52,14 @@ public class Pedido {
 
     public boolean getActive(){
         return active;
+    }
+
+    @Override
+    public void calculateTotalAmount() {
+        if (getTotalAmount() != null) return;
+
+        this.totalAmount = productOrders.stream()
+                .map(p -> p.getUnitPrice().multiply(BigDecimal.valueOf(p.getQuantity())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 }

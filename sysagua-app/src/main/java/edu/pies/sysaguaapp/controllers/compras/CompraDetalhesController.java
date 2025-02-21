@@ -3,11 +3,11 @@ package edu.pies.sysaguaapp.controllers.compras;
 import edu.pies.sysaguaapp.dtos.compra.SendPgtoCompraDto;
 import edu.pies.sysaguaapp.enumeration.PaymentMethod;
 import edu.pies.sysaguaapp.enumeration.TransactionType;
-import edu.pies.sysaguaapp.models.compras.TransactionCompra;
+import edu.pies.sysaguaapp.models.Transaction;
 import edu.pies.sysaguaapp.models.compras.Compra;
 import edu.pies.sysaguaapp.models.compras.ItemCompra;
-import edu.pies.sysaguaapp.services.compra.CompraService;
-import edu.pies.sysaguaapp.services.compra.TransactionCompraService;
+import edu.pies.sysaguaapp.services.TransactionService;
+import edu.pies.sysaguaapp.services.CompraService;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 
 public class CompraDetalhesController {
     private final CompraService compraService;
-    private final TransactionCompraService transactionService;
+    private final TransactionService transactionService;
     private final String token;
     private Compra compra;
 
@@ -39,10 +39,10 @@ public class CompraDetalhesController {
     private ObservableList<ItemCompra> produtosAddList;
 
     @FXML
-    private ObservableList<TransactionCompra> pagamentosAddList;
+    private ObservableList<Transaction> pagamentosAddList;
 
     @FXML
-    private TableView<TransactionCompra> pagamentosTableView;
+    private TableView<Transaction> pagamentosTableView;
 
     @FXML
     private TableView<ItemCompra> produtosTableView;
@@ -51,7 +51,7 @@ public class CompraDetalhesController {
     private TableColumn<ItemCompra, String> produtoColumn, precoColumn, codigoColumn;
 
     @FXML
-    private TableColumn<TransactionCompra, String> dataColumn, tipoColumn, valorColumn;
+    private TableColumn<Transaction, String> dataColumn, tipoColumn, valorColumn;
 
     @FXML
     private TableColumn<ItemCompra, Integer> quantidadeColumn;
@@ -70,7 +70,7 @@ public class CompraDetalhesController {
 
     public CompraDetalhesController(CompraService compraService, String token, Compra compra) {
         this.compraService = compraService;
-        transactionService = new TransactionCompraService();
+        transactionService = new TransactionService();
         this.token = token;
         this.compra = compra;
         produtosAddList = FXCollections.observableArrayList();
@@ -80,6 +80,7 @@ public class CompraDetalhesController {
     @FXML
     public void initialize() {
         produtosAddList.addAll(compra.getItems());
+        atualizaCompra();
         preencherCampos();
         atualizarTotais();
         validarCampos();
@@ -167,7 +168,7 @@ public class CompraDetalhesController {
 
     private void obterPagamentos() {
         try {
-            List<TransactionCompra> transacoes = transactionService.buscarTransacoes(token);
+            List<Transaction> transacoes = transactionService.buscarTransacoes(token);
             if (transacoes != null) {
                 pagamentosAddList.setAll(transacoes.stream()
                     .filter(transacao -> transacao.getType() == TransactionType.EXPENSE && 

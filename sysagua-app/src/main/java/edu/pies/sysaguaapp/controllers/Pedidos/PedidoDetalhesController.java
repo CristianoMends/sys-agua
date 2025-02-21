@@ -1,17 +1,13 @@
 package edu.pies.sysaguaapp.controllers.Pedidos;
 
-import edu.pies.sysaguaapp.dtos.compra.SendPgtoCompraDto;
 import edu.pies.sysaguaapp.dtos.pedido.SendPgtoPedidoDto;
 import edu.pies.sysaguaapp.enumeration.PaymentMethod;
 import edu.pies.sysaguaapp.enumeration.TransactionType;
 import edu.pies.sysaguaapp.models.Pedido.ItemPedido;
 import edu.pies.sysaguaapp.models.Pedido.Pedido;
-import edu.pies.sysaguaapp.models.Pedido.TransactionPedido;
-import edu.pies.sysaguaapp.models.compras.TransactionCompra;
-import edu.pies.sysaguaapp.models.compras.Compra;
-import edu.pies.sysaguaapp.services.pedido.PedidoService;
-import edu.pies.sysaguaapp.services.compra.TransactionCompraService;
-import edu.pies.sysaguaapp.services.pedido.TransactionPedidoService;
+import edu.pies.sysaguaapp.models.Transaction;
+import edu.pies.sysaguaapp.services.TransactionService;
+import edu.pies.sysaguaapp.services.PedidoService;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -25,14 +21,13 @@ import javafx.util.StringConverter;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class PedidoDetalhesController {
     private final PedidoService pedidoService;
-    private final TransactionPedidoService transactionService;
+    private final TransactionService transactionService;
     private final String token;
     private Pedido pedido;
 
@@ -43,10 +38,10 @@ public class PedidoDetalhesController {
     private ObservableList<ItemPedido> produtosAddList;
 
     @FXML
-    private ObservableList<TransactionPedido> pagamentosAddList;
+    private ObservableList<Transaction> pagamentosAddList;
 
     @FXML
-    private TableView<TransactionPedido> pagamentosTableView;
+    private TableView<Transaction> pagamentosTableView;
 
     @FXML
     private TableView<ItemPedido> produtosTableView;
@@ -55,7 +50,7 @@ public class PedidoDetalhesController {
     private TableColumn<ItemPedido, String> produtoColumn, precoColumn, codigoColumn;
 
     @FXML
-    private TableColumn<TransactionPedido, String> dataColumn, tipoColumn, valorColumn;
+    private TableColumn<Transaction, String> dataColumn, tipoColumn, valorColumn;
 
     @FXML
     private TableColumn<ItemPedido, Integer> quantidadeColumn;
@@ -74,7 +69,7 @@ public class PedidoDetalhesController {
 
     public PedidoDetalhesController(PedidoService pedidoService, String token, Pedido pedido) {
         this.pedidoService = pedidoService;
-        transactionService = new TransactionPedidoService();
+        transactionService = new TransactionService();
         this.token = token;
         this.pedido = pedido;
         produtosAddList = FXCollections.observableArrayList();
@@ -172,7 +167,7 @@ public class PedidoDetalhesController {
 
     private void obterPagamentos() {
         try {
-            List<TransactionPedido> transacoes = transactionService.buscarTransacoes(token);
+            List<Transaction> transacoes = transactionService.buscarTransacoes(token);
             if (transacoes != null) {
                 pagamentosAddList.setAll(transacoes.stream()
                         .filter(transacao -> transacao.getType() == TransactionType.INCOME &&

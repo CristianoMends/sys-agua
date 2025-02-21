@@ -6,7 +6,7 @@ import edu.pies.sysaguaapp.models.Clientes;
 import edu.pies.sysaguaapp.models.Entregador;
 import edu.pies.sysaguaapp.models.Pedido.Pedido;
 import edu.pies.sysaguaapp.services.ClientesService;
-import edu.pies.sysaguaapp.services.pedido.PedidoService;
+import edu.pies.sysaguaapp.services.PedidoService;
 import edu.pies.sysaguaapp.services.EntregadorService;
 import edu.pies.sysaguaapp.services.TokenManager;
 import javafx.animation.PauseTransition;
