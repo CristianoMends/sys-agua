@@ -2,6 +2,7 @@ package com.api.sysagua.service;
 
 import com.api.sysagua.dto.stock.AddProductDto;
 import com.api.sysagua.dto.stock.UpdateStockDto;
+import com.api.sysagua.model.Product;
 import com.api.sysagua.model.Stock;
 
 import java.time.LocalDateTime;
@@ -11,7 +12,9 @@ public interface StockService {
 
     void addProduct(AddProductDto dto);
 
-    void removeProduct(AddProductDto dto);
+    void addWithdraw(int quantity, Product product);
+
+    void processStockReturn(Long productId, int quantity, String reason);
 
     List<Stock> getStock(Long id,
                          Integer initialQuantityStart,
