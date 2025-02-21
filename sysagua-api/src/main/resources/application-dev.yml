@@ -43,6 +43,10 @@ security:
     key: qwe123  # Chave para segurança (pode ser modificada conforme necessidade)
     expiration: 3  # Expiração dos tokens em horas
 
+default-user:
+  password: senha123
+  email: usuario@gmail.com
+
 logging:
   level:
     org:
