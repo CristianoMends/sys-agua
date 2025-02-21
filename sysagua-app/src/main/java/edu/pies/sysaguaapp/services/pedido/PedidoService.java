@@ -129,8 +129,6 @@ public class PedidoService {
     public Pedido cadastrarPagamento(SendPgtoPedidoDto pagamento, Long idPedido, String token) throws Exception {
         String pedidoJson = objectMapper.writeValueAsString(pagamento);
         String urlPagamento = BASE_URL + "/" + idPedido;
-        System.out.println(pedidoJson);
-        System.out.println(urlPagamento);
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(urlPagamento))
