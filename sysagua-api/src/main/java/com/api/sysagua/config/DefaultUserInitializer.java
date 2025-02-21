@@ -11,10 +11,11 @@ import com.api.sysagua.repository.UserRepository;
 
 @Component
 public class DefaultUserInitializer implements CommandLineRunner {
-    @Value("${DEFAULT_EMAIL}")
+
+    @Value("${default-user.email}")
     String defaultEmail;
 
-    @Value("${DEFAULT_PASSWORD}")
+    @Value("${default-user.password}")
     String defaultPassword;
 
     @Autowired
@@ -23,20 +24,16 @@ public class DefaultUserInitializer implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
 
-        if (userRepository.findByEmail(defaultEmail).isEmpty()) {
-
+        if (userRepository.count() == 0) {
             User defaultUser = new User.Builder()
-                    .withName("Desenvolvedor")
+                    .withName("usuario")
                     .withEmail(defaultEmail)
                     .withPassword(defaultPassword)
                     .withStatus(UserStatus.ACTIVE)
-                    .withAccess(UserAccess.DEVELOPER)
+                    .withAccess(UserAccess.OWNER)
                     .build();
 
             userRepository.save(defaultUser);
-            System.out.println("Default User created successfully!");
-        } else {
-            System.out.println("Default user already exists");
         }
     }
 }
