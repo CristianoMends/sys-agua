@@ -4,6 +4,7 @@ import com.api.sysagua.dto.stock.AddProductDto;
 import com.api.sysagua.dto.stock.UpdateStockDto;
 import com.api.sysagua.enumeration.MovementType;
 import com.api.sysagua.exception.BusinessException;
+import com.api.sysagua.model.Product;
 import com.api.sysagua.model.Stock;
 import com.api.sysagua.observer.StockObserver;
 import com.api.sysagua.observer.StockSubject;
@@ -91,20 +92,39 @@ public class StockServiceImpl implements StockService, StockSubject {
         var saved = this.stockRepository.save(newStock);
         notifyObservers(saved, MovementType.ENTRY, dto.getQuantity(), "Criação de estoque");
     }
+    @Override
+    public void addWithdraw(int quantity, Product product) {
+        var stock = this.stockRepository.findProduct(product.getId()).orElseThrow(
+                () -> new BusinessException("Stock by product not found", HttpStatus.NOT_FOUND)
+        );
+        stock.setTotalWithdrawals(stock.getTotalWithdrawals() + quantity);
+        var saved = this.stockRepository.save(stock);
+        notifyObservers(saved, MovementType.WITHDRAWAL, quantity, "Saída por venda");
+    }
 
     @Override
-    public void removeProduct(AddProductDto dto) {
-
-        var stock = this.stockRepository.findProduct(dto.getProductId());
+    public void processStockReturn(Long productId, int quantity, String reason) {
+        var stock = this.stockRepository.findProduct(productId);
 
         if (stock.isPresent()) {
-            stock.get().setTotalEntries(stock.get().getTotalEntries() - dto.getQuantity());
-            stock.get().setUpdatedAt(getCurrentTimestamp());
-            var saved = this.stockRepository.save(stock.get());
+            var productStock = stock.get();
+            int newTotalEntries = productStock.getTotalEntries() + quantity; // quantity pode ser positivo ou negativo
 
-            notifyObservers(saved, MovementType.WITHDRAWAL, dto.getQuantity(), "Estorno de produto");
+            if (newTotalEntries < 0) {
+                throw new IllegalArgumentException("Não é possível ter estoque negativo.");
+            }
+
+            productStock.setTotalEntries(newTotalEntries);
+            productStock.setUpdatedAt(getCurrentTimestamp());
+
+            var saved = this.stockRepository.save(productStock);
+
+            // Determinar se é entrada ou saída para a notificação
+            MovementType movementType = (quantity > 0) ? MovementType.ENTRY : MovementType.WITHDRAWAL;
+            notifyObservers(saved, movementType, Math.abs(quantity), reason);
         }
     }
+
 
     @Override
     public List<Stock> getStock(Long id,
