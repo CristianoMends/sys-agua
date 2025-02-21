@@ -1,5 +1,6 @@
 package com.api.sysagua.dto.order;
 
+import com.api.sysagua.dto.productItem.ViewProductItemDto;
 import com.api.sysagua.dto.transaction.ViewTransactableDto;
 import com.api.sysagua.enumeration.DeliveryStatus;
 import com.api.sysagua.enumeration.PaymentMethod;
@@ -33,7 +34,7 @@ public class ViewOrderDto extends ViewTransactableDto {
     private PaymentStatus paymentStatus;
 
     @Schema(description = "Valor recebido do pedido", example = "50.00")
-    private BigDecimal receivedAmount;
+    private BigDecimal paidAmount;
 
     @Schema(description = "Valor total do pedido", example = "80.00")
     private BigDecimal totalAmount;
@@ -62,6 +63,7 @@ public class ViewOrderDto extends ViewTransactableDto {
     @Schema(description = "Dados do entregador responsável pelo pedido")
     private DeliveryPerson deliveryPerson;
 
-    @Schema(description = "Lista de produtos incluídos no pedido")
-    private List<ViewProductOrderDto> productOrders;
+    @Schema(description = "Lista de produtos incluídos no pedido",
+            implementation = ViewProductItemDto.class)
+    private List<ViewProductItemDto> productOrders;
 }
