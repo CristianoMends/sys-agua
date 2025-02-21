@@ -1,6 +1,6 @@
 package com.api.sysagua.factory;
 
-import com.api.sysagua.dto.purchase.CreateProductPurchaseDto;
+import com.api.sysagua.dto.productItem.CreateProductItemDto;
 import com.api.sysagua.dto.purchase.CreatePurchaseDto;
 import com.api.sysagua.enumeration.PaymentStatus;
 import com.api.sysagua.exception.BusinessException;
@@ -11,6 +11,7 @@ import com.api.sysagua.repository.ProductRepository;
 import com.api.sysagua.repository.PurchaseRepository;
 import com.api.sysagua.repository.SupplierRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -29,7 +30,7 @@ public class PurchaseFactoryImpl implements PurchaseFactory {
     @Override
     public Purchase createPurchase(CreatePurchaseDto dto) {
         var purchase = new Purchase();
-        var supplier = supplierRepository.findById(dto.getSupplierId()).orElseThrow();
+        var supplier = supplierRepository.findById(dto.getSupplierId()).orElseThrow(()-> new BusinessException("Supplier not found", HttpStatus.NOT_FOUND));
         if (!supplier.getActive()) throw new BusinessException("Supplier is inactive");
         purchase.setSupplier(supplier);
         purchase.setProductPurchases(createProductPurchases(dto.getItems(), purchase));
@@ -43,11 +44,11 @@ public class PurchaseFactoryImpl implements PurchaseFactory {
         return purchase;
     }
 
-    private List<ProductPurchase> createProductPurchases(List<CreateProductPurchaseDto> productDtos, Purchase purchase) {
+    private List<ProductPurchase> createProductPurchases(List<CreateProductItemDto> productDtos, Purchase purchase) {
         List<ProductPurchase> productPurchases = new ArrayList<>();
         productDtos.forEach(dto -> {
             Product product = productRepository.findById(dto.getProductId()).orElseThrow();
-            productPurchases.add(new ProductPurchase(purchase, product, dto.getQuantity(), dto.getPurchasePrice()));
+            productPurchases.add(new ProductPurchase(purchase, product, dto.getQuantity(), dto.getUnitPrice() != null ? dto.getUnitPrice() : product.getPrice()));
         });
         return productPurchases;
     }
