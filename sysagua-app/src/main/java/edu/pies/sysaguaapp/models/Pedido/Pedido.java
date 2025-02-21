@@ -53,8 +53,8 @@ public class Pedido {
         productOrders = new ArrayList<>();
     }
 
-    public Pedido(LocalDateTime entryAt){
-       this.entryAt = entryAt;
+    public Pedido(LocalDateTime createdAt){
+       this.createdAt = createdAt;
        productOrders = new ArrayList<>();
     }
 

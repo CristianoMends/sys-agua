@@ -218,7 +218,6 @@ public class PedidoController {
                     super.updateItem(item, empty);
 
                     if (item != null && getTreeItem() != null) {
-
                         if (getTreeItem().getParent() == null) {
 
                             setStyle("-fx-background-color: red");
@@ -356,7 +355,7 @@ public class PedidoController {
             Map<LocalDate, TreeItem<Pedido>> gruposPorData = new LinkedHashMap<>();
             for (Pedido pedido : listaPedido) {
                 LocalDate data = pedido.getCreatedAt().toLocalDate();
-                gruposPorData.putIfAbsent(data, new TreeItem<>(new Pedido()));
+                gruposPorData.putIfAbsent(data, new TreeItem<>(new Pedido(data.atStartOfDay())));
                 gruposPorData.get(data).getChildren().add(new TreeItem<>(pedido));
             }
             TreeItem<Pedido> root = new TreeItem<>(new Pedido());

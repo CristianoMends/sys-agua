@@ -67,7 +67,7 @@ public class PedidoDetalhesController {
     private TextField valorField;
 
     @FXML
-    private Label totalLabel, totalItensLabel, saldoLabel, pagoLabel;
+    private Label totalLabel, totalItensLabel, saldoLabel, pagoLabel, pedidoIdLabel;
 
     @FXML
     private Label entregadorLabel, clienteLabel, dataEntrada, pagamentoErrorLabel, valorErrorLabel;
@@ -84,10 +84,11 @@ public class PedidoDetalhesController {
     @FXML
     public void initialize() {
         produtosAddList.addAll(pedido.getProductOrders());
+        atualizaPedido();
         preencherCampos();
-        atualizarTotais();
         validarCampos();
         obterPagamentos();
+        atualizarTotais();
 
         produtosTableView.setItems(produtosAddList);
         codigoColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getProduct().getId().toString()));
@@ -103,7 +104,7 @@ public class PedidoDetalhesController {
         tipoColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getPaymentMethod().getDescription()));
         valorColumn.setCellValueFactory(cellData -> {
             BigDecimal valor = cellData.getValue().getAmount();
-            return new SimpleStringProperty(valor != null ? "R$ " + valor.negate().setScale(2, RoundingMode.HALF_UP).toString().replace(".", ",") : "");
+            return new SimpleStringProperty(valor != null ? "R$ " + valor.setScale(2, RoundingMode.HALF_UP).toString().replace(".", ",") : "");
         });
 
         metodoPagamento.setItems(FXCollections.observableArrayList(PaymentMethod.values()));
@@ -153,6 +154,7 @@ public class PedidoDetalhesController {
         entregadorLabel.setText(pedido.getDeliveryPerson().getName());
         clienteLabel.setText(pedido.getCustomer().getName());
         dataEntrada.setText(pedido.getCreatedAt().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+        pedidoIdLabel.setText("N° " + pedido.getId());
 
     }
 
@@ -173,7 +175,7 @@ public class PedidoDetalhesController {
             List<TransactionPedido> transacoes = transactionService.buscarTransacoes(token);
             if (transacoes != null) {
                 pagamentosAddList.setAll(transacoes.stream()
-                        .filter(transacao -> transacao.getType() == TransactionType.EXPENSE &&
+                        .filter(transacao -> transacao.getType() == TransactionType.INCOME &&
                                 transacao.getTransactable() != null &&
                                 transacao.getTransactable().getId().equals(pedido.getId()))
                         .collect(Collectors.toList()));
