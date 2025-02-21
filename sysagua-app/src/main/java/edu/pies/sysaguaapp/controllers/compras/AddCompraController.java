@@ -5,7 +5,7 @@ import edu.pies.sysaguaapp.dtos.compra.ItemCompraDto;
 import edu.pies.sysaguaapp.dtos.compra.SendCompraDto;
 import edu.pies.sysaguaapp.enumeration.PaymentMethod;
 import edu.pies.sysaguaapp.models.Fornecedor;
-import edu.pies.sysaguaapp.models.Produto;
+import edu.pies.sysaguaapp.models.produto.Produto;
 import edu.pies.sysaguaapp.models.compras.ItemCompra;
 import edu.pies.sysaguaapp.services.compra.CompraService;
 import edu.pies.sysaguaapp.services.FornecedorService;

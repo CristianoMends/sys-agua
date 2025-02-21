@@ -1,5 +1,6 @@
 package edu.pies.sysaguaapp.models;
 
+import edu.pies.sysaguaapp.models.produto.Produto;
 import lombok.*;
 
 

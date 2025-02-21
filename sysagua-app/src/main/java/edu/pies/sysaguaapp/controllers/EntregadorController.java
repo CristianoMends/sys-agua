@@ -1,7 +1,6 @@
 package edu.pies.sysaguaapp.controllers;
 
 import edu.pies.sysaguaapp.models.Entregador;
-import edu.pies.sysaguaapp.models.Produto;
 import edu.pies.sysaguaapp.services.EntregadorService;
 import edu.pies.sysaguaapp.services.TokenManager;
 import javafx.animation.PauseTransition;

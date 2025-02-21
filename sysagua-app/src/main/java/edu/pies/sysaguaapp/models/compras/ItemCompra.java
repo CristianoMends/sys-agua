@@ -1,6 +1,6 @@
 package edu.pies.sysaguaapp.models.compras;
 
-import edu.pies.sysaguaapp.models.Produto;
+import edu.pies.sysaguaapp.models.produto.Produto;
 import lombok.*;
 
 import java.math.BigDecimal;

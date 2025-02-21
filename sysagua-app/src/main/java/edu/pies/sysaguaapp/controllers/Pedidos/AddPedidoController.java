@@ -4,12 +4,11 @@ package edu.pies.sysaguaapp.controllers.Pedidos;
 import edu.pies.sysaguaapp.dtos.pedido.ItemPedidoDto;
 import edu.pies.sysaguaapp.dtos.pedido.SendPedidoDto;
 import edu.pies.sysaguaapp.enumeration.PaymentMethod;
-import edu.pies.sysaguaapp.enumeration.PaymentStatus;
 import edu.pies.sysaguaapp.models.Clientes;
 import edu.pies.sysaguaapp.models.Entregador;
 import edu.pies.sysaguaapp.models.Estoque;
 import edu.pies.sysaguaapp.models.Pedido.ItemPedido;
-import edu.pies.sysaguaapp.models.Produto;
+import edu.pies.sysaguaapp.models.produto.Produto;
 import edu.pies.sysaguaapp.services.*;
 import edu.pies.sysaguaapp.services.pedido.PedidoService;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -28,7 +27,6 @@ import javafx.util.StringConverter;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 

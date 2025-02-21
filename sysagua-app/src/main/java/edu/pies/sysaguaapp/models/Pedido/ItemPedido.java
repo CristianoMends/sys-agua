@@ -1,7 +1,7 @@
 package edu.pies.sysaguaapp.models.Pedido;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import edu.pies.sysaguaapp.models.Produto;
+import edu.pies.sysaguaapp.models.produto.Produto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
