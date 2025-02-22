@@ -1,13 +1,17 @@
 package com.api.sysagua.service.impl;
 
 import com.api.sysagua.dto.order.*;
+import com.api.sysagua.dto.transaction.CreateTransactionDto;
 import com.api.sysagua.enumeration.*;
 import com.api.sysagua.exception.BusinessException;
+import com.api.sysagua.factory.OrderFactory;
 import com.api.sysagua.model.*;
+import com.api.sysagua.observer.TransactionObserver;
+import com.api.sysagua.observer.TransactionSubject;
 import com.api.sysagua.repository.*;
-import com.api.sysagua.service.CashierService;
 import com.api.sysagua.service.OrderService;
-import com.api.sysagua.service.UserService;
+import com.api.sysagua.service.StockService;
+import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,67 +23,54 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class OrderServiceImpl implements OrderService {
+public class OrderServiceImpl implements OrderService, TransactionSubject {
 
-    @Autowired
-    private DeliveryPersonRepository deliveryPersonRepository;
-    @Autowired
-    private CustomerRepository customerRepository;
-    @Autowired
-    private ProductRepository productRepository;
+    private final List<TransactionObserver> observers = new ArrayList<>();
+
     @Autowired
     private OrderRepository orderRepository;
     @Autowired
-    private StockRepository stockRepository;
+    private OrderFactory orderFactory;
     @Autowired
-    private CashierService cashierService;
+    private TransactionObserver transactionObserver;
     @Autowired
-    private TransactionRepository transactionRepository;
-    @Autowired
-    private StockHistoryRepository stockHistoryRepository;
-    @Autowired
-    private UserService userService;
+    private StockService stockService;
+
+    @PostConstruct
+    void init() {
+        addObserver(transactionObserver);
+    }
 
     @Override
     @Transactional
     public void create(CreateOrderDto dto) {
-        var order = new Order();
-        order.setCustomer(getCustomerById(dto.getCustomerId()));
-        order.setDeliveryPerson(getDeliveryPersonById(dto.getDeliveryPersonId()));
-        order.setProductOrders(createListProductOrder(order, dto.getProductOrders()));
-        order.setDeliveryStatus(DeliveryStatus.PENDING);
-        order.setReceivedAmount(dto.getReceivedAmount());
+        var order = orderFactory.createOrder(dto);
+        checkPaimentValue(order);
 
-        order.calculateTotalAmount();
-
-        order.setBalance(order.getTotalAmount().subtract(dto.getReceivedAmount()));
-        order.setPaymentMethod(dto.getPaymentMethod());
-        order.setDescription(dto.getDescription());
-
-        switch (checkPaymentStatus(order)) {
-            case PAID -> {
-                order.setPaymentStatus(PaymentStatus.PAID);
-                order.setFinishedAt(LocalDateTime.now());
-            }
-            case PENDING -> {
-                order.setPaymentStatus(PaymentStatus.PENDING);
-            }
+        if (isPaid(order)) {
+            order.setPaymentStatus(PaymentStatus.PAID);
+            order.setFinishedAt(LocalDateTime.now());
+        } else {
+            order.setPaymentStatus(PaymentStatus.PENDING);
         }
         var saved = this.orderRepository.save(order);
 
-        switch (saved.getPaymentStatus()) {
-            case PAID -> createPaidTransaction(saved);
-            case PENDING -> createPendingTransaction(saved);
+        if (dto.getPaidAmount() != null && dto.getPaidAmount().compareTo(BigDecimal.ZERO) > 0) {
+            notifyObservers(saved, dto.getPaidAmount(), dto.getPaymentMethod(), "Pedido registrado");
         }
     }
 
-    private PaymentStatus checkPaymentStatus(Order order) {
-        if (order.getTotalAmount() == null) order.calculateTotalAmount();
+    private boolean isPaid(Order order) {
+        if (order.getTotal() == null) order.calculateTotalAmount();
 
-        if (order.getReceivedAmount().compareTo(order.getTotalAmount()) >= 0) {
-            return PaymentStatus.PAID;
+        return order.getPaidAmount().compareTo(order.getTotal()) >= 0;
+    }
+
+    private void checkPaimentValue(Order order) {
+        order.calculateTotalAmount();
+        if (order.getPaidAmount().compareTo(order.getTotal()) > 0) {
+            throw new BusinessException("Amount received is greater than the total order amount");
         }
-        return PaymentStatus.PENDING;
     }
 
     @Override
@@ -107,118 +98,56 @@ public class OrderServiceImpl implements OrderService {
 
 
     @Override
-    public void update(Long id, UpdateOrderDto dto) {
-        var order = this.orderRepository.findById(id).orElseThrow(
-                () -> new BusinessException("Order not found", HttpStatus.NOT_FOUND)
-        );
+    @Transactional
+    public void addPayment(Long id, CreateTransactionDto dto) {
+        var order = this.orderRepository.findById(id).orElseThrow(() -> new BusinessException("Order not found", HttpStatus.NOT_FOUND));
+        if (isPaid(order)) throw new BusinessException("Order is paid");
+        if (order.getPaymentStatus() == PaymentStatus.CANCELED) throw new BusinessException("Order is canceled");
 
+        order.setPaidAmount(order.getPaidAmount().add(dto.getAmount()));
+        checkPaimentValue(order);
 
-        if (dto.getStatus() != null) {
-            DeliveryStatus newStatus = dto.getStatus();
-
-            if (newStatus == DeliveryStatus.CANCELED && order.getDeliveryStatus() == DeliveryStatus.PENDING) {
-                order.setCanceledAt(LocalDateTime.now());
-                order.setPaymentStatus(PaymentStatus.CANCELED);
-            }
-
-            if (newStatus == DeliveryStatus.FINISHED && order.getDeliveryStatus() == DeliveryStatus.PENDING) {
-                processOrderProducts(order);
-                order.setFinishedAt(LocalDateTime.now());
-            }
-
-
-            order.setDeliveryStatus(newStatus);
+        if (isPaid(order)) {
+            order.setPaymentStatus(PaymentStatus.PAID);
+        } else {
+            order.setPaymentStatus(PaymentStatus.PENDING);
         }
 
-        if (dto.getReceivedAmount() != null) {
-            BigDecimal previousAmount = order.getReceivedAmount();
-            BigDecimal newAmount = previousAmount.add(dto.getReceivedAmount());
+        var saved = this.orderRepository.save(order);
+        notifyObservers(saved, dto.getAmount(), dto.getPaymentMethod(), dto.getDescription());
+    }
 
-            if (newAmount.compareTo(order.getTotalAmount()) == 0) {
-                newAmount = order.getTotalAmount();
-                order.setPaymentStatus(PaymentStatus.PAID);
-            }
+    @Override
+    public void delete(Long id) {
+        var order = this.orderRepository.findById(id).orElseThrow(() -> new BusinessException("Purchase not found", HttpStatus.NOT_FOUND));
+        order.setPaymentStatus(PaymentStatus.CANCELED);
+        order.setDeliveryStatus(DeliveryStatus.CANCELED);
+        order.setCanceledAt(LocalDateTime.now());
 
-            switch (checkPaymentStatus(order)) {
-                case PAID -> {
-                    order.setPaymentStatus(PaymentStatus.PAID);
-                    order.setFinishedAt(LocalDateTime.now());
-                }
-                case CANCELED -> {
-                    order.setCanceledAt(LocalDateTime.now());
-                    order.setPaymentStatus(PaymentStatus.CANCELED);
-                }
-                case PENDING -> order.setPaymentStatus(PaymentStatus.PENDING);
+        var saved = this.orderRepository.save(order);
 
-            }
-            order.setBalance(order.getTotalAmount().subtract(newAmount));
-            if (newAmount.equals(order.getTotalAmount())) {
-                order.setPaymentStatus(PaymentStatus.PAID);
-            } else if (newAmount.compareTo(order.getTotalAmount()) < 0) {
-                order.setReceivedAmount(newAmount);
-            } else if (newAmount.compareTo(order.getTotalAmount()) > 0) {
-                throw new BusinessException("Order received value overtakes total value.");
-            }
+        notifyObservers(order, order.getPaidAmount(), PaymentMethod.UNDEFINED, "Estorno de pagamentos");
+        processProductRefunds(saved);
+    }
+
+    @Override
+    public void finishDelivery(Long id) {
+        var order = this.orderRepository.findById(id).orElseThrow(() -> new BusinessException("Purchase not found", HttpStatus.NOT_FOUND));
+
+        switch (order.getDeliveryStatus()) {
+            case CANCELED -> throw new BusinessException("Order is canceled");
+            case FINISHED -> throw new BusinessException("Order is finished");
         }
 
-        var saved_order = this.orderRepository.save(order);
+        order.setDeliveryStatus(DeliveryStatus.FINISHED);
+        order.setFinishedAt(LocalDateTime.now());
+        var saved = this.orderRepository.save(order);
 
-        if (order.getPaymentStatus() != null) {
-            PaymentStatus paymentStatus = order.getPaymentStatus();
-
-            switch (paymentStatus) {
-                case PAID -> createPaidTransaction(saved_order);
-                case CANCELED -> createCanceledTransaction(saved_order);
-                case PENDING -> createTransaction(order, dto.getReceivedAmount(), TransactionType.INCOME);
-            }
-            order.setPaymentStatus(paymentStatus);
-        }
-        this.orderRepository.save(order);
-    }
-
-    private DeliveryPerson getDeliveryPersonById(Long id) {
-        return this.deliveryPersonRepository.findById(id).orElseThrow(
-                () -> new BusinessException("Delivery Person with id " + id + " not found", HttpStatus.NOT_FOUND)
-        );
-    }
-
-    private Customer getCustomerById(Long id) {
-        return this.customerRepository.findById(id).orElseThrow(
-                () -> new BusinessException("Customer with id " + id + " not found", HttpStatus.NOT_FOUND)
-        );
-    }
-
-    private Product getProductById(Long id) {
-        return this.productRepository.findById(id).orElseThrow(
-                () -> new BusinessException("Product with id " + id + " not found", HttpStatus.NOT_FOUND)
-        );
-    }
-
-    private List<ProductOrder> createListProductOrder(Order order, List<CreateProductOrderDto> dtos) {
-        var list = new ArrayList<ProductOrder>();
-
-        dtos.forEach(createProductOrderDto -> {
-            var product = this.getProductById(createProductOrderDto.getProductId());
-
-            list.add(new ProductOrder(
-                    order,
-                    product,
-                    createProductOrderDto.getQuantity(),
-                    createProductOrderDto.getUnitPrice() == null ? product.getPrice() : createProductOrderDto.getUnitPrice()
-            ));
-        });
-
-        return list;
+        processOrderProducts(saved);
     }
 
     private void addWithdrawsProductFromStock(int quantity, Product product) {
-        var stock = this.stockRepository.findProduct(product.getId()).orElseThrow(
-                () -> new BusinessException("Stock by product not found", HttpStatus.NOT_FOUND)
-        );
-        stock.setTotalWithdrawals(stock.getTotalWithdrawals() + quantity);
-        var saved = this.stockRepository.save(stock);
-
-        saveStockHistory(saved, MovementType.WITHDRAWAL, quantity, "Retirado produto " + product.getName() + " do estoque");
+        this.stockService.addWithdraw(quantity,product);
     }
 
     private void processOrderProducts(Order order) {
@@ -227,65 +156,31 @@ public class OrderServiceImpl implements OrderService {
 
     }
 
-    private void createTransaction(Order order, BigDecimal amout, TransactionType type) {
-        var amountPending = order.getBalance();
-        var description = "Quantia paga R$ " + amout + ", Quantia pendente R$" + amountPending;
-        var user = this.userService.getLoggedUser();
-        var t = new Transaction(
-                amout,
-                type,
-                order.getPaymentMethod(),
-                description,
-                user,
-                order
-        );
-        this.transactionRepository.save(t);
+    private void remWithdrawsProductOnStock(int quantity, Product product) {
+        this.stockService.processStockReturn(product.getId(), quantity, "Cancelamento de pedido");
     }
 
-    private void createPendingTransaction(Order order) {
-        var user = this.userService.getLoggedUser();
-        var t = new Transaction(
-                order.getReceivedAmount(),
-                TransactionType.INCOME,
-                order.getPaymentMethod(),
-                "Pedido aguardando pagamento - Restante a ser pago: R$" + order.getTotalAmount().subtract(order.getReceivedAmount()),
-                user,
-                order
-        );
-        this.transactionRepository.save(t);
+    private void processProductRefunds(Order order) {
+        order.getProductOrders()
+                .forEach(p -> remWithdrawsProductOnStock(p.getQuantity(), p.getProduct()));
     }
 
-    private void createPaidTransaction(Order order) {
-        var user = this.userService.getLoggedUser();
-        var t = new Transaction(
-                order.getReceivedAmount(),
-                TransactionType.INCOME,
-                order.getPaymentMethod(),
-                String.format("Pagamento confirmado! O pedido foi pago com sucesso. Valor total: R$ %.2f, valor recebido: R$ %.2f. A transação foi concluída e o pedido está finalizado.",
-                        order.getTotalAmount(), order.getReceivedAmount()),
-                user,
-                order
-        );
-        this.transactionRepository.save(t);
+    @Override
+    public void addObserver(TransactionObserver observer) {
+        if (this.observers.contains(observer)) return;
+
+        this.observers.add(observer);
     }
 
-    private void createCanceledTransaction(Order order) {
-        var user = this.userService.getLoggedUser();
-        var t = new Transaction(
-                order.getReceivedAmount().negate(),
-                TransactionType.EXPENSE,
-                order.getPaymentMethod(),
-                "Pedido cancelado e valor pago estornado",
-                user,
-                order
-        );
-        this.transactionRepository.save(t);
-
+    @Override
+    public void removeObserver(TransactionObserver observer) {
+        this.observers.remove(observer);
     }
 
-    void saveStockHistory(Stock stock, MovementType type, int quantity, String description) {
-        var user = this.userService.getLoggedUser();
-        var history = new StockHistory(user, stock, type, quantity, description);
-        this.stockHistoryRepository.save(history);
+    @Override
+    public void notifyObservers(Transactable transactable, BigDecimal amount, PaymentMethod paymentMethod, String description) {
+        for (var o : this.observers) {
+            o.update(transactable, amount, paymentMethod, description);
+        }
     }
 }

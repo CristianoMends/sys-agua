@@ -7,7 +7,7 @@ import com.api.sysagua.enumeration.*;
 import com.api.sysagua.exception.BusinessException;
 import com.api.sysagua.factory.PurchaseFactory;
 import com.api.sysagua.model.*;
-import com.api.sysagua.observer.PurchaseSubject;
+import com.api.sysagua.observer.TransactionSubject;
 import com.api.sysagua.observer.TransactionObserver;
 import com.api.sysagua.repository.*;
 import com.api.sysagua.service.PurchaseService;
@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class PurchaseServiceImpl implements PurchaseService, PurchaseSubject {
+public class PurchaseServiceImpl implements PurchaseService, TransactionSubject {
 
     private final List<TransactionObserver> observers = new ArrayList<>();
 
@@ -57,7 +57,7 @@ public class PurchaseServiceImpl implements PurchaseService, PurchaseSubject {
 
         var saved = this.purchaseRepository.save(purchase);
 
-        if (dto.getPaidAmount() != null) {
+        if (dto.getPaidAmount() != null && dto.getPaidAmount().compareTo(BigDecimal.ZERO) > 0) {
             notifyObservers(saved, dto.getPaidAmount().negate(), dto.getPaymentMethod(), "Compra registrada");
         }
 
@@ -146,15 +146,15 @@ public class PurchaseServiceImpl implements PurchaseService, PurchaseSubject {
 
     private void checkPaimentValue(Purchase purchase) {
         purchase.calculateTotalAmount();
-        if (purchase.getPaidAmount().compareTo(purchase.getTotalAmount()) > 0) {
+        if (purchase.getPaidAmount().compareTo(purchase.getTotal()) > 0) {
             throw new BusinessException("Amount paid is greater than the total purchase amount");
         }
     }
 
     private boolean isPaid(Purchase purchase) {
-        if (purchase.getTotalAmount() == null) purchase.calculateTotalAmount();
+        if (purchase.getTotal() == null) purchase.calculateTotalAmount();
 
-        return purchase.getPaidAmount().compareTo(purchase.getTotalAmount()) >= 0;
+        return purchase.getPaidAmount().compareTo(purchase.getTotal()) >= 0;
     }
 
     private void addEntriesProductOnStock(int quantity, Product product) {
@@ -162,7 +162,7 @@ public class PurchaseServiceImpl implements PurchaseService, PurchaseSubject {
     }
 
     private void remEntriesProductOnStock(int quantity, Product product) {
-        this.stockService.removeProduct(new AddProductDto(product.getId(), quantity));
+        this.stockService.processStockReturn(product.getId(), (quantity*-1),"Cancelamento de compra");
     }
 
     private void processProductsOnStock(Purchase purchase) {
@@ -188,9 +188,9 @@ public class PurchaseServiceImpl implements PurchaseService, PurchaseSubject {
     }
 
     @Override
-    public void notifyObservers(Purchase purchase, BigDecimal amount, PaymentMethod paymentMethod, String description) {
+    public void notifyObservers(Transactable purchase, BigDecimal amount, PaymentMethod paymentMethod, String description) {
         for (var o : observers) {
-            o.update(purchase, amount, paymentMethod, description);
+            o.update((Purchase) purchase, amount, paymentMethod, description);
         }
     }
 }

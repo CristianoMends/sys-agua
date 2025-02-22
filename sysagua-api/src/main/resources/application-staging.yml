@@ -24,6 +24,10 @@ spring:
     console:
       enabled: false  # Desativa o console H2 em staging (não usado aqui)
 
+default-user:
+  password: senha123
+  email: usuario@gmail.com
+
 security:
   config:
     key: ${JWT_SECRET_KEY:secrect-key}                         # Variável de ambiente para a chave JWT (pode ser definida no ambiente)

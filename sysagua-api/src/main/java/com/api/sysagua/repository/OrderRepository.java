@@ -21,8 +21,8 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             and (:deliveryPersonId is null or o.deliveryPerson.id = :deliveryPersonId) 
             and (:productOrderId is null or productOrders.id = :productOrderId) 
             and (:deliveryStatus is null or o.deliveryStatus = :deliveryStatus) 
-            and ((:receivedAmountStart is null or :receivedAmountEnd is null) or o.receivedAmount between :receivedAmountStart and :receivedAmountEnd) 
-            and ((:totalAmountStart is null or :totalAmountEnd is null) or o.totalAmount between :totalAmountStart and :totalAmountEnd)
+            and ((:paidAmountStart is null or :paidAmountEnd is null) or o.paidAmount between :paidAmountStart and :paidAmountEnd) 
+            and ((:totalAmountStart is null or :totalAmountEnd is null) or o.total between :totalAmountStart and :totalAmountEnd)
             and ((:balanceStart is null or :balanceEnd is null) or o.balance between :balanceStart and :balanceEnd) 
             and (:paymentMethod is null or o.paymentMethod = :paymentMethod) 
             and (:paymentStatus is null or o.paymentStatus = :paymentStatus)
@@ -36,8 +36,8 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             @Param("deliveryPersonId") Long deliveryPersonId,
             @Param("productOrderId") Long productOrderId,
             @Param("deliveryStatus") DeliveryStatus deliveryStatus,
-            @Param("receivedAmountStart") BigDecimal receivedAmountStart,
-            @Param("receivedAmountEnd") BigDecimal receivedAmountEnd,
+            @Param("paidAmountStart") BigDecimal paidAmountStart,
+            @Param("paidAmountEnd") BigDecimal paidAmountEnd,
             @Param("totalAmountStart") BigDecimal totalAmountStart,
             @Param("totalAmountEnd") BigDecimal totalAmountEnd,
             @Param("balanceStart") BigDecimal balanceStart,

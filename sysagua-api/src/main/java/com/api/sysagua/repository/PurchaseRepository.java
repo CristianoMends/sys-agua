@@ -17,14 +17,14 @@ public interface PurchaseRepository extends JpaRepository<Purchase, Long> {
             select p from Purchase p 
             inner join p.productPurchases productPurchases
             where (:id is null or p.id = :id) 
-            and ((:totalAmountStart is null or :totalAmountEnd is null) or p.totalAmount between :totalAmountStart and :totalAmountEnd) 
+            and ((:totalAmountStart is null or :totalAmountEnd is null) or p.total between :totalAmountStart and :totalAmountEnd) 
             and ((:paidAmountStart is null or :paidAmountEnd is null) or p.paidAmount between :paidAmountStart and :paidAmountEnd) 
             and (:active is null or p.active = :active) 
             and ((CAST(:entryAtStart AS timestamp) is null or CAST(:entryAtEnd AS timestamp) is null) or p.entryAt between :entryAtStart and :entryAtEnd) 
             and ((CAST(:createdAtStart AS timestamp) is null or CAST(:createdAtEnd AS timestamp) is null) or p.createdAt between :createdAtStart and :createdAtEnd)
             and ((CAST(:finishedAtStart AS timestamp) is null or CAST(:finishedAtEnd AS timestamp) is null) or p.finishedAt between :finishedAtStart and :finishedAtEnd)
             and ((CAST(:canceledAtStart AS timestamp) is null or CAST(:canceledAtEnd AS timestamp) is null) or p.canceledAt between :canceledAtStart and :canceledAtEnd)
-            and (:description is null or lower(p.description) like lower(concat('%', :description, '%')))
+            and ((:description is null or :description = '') or lower(p.description) like lower(concat('%', :description, '%')))
             and (:nfe is null or p.nfe = :nfe)
             and (:paymentMethod is null or p.paymentMethod = :paymentMethod)
             and (:paymentStatus is null or p.paymentStatus = :paymentStatus)

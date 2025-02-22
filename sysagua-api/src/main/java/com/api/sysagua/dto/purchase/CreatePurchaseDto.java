@@ -1,5 +1,6 @@
 package com.api.sysagua.dto.purchase;
 
+import com.api.sysagua.dto.productItem.CreateProductItemDto;
 import com.api.sysagua.enumeration.PaymentMethod;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
@@ -22,7 +23,7 @@ public class CreatePurchaseDto {
 
     @NotNull(message = "Items list cannot be null.")
     @Schema(description = "Lista de produtos com seus dados a serem adquiridos")
-    private List<CreateProductPurchaseDto> items;
+    private List<CreateProductItemDto> items;
 
     @Schema(description = "Quantia já paga do valor da compra", example = "100.00")
     @NotNull

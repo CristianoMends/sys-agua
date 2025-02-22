@@ -1,5 +1,6 @@
 package com.api.sysagua.dto.order;
 
+import com.api.sysagua.dto.productItem.CreateProductItemDto;
 import com.api.sysagua.enumeration.PaymentMethod;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -26,20 +27,17 @@ public class CreateOrderDto {
     @NotNull
     private Long deliveryPersonId;
 
-    @ArraySchema(schema = @Schema(implementation = CreateProductOrderDto.class))
+    @ArraySchema(schema = @Schema(implementation = CreateProductItemDto.class))
     @Schema(description = "Lista de produtos pedidos", example = "[{\"productId\": 1, \"quantity\": 3, \"unitPrice\": 19.99}]")
     @NotNull(message = "Products is mandatory")
-    private List<CreateProductOrderDto> productOrders;
+    private List<CreateProductItemDto> productOrders;
 
     @Schema(description = "Valor recebido", example = "6.50")
     @NotNull(message = "ReceivedAmount is mandatory")
-    private BigDecimal receivedAmount;
+    private BigDecimal paidAmount;
 
     @Schema(description = "Valor total, caso não informado, é calculado automatico", example = "14.00")
     private BigDecimal totalAmount;
-
-    @Schema(description = "Saldo do cliente no pedido", example = "4.50")
-    private BigDecimal balance;
 
     @Schema(description = "Metodo de pagamento", example = "PIX")
     @NotNull(message = "PaymentMethod is mandatory")

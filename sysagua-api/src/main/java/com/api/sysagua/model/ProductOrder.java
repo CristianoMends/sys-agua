@@ -1,6 +1,6 @@
 package com.api.sysagua.model;
 
-import com.api.sysagua.dto.order.ViewProductOrderDto;
+import com.api.sysagua.dto.productItem.ViewProductItemDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -30,12 +30,12 @@ public class ProductOrder {
 
     private Integer quantity;
     private BigDecimal unitPrice;
-    private BigDecimal totalPrice;
+    private BigDecimal total;
 
 
     @PostLoad
     private void calculateItemTotal() {
-        this.totalPrice = unitPrice.multiply(BigDecimal.valueOf(quantity));
+        this.total = unitPrice.multiply(BigDecimal.valueOf(quantity));
     }
 
     public ProductOrder(Order order, Product product, Integer quantity, BigDecimal unitPrice) {
@@ -45,14 +45,13 @@ public class ProductOrder {
         setUnitPrice(unitPrice);
     }
 
-    public ViewProductOrderDto toView() {
-        return new ViewProductOrderDto(
+    public ViewProductItemDto toView() {
+        return new ViewProductItemDto(
                 getId(),
-                getOrder().getId(),
                 getQuantity(),
                 getUnitPrice(),
-                getTotalPrice(),
-                getProduct() != null? getProduct().toView():null
+                getTotal(),
+                getProduct().toView()
         );
     }
 }

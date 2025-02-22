@@ -75,9 +75,10 @@ public class UserController implements UserDoc {
             @RequestParam(required = false) String phone,
             @RequestParam(required = false) String email,
             @RequestParam(required = false) UserStatus status,
-            @RequestParam(required = false) UserAccess access
+            @RequestParam(required = false) UserAccess access,
+            @RequestParam(required = false) String password
     ) {
-        var userDto = new UpdateUserDto(id, name, surname, phone, email, status, access);
+        var userDto = new UpdateUserDto(id, name, surname, phone, email, status, access, password);
         userService.updateUser(userDto);
         return ResponseEntity.noContent().build();
     }

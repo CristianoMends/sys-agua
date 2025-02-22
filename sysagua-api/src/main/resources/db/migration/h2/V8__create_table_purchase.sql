@@ -1,7 +1,7 @@
 CREATE TABLE purchases (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     supplier_id BIGINT,
-    total_amount NUMERIC(10,2),
+    total NUMERIC(10,2),
     paid_amount NUMERIC(10,2),
     balance NUMERIC(10,2),
     active BOOLEAN DEFAULT TRUE,

@@ -1,4 +1,4 @@
-package com.api.sysagua.dto.purchase;
+package com.api.sysagua.dto.productItem;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.DecimalMin;
@@ -15,8 +15,8 @@ import java.math.BigDecimal;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Schema(description = "DTO para criar uma compra de produto\n")
-public class CreateProductPurchaseDto {
+@Schema(description = "DTO para criar um item produto\n")
+public class CreateProductItemDto {
 
     @NotNull(message = "Product ID cannot be null.")
     @Schema(description = "Identificador único do produto", example = "1")
@@ -27,9 +27,8 @@ public class CreateProductPurchaseDto {
     @Schema(description = "Quantidade do produto que está sendo adquirido", example = "10", minimum = "1")
     private Integer quantity;
 
-    @NotNull(message = "Purchase price cannot be null.")
     @DecimalMin(value = "0.01", message = "Purchase price must be at least 0.01.")
-    @Schema(description = "Preço do produto por unidade na compra", example = "30.00", minimum = "0.01")
-    private BigDecimal purchasePrice;
+    @Schema(description = "Preço do produto por unidade", example = "30.00", minimum = "0.01")
+    private BigDecimal unitPrice;
 
 }
