@@ -58,7 +58,7 @@ public class PurchaseServiceImpl implements PurchaseService, TransactionSubject 
         var saved = this.purchaseRepository.save(purchase);
 
         if (dto.getPaidAmount() != null && dto.getPaidAmount().compareTo(BigDecimal.ZERO) > 0) {
-            notifyObservers(saved, dto.getPaidAmount().negate(), dto.getPaymentMethod(), "Compra registrada");
+            notifyObservers(saved, dto.getPaidAmount().negate(), dto.getPaymentMethod(), "Compra registrada",TransactionType.EXPENSE);
         }
 
         processProductsOnStock(saved);
@@ -81,7 +81,7 @@ public class PurchaseServiceImpl implements PurchaseService, TransactionSubject 
         }
 
         var saved = this.purchaseRepository.save(purchase);
-        notifyObservers(saved, dto.getAmount().negate(), dto.getPaymentMethod(), dto.getDescription());
+        notifyObservers(saved, dto.getAmount().negate(), dto.getPaymentMethod(), dto.getDescription(), TransactionType.EXPENSE);
     }
 
     @Override
@@ -93,7 +93,7 @@ public class PurchaseServiceImpl implements PurchaseService, TransactionSubject 
 
         var saved = this.purchaseRepository.save(purchase);
 
-        notifyObservers(purchase, purchase.getPaidAmount(), PaymentMethod.UNDEFINED, "Estorno de pagamentos");
+        notifyObservers(purchase, purchase.getPaidAmount(), PaymentMethod.UNDEFINED, "Estorno de pagamentos", TransactionType.INCOME);
         processProductRefunds(saved);
     }
 
@@ -188,9 +188,9 @@ public class PurchaseServiceImpl implements PurchaseService, TransactionSubject 
     }
 
     @Override
-    public void notifyObservers(Transactable purchase, BigDecimal amount, PaymentMethod paymentMethod, String description) {
+    public void notifyObservers(Transactable purchase, BigDecimal amount, PaymentMethod paymentMethod, String description, TransactionType transactionType) {
         for (var o : observers) {
-            o.update((Purchase) purchase, amount, paymentMethod, description);
+            o.update((Purchase) purchase, amount, paymentMethod, description, transactionType);
         }
     }
 }

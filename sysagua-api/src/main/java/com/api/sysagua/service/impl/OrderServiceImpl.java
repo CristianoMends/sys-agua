@@ -56,7 +56,7 @@ public class OrderServiceImpl implements OrderService, TransactionSubject {
         var saved = this.orderRepository.save(order);
 
         if (dto.getPaidAmount() != null && dto.getPaidAmount().compareTo(BigDecimal.ZERO) > 0) {
-            notifyObservers(saved, dto.getPaidAmount(), dto.getPaymentMethod(), "Pedido registrado");
+            notifyObservers(saved, dto.getPaidAmount(), dto.getPaymentMethod(), "Pedido registrado", TransactionType.INCOME);
         }
     }
 
@@ -114,7 +114,7 @@ public class OrderServiceImpl implements OrderService, TransactionSubject {
         }
 
         var saved = this.orderRepository.save(order);
-        notifyObservers(saved, dto.getAmount(), dto.getPaymentMethod(), dto.getDescription());
+        notifyObservers(saved, dto.getAmount(), dto.getPaymentMethod(), dto.getDescription(), TransactionType.INCOME);
     }
 
     @Override
@@ -126,7 +126,7 @@ public class OrderServiceImpl implements OrderService, TransactionSubject {
 
         var saved = this.orderRepository.save(order);
 
-        notifyObservers(order, order.getPaidAmount(), PaymentMethod.UNDEFINED, "Estorno de pagamentos");
+        notifyObservers(order, order.getPaidAmount(), PaymentMethod.UNDEFINED, "Estorno de pagamentos", TransactionType.EXPENSE);
         processProductRefunds(saved);
     }
 
@@ -178,9 +178,9 @@ public class OrderServiceImpl implements OrderService, TransactionSubject {
     }
 
     @Override
-    public void notifyObservers(Transactable transactable, BigDecimal amount, PaymentMethod paymentMethod, String description) {
+    public void notifyObservers(Transactable transactable, BigDecimal amount, PaymentMethod paymentMethod, String description, TransactionType transactionType) {
         for (var o : this.observers) {
-            o.update(transactable, amount, paymentMethod, description);
+            o.update(transactable, amount, paymentMethod, description, transactionType);
         }
     }
 }

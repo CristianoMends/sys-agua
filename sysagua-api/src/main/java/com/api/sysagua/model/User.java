@@ -81,12 +81,10 @@ public class User implements UserDetails {
                     .withStatus(user.getStatus())
                     .withAccess(user.getAccess());
         }
-
         public Builder withId(UUID id) {
             this.id = id;
             return this;
         }
-
         public Builder withName(String name) {
             Optional.ofNullable(name).ifPresent(value -> this.name = value);
             return this;
@@ -96,32 +94,26 @@ public class User implements UserDetails {
             Optional.ofNullable(surname).ifPresent(value -> this.surname = value);
             return this;
         }
-
         public Builder withPhone(String phone) {
             Optional.ofNullable(phone).ifPresent(value -> this.phone = value);
             return this;
         }
-
         public Builder withEmail(String email) {
             Optional.ofNullable(email).ifPresent(value -> this.email = value);
             return this;
         }
-
         public Builder withPassword(String password) {
             Optional.ofNullable(password).ifPresent(value -> this.password = encoder.encode(value));
             return this;
         }
-
         public Builder withStatus(UserStatus status) {
             Optional.ofNullable(status).ifPresent(value -> this.status = value);
             return this;
         }
-
         public Builder withAccess(UserAccess access) {
             Optional.ofNullable(access).ifPresent(value -> this.access = value);
             return this;
         }
-
         public User build() {
             return new User(id, name, surname, phone, email, password, status, access);
         }

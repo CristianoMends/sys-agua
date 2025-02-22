@@ -8,7 +8,6 @@ import com.api.sysagua.model.Product;
 import com.api.sysagua.model.ProductPurchase;
 import com.api.sysagua.model.Purchase;
 import com.api.sysagua.repository.ProductRepository;
-import com.api.sysagua.repository.PurchaseRepository;
 import com.api.sysagua.repository.SupplierRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,8 +23,6 @@ public class PurchaseFactoryImpl implements PurchaseFactory {
     private ProductRepository productRepository;
     @Autowired
     private SupplierRepository supplierRepository;
-    @Autowired
-    private PurchaseRepository purchaseRepository;
 
     @Override
     public Purchase createPurchase(CreatePurchaseDto dto) {
