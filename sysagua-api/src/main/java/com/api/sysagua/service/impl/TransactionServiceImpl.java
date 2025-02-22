@@ -24,19 +24,19 @@ public class TransactionServiceImpl implements TransactionService, TransactionOb
     private UserService userService;
 
     @Override
-    public void update(Transactable transactable, BigDecimal amount, PaymentMethod paymentMethod, String description) {
+    public void update(Transactable transactable, BigDecimal amount, PaymentMethod paymentMethod, String description, TransactionType transactionType) {
         if (transactable instanceof Order) {
-            createTransaction((Order) transactable, amount, paymentMethod, description);
+            createOrderTransaction((Order) transactable, amount, paymentMethod, description,transactionType);
         } else {
-            createTransaction((Purchase) transactable, amount, paymentMethod, description);
+            createPurchaseTransaction((Purchase) transactable, amount, paymentMethod, description, transactionType);
         }
     }
 
-    private void createTransaction(Order order, BigDecimal amount, PaymentMethod paymentMethod, String description) {
+    private void createOrderTransaction(Order order, BigDecimal amount, PaymentMethod paymentMethod, String description, TransactionType transactionType) {
         var user = this.userService.getLoggedUser();
         var t = new Transaction(
                 amount,
-                TransactionType.EXPENSE,
+                transactionType,
                 paymentMethod,
                 description,
                 user,
@@ -45,11 +45,11 @@ public class TransactionServiceImpl implements TransactionService, TransactionOb
         this.transactionRepository.save(t);
     }
 
-    private void createTransaction(Purchase purchase, BigDecimal amount, PaymentMethod paymentMethod, String description) {
+    private void createPurchaseTransaction(Purchase purchase, BigDecimal amount, PaymentMethod paymentMethod, String description, TransactionType transactionType) {
         var user = this.userService.getLoggedUser();
         var t = new Transaction(
                 amount,
-                TransactionType.EXPENSE,
+                transactionType,
                 paymentMethod,
                 description,
                 user,
