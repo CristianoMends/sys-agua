@@ -198,7 +198,7 @@ public class AddPedidoController {
                         .collect(Collectors.toList());
                 novoPedido.setProductOrders(itensDto);
 
-                novoPedido.setReceivedAmount(BigDecimal.ZERO);
+                novoPedido.setPaidAmount(BigDecimal.ZERO);
 
                 BigDecimal totalAmount = produtosAddList.stream()
                         .map(item -> item.getUnitPrice().multiply(BigDecimal.valueOf(item.getQuantity())))

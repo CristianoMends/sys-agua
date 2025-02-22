@@ -15,7 +15,7 @@ public class SendPedidoDto {
     private Long customerId;
     private Long deliveryPersonId;
     private List<ItemPedidoDto> productOrders;
-    private BigDecimal receivedAmount;
+    private BigDecimal paidAmount;
     private BigDecimal totalAmount;
     private PaymentMethod paymentMethod;
     private String description;

@@ -28,15 +28,9 @@ public class Pedido extends Transactable {
     private Entregador deliveryPerson;
     private List<ItemPedido> productOrders;
     private PedidoStatus deliveryStatus;
-    private BigDecimal receivedAmount;
     private BigDecimal totalAmount;
-    private BigDecimal balance;
-    private PaymentMethod paymentMethod;
-    private PaymentStatus paymentStatus;
-    private LocalDateTime createdAt;
-    private LocalDateTime finishedAt;
-    private LocalDateTime canceledAt;
     private String enderecoEntrega;
+    private LocalDateTime createdAt;
     private boolean active;
     private final String type = "order";
 

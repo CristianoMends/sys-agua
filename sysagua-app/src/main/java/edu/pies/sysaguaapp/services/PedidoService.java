@@ -8,6 +8,7 @@ import edu.pies.sysaguaapp.dtos.pedido.SendPedidoDto;
 import edu.pies.sysaguaapp.dtos.pedido.SendPgtoPedidoDto;
 import edu.pies.sysaguaapp.enumeration.Pedidos.PedidoStatus;
 import edu.pies.sysaguaapp.models.Pedido.Pedido;
+import jdk.swing.interop.SwingInterOpUtils;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -64,7 +65,7 @@ public class PedidoService {
 
     public static Pedido cancelarPedido(Pedido pedido, String token) throws Exception {
 
-        if (pedido.getReceivedAmount().compareTo(pedido.getTotalAmount()) > 0 ) {
+        if (pedido.getPaidAmount().compareTo(pedido.getTotalAmount()) > 0 ) {
             throw new Exception("O valor recebido ultrapassa o valor total do pedido.");
         }
 
@@ -124,13 +125,13 @@ public class PedidoService {
         }
     }
 
-    public Pedido cadastrarPagamento(SendPgtoPedidoDto pagamento, Long idPedido, String token) throws Exception {
-        String pedidoJson = objectMapper.writeValueAsString(pagamento);
-        String urlPagamento = BASE_URL + "/" + idPedido;
+    public Pedido cadastrarPagamento(SendPgtoPedidoDto pagamento,Long idPedido, String token) throws Exception {
+        String compraJson = objectMapper.writeValueAsString(pagamento);
+        String urlPagamento = BASE_URL + "/payment/" + idPedido;
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(urlPagamento))
-                .PUT(HttpRequest.BodyPublishers.ofString(pedidoJson))
+                .POST(HttpRequest.BodyPublishers.ofString(compraJson))
                 .header("Content-Type", "application/json")
                 .header("Authorization", "Bearer " + token)
                 .build();
@@ -140,7 +141,7 @@ public class PedidoService {
         if (response.statusCode() == 204) {
             return null;
         } else {
-            throw new Exception("Erro ao cadastrar pagamento: " + response.body());
+            throw new Exception("Erro ao cadastrar: " + response.body());
         }
     }
 

@@ -57,7 +57,7 @@ public class Compra extends Transactable {
         if (getTotalAmount() != null) return;
 
         this.totalAmount = items.stream()
-                .map(i -> i.getPurchasePrice().multiply(BigDecimal.valueOf(i.getQuantity())))
+                .map(i -> i.getUnitPrice().multiply(BigDecimal.valueOf(i.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 }

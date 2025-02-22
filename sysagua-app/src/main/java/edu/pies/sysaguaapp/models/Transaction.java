@@ -18,7 +18,7 @@ public class Transaction {
     private BigDecimal amount;
     private TransactionType type;
     private String description;
-    private User responsibleUser;
+    private Usuario responsibleUser;
     private Transactable transactable;
     private PaymentMethod paymentMethod;
 }

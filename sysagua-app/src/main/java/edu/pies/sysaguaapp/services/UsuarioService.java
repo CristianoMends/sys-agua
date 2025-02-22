@@ -3,7 +3,6 @@ package edu.pies.sysaguaapp.services;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import edu.pies.sysaguaapp.dtos.usuario.UpdateUsuarioDto;
 import edu.pies.sysaguaapp.enumeration.Usuarios.UserStatus;
 import edu.pies.sysaguaapp.models.Usuario;
 
@@ -64,35 +63,36 @@ public class UsuarioService {
             throw new Exception("Erro ao cadastrar: " + response.body());
         }
     }
-    public Usuario editarUsuario(Usuario usuario, String token) throws Exception {
-        UpdateUsuarioDto updateDTO = new UpdateUsuarioDto();
-        updateDTO.setName(usuario.getName());
-        updateDTO.setSurname(usuario.getSurname());
-        updateDTO.setPhone(usuario.getPhone());
-        updateDTO.setEmail(usuario.getEmail());
-        updateDTO.setStatus(usuario.getStatus());
-        updateDTO.setAccess(usuario.getAccess());
-
-        String usuarioJson = objectMapper.writeValueAsString(usuario);
-        String urlComId = BASE_URL + "?id=" + usuario.getId();
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(urlComId))
-                .PUT(HttpRequest.BodyPublishers.ofString(usuarioJson))
-                .header("Content-Type", "application/json")
-                .header("Authorization", "Bearer " + token)
-                .build();
-
-        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-
-        if (response.statusCode() == 204) {
-            return usuario;
-        } else {
-            throw new Exception("Erro ao atualizar: " + response.body());
-        }
-    }
+//    public Usuario editarUsuario(Usuario usuario, String token) throws Exception {
+//        UpdateUsuarioDto updateDTO = new UpdateUsuarioDto();
+//        updateDTO.setName(usuario.getName());
+//        updateDTO.setSurname(usuario.getSurname());
+//        updateDTO.setPhone(usuario.getPhone());
+//        updateDTO.setEmail(usuario.getEmail());
+//        updateDTO.setStatus(usuario.getStatus());
+//        updateDTO.setAccess(usuario.getAccess());
+//
+//        String usuarioJson = objectMapper.writeValueAsString(usuario);
+//        String urlComId = BASE_URL + "?id=" + usuario.getId();
+//        HttpRequest request = HttpRequest.newBuilder()
+//                .uri(URI.create(urlComId))
+//                .PUT(HttpRequest.BodyPublishers.ofString(usuarioJson))
+//                .header("Content-Type", "application/json")
+//                .header("Authorization", "Bearer " + token)
+//                .build();
+//
+//        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+//
+//        if (response.statusCode() == 204) {
+//            return usuario;
+//        } else {
+//            throw new Exception("Erro ao atualizar: " + response.body());
+//        }
+//    }
+//
     public Usuario inativarUsuario(Usuario usuario, String token) throws Exception {
 
-        if (usuario.getStatus() == UserStatus.INACTIVE) {
+        if (usuario.getStatus().equals(UserStatus.INACTIVE)) {
             throw new Exception("O usuário já está inativo.");
         }
         String emailCodificado = URLEncoder.encode(usuario.getEmail(), StandardCharsets.UTF_8);

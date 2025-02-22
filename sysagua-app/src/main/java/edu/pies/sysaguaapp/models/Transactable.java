@@ -23,6 +23,7 @@ public abstract class Transactable {
     private Long id;
     private BigDecimal totalAmount;
     private BigDecimal balance;
+    private BigDecimal paidAmount;
     private PaymentMethod paymentMethod;
     private PaymentStatus paymentStatus;
     private LocalDateTime createdAt;

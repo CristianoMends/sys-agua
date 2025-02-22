@@ -12,7 +12,7 @@ public class ItemCompra {
     private Long id;
     private Produto product;
     private Integer quantity;
-    private BigDecimal purchasePrice;
+    private BigDecimal unitPrice;
     private BigDecimal total;
 
 }

@@ -21,6 +21,7 @@ import javafx.util.StringConverter;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -127,11 +128,12 @@ public class PedidoDetalhesController {
                 BigDecimal valor = new BigDecimal(valorField.getText().replace(",", "."));
 
                 SendPgtoPedidoDto novoPagamento = new SendPgtoPedidoDto();
-                novoPagamento.setReceivedAmount(valor);
-                novoPagamento.setPaymentMethod(PaymentMethod.PIX);
-                Long idCompra = pedido.getId();
+                novoPagamento.setAmount(valor);
+                novoPagamento.setPaymentMethod(metodoPagamento.getValue());
+                novoPagamento.setDescription("Pagamento via " + metodoPagamento.getValue() + " em: " + LocalDateTime.now());
+                Long idPedido = pedido.getId();
 
-                pedidoService.cadastrarPagamento(novoPagamento, idCompra, token);
+                pedidoService.cadastrarPagamento(novoPagamento, idPedido, token);
                 limparCampos();
                 obterPagamentos();
                 atualizaPedido();
@@ -193,7 +195,7 @@ public class PedidoDetalhesController {
         totalItensLabel.setText(String.valueOf(itens));
 
         saldoLabel.setText("R$ " + pedido.getBalance().setScale(2, RoundingMode.HALF_UP).toString().replace(".", ","));
-        pagoLabel.setText("R$ " + pedido.getReceivedAmount().setScale(2, RoundingMode.HALF_UP).toString().replace(".", ","));
+        pagoLabel.setText("R$ " + pedido.getPaidAmount().setScale(2, RoundingMode.HALF_UP).toString().replace(".", ","));
 
     }
 

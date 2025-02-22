@@ -12,9 +12,7 @@ import java.math.BigDecimal;
 @Setter
 @NoArgsConstructor
 public class SendPgtoPedidoDto {
-    private PedidoStatus status;
-    private BigDecimal receivedAmount;
-    private BigDecimal totalAmount;
-    private BigDecimal balance;
+    private BigDecimal amount;
     private PaymentMethod paymentMethod;
+    private String description;
 }

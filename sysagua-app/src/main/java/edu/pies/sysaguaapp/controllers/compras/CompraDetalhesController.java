@@ -82,16 +82,16 @@ public class CompraDetalhesController {
         produtosAddList.addAll(compra.getItems());
         atualizaCompra();
         preencherCampos();
+        obterPagamentos();
         atualizarTotais();
         validarCampos();
-        obterPagamentos();
 
         produtosTableView.setItems(produtosAddList);
         codigoColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getProduct().getId().toString()));
         produtoColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getProduct().getName()));
         quantidadeColumn.setCellValueFactory(cellData -> new SimpleIntegerProperty(cellData.getValue().getQuantity()).asObject());
         precoColumn.setCellValueFactory(cellData -> {
-            BigDecimal preco = cellData.getValue().getPurchasePrice();
+            BigDecimal preco = cellData.getValue().getUnitPrice();
             return new SimpleStringProperty(preco != null ? "R$ " + preco.setScale(2, RoundingMode.HALF_UP).toString().replace(".", ",") : "");
         });
 
@@ -185,7 +185,7 @@ public class CompraDetalhesController {
 
     private void atualizarTotais() {
         BigDecimal total = produtosAddList.stream()
-                .map(item -> item.getPurchasePrice().multiply(BigDecimal.valueOf(item.getQuantity())))
+                .map(item -> item.getUnitPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         int itens = produtosAddList.size();

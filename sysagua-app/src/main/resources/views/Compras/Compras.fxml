@@ -104,7 +104,7 @@
                   <Insets bottom="10.0" left="20.0" right="20.0" />
                </padding>
                 </HBox>
-                <StackPane prefWidth="917.0" VBox.vgrow="SOMETIMES">
+                <StackPane prefWidth="900.0" VBox.vgrow="SOMETIMES">
                     <children>
                         <TreeTableView fx:id="tabelaCompra">
                             <columnResizePolicy>
