@@ -5,11 +5,14 @@ import com.api.sysagua.dto.stock.AddProductDto;
 import com.api.sysagua.dto.transaction.CreateTransactionDto;
 import com.api.sysagua.enumeration.*;
 import com.api.sysagua.exception.BusinessException;
+import com.api.sysagua.factory.PurchaseFactory;
 import com.api.sysagua.model.*;
+import com.api.sysagua.observer.TransactionSubject;
+import com.api.sysagua.observer.TransactionObserver;
 import com.api.sysagua.repository.*;
 import com.api.sysagua.service.PurchaseService;
 import com.api.sysagua.service.StockService;
-import com.api.sysagua.service.UserService;
+import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,44 +24,28 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class PurchaseServiceImpl implements PurchaseService {
+public class PurchaseServiceImpl implements PurchaseService, TransactionSubject {
 
+    private final List<TransactionObserver> observers = new ArrayList<>();
+
+    @Autowired
+    private PurchaseFactory purchaseFactory;
     @Autowired
     private PurchaseRepository purchaseRepository;
     @Autowired
-    private ProductRepository productRepository;
-    @Autowired
-    private SupplierRepository supplierRepository;
-    @Autowired
     private StockService stockService;
     @Autowired
-    private TransactionRepository transactionRepository;
-    @Autowired
-    private StockHistoryRepository stockHistoryRepository;
-    @Autowired
-    private UserService userService;
+    private TransactionObserver transactionObserver;
+
+    @PostConstruct
+    void init() {
+        addObserver(transactionObserver);
+    }
 
     @Override
     @Transactional
     public void create(CreatePurchaseDto dto) {
-
-        var purchase = new Purchase();
-        var productPurchases = createProductPurchase(dto.getItems(), purchase);
-        var supplier = this.findSupplierById(dto.getSupplierId());
-        if (supplier.getActive().equals(false)) {
-            throw new BusinessException("Supplier is inactive");
-        }
-
-        purchase.setProductPurchases(productPurchases);
-        purchase.setSupplier(supplier);
-        purchase.setActive(true);
-        purchase.setDescription(dto.getDescription());
-        purchase.setPaymentMethod(dto.getPaymentMethod());
-        purchase.setEntryAt(dto.getEntryAt());
-        purchase.setNfe(dto.getNfe());
-        purchase.setPaidAmount(dto.getPaidAmount());
-        purchase.setPaymentStatus(PaymentStatus.PENDING);
-
+        var purchase = purchaseFactory.createPurchase(dto);
         checkPaimentValue(purchase);
 
         if (isPaid(purchase)) {
@@ -70,8 +57,8 @@ public class PurchaseServiceImpl implements PurchaseService {
 
         var saved = this.purchaseRepository.save(purchase);
 
-        if (dto.getPaidAmount() != null) {
-            createTransaction(saved, dto.getPaidAmount().negate(), dto.getPaymentMethod(), "Compra registrada");
+        if (dto.getPaidAmount() != null && dto.getPaidAmount().compareTo(BigDecimal.ZERO) > 0) {
+            notifyObservers(saved, dto.getPaidAmount().negate(), dto.getPaymentMethod(), "Compra registrada");
         }
 
         processProductsOnStock(saved);
@@ -94,7 +81,7 @@ public class PurchaseServiceImpl implements PurchaseService {
         }
 
         var saved = this.purchaseRepository.save(purchase);
-        createTransaction(saved, dto.getAmount().negate(), dto.getPaymentMethod(), dto.getDescription());
+        notifyObservers(saved, dto.getAmount().negate(), dto.getPaymentMethod(), dto.getDescription());
     }
 
     @Override
@@ -106,7 +93,7 @@ public class PurchaseServiceImpl implements PurchaseService {
 
         var saved = this.purchaseRepository.save(purchase);
 
-        createTransaction(purchase, purchase.getPaidAmount(), PaymentMethod.UNDEFINED, "Estorno de pagamentos");
+        notifyObservers(purchase, purchase.getPaidAmount(), PaymentMethod.UNDEFINED, "Estorno de pagamentos");
         processProductRefunds(saved);
     }
 
@@ -159,36 +146,15 @@ public class PurchaseServiceImpl implements PurchaseService {
 
     private void checkPaimentValue(Purchase purchase) {
         purchase.calculateTotalAmount();
-        if (purchase.getPaidAmount().compareTo(purchase.getTotalAmount()) > 0) {
+        if (purchase.getPaidAmount().compareTo(purchase.getTotal()) > 0) {
             throw new BusinessException("Amount paid is greater than the total purchase amount");
         }
     }
 
     private boolean isPaid(Purchase purchase) {
-        if (purchase.getTotalAmount() == null) purchase.calculateTotalAmount();
+        if (purchase.getTotal() == null) purchase.calculateTotalAmount();
 
-        return purchase.getPaidAmount().compareTo(purchase.getTotalAmount()) >= 0;
-    }
-
-    private List<ProductPurchase> createProductPurchase(List<CreateProductPurchaseDto> dto, Purchase purchase) {
-        List<ProductPurchase> productPurchases = new ArrayList<>();
-        for (var item : dto) {
-            var product = this.findProductById(item.getProductId());
-            productPurchases.add(new ProductPurchase(purchase, product, item.getQuantity(), item.getPurchasePrice()));
-        }
-        return productPurchases;
-    }
-
-    private Product findProductById(Long productId) {
-        return productRepository.findById(productId)
-                .orElseThrow(() -> new BusinessException(
-                        String.format("Product with id %d not found", productId), HttpStatus.NOT_FOUND));
-    }
-
-    private Supplier findSupplierById(Long supplierId) {
-        return supplierRepository.findById(supplierId)
-                .orElseThrow(() -> new BusinessException(
-                        String.format("Supplier with id %d not found", supplierId), HttpStatus.NOT_FOUND));
+        return purchase.getPaidAmount().compareTo(purchase.getTotal()) >= 0;
     }
 
     private void addEntriesProductOnStock(int quantity, Product product) {
@@ -196,7 +162,7 @@ public class PurchaseServiceImpl implements PurchaseService {
     }
 
     private void remEntriesProductOnStock(int quantity, Product product) {
-        this.stockService.removeProduct(new AddProductDto(product.getId(), quantity));
+        this.stockService.processStockReturn(product.getId(), (quantity*-1),"Cancelamento de compra");
     }
 
     private void processProductsOnStock(Purchase purchase) {
@@ -210,17 +176,21 @@ public class PurchaseServiceImpl implements PurchaseService {
                 .forEach(p -> remEntriesProductOnStock(p.getQuantity(), p.getProduct()));
     }
 
-    private void createTransaction(Purchase purchase, BigDecimal amount, PaymentMethod paymentMethod, String description) {
+    @Override
+    public void addObserver(TransactionObserver observer) {
+        if (this.observers.contains(observer)) return;
+        this.observers.add(observer);
+    }
 
-        var user = this.userService.getLoggedUser();
-        var t = new Transaction(
-                amount,
-                TransactionType.EXPENSE,
-                paymentMethod,
-                description,
-                user,
-                purchase
-        );
-        this.transactionRepository.save(t);
+    @Override
+    public void removeObserver(TransactionObserver observer) {
+        this.observers.remove(observer);
+    }
+
+    @Override
+    public void notifyObservers(Transactable purchase, BigDecimal amount, PaymentMethod paymentMethod, String description) {
+        for (var o : observers) {
+            o.update((Purchase) purchase, amount, paymentMethod, description);
+        }
     }
 }

@@ -4,6 +4,7 @@ import com.api.sysagua.enumeration.UserAccess;
 import com.api.sysagua.enumeration.UserStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -45,7 +46,11 @@ public class UpdateUserDto {
     private UserStatus status;
 
     @Schema(description = "Tipo de acesso do usuário", example = "OWNER")
-    @Pattern(regexp = "OWNER|EMPLOYEE|DEVELOPER|MANAGER", message = "Access must be one of: OWNER, EMPLOYEE, DEVELOPER, MANAGER")
+    @Pattern(regexp = "OWNER|EMPLOYEE|MANAGER", message = "Access must be one of: OWNER, EMPLOYEE, MANAGER")
     private UserAccess access;
+
+    @Schema(description = "Senha do usuário", example = "novasenha123", minLength = 6, maxLength = 20)
+    @Size(min = 6, max = 20, message = "Password should have between 6 and 20 characters")
+    private String password;
 
 }

@@ -1,4 +1,4 @@
-package com.api.sysagua.dto.purchase;
+package com.api.sysagua.dto.productItem;
 
 import com.api.sysagua.dto.product.ViewProductDto;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -14,20 +14,20 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @NoArgsConstructor
 @Schema(description = "DTO para visualização de uma compra de produto")
-public class ViewProductPurchaseDto {
+public class ViewProductItemDto {
 
     @Schema(description = "Identificador único", example = "1")
     private Long id;
 
-    @Schema(description = "Detalhes do produto adquirido")
-    private ViewProductDto product;
-
-    @Schema(description = "Quantidade do produto comprado", example = "5")
+    @Schema(description = "Quantidade do produto comprado", example = "10")
     private Integer quantity;
 
-    @Schema(description = "Preço de compra do produto por unidade", example = "15.99")
-    private BigDecimal purchasePrice;
+    @Schema(description = "Preço por unidade", example = "30.00")
+    private BigDecimal unitPrice;
 
-    @Schema(description = "Preço total da compra do produto (quantidade * preço de compra)", example = "79.95")
+    @Schema(description = "Preço total do produto (quantidade * preço)", example = "300.00")
     private BigDecimal total;
+
+    @Schema(description = "Detalhes do produto")
+    private ViewProductDto product;
 }

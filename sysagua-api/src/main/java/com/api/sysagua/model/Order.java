@@ -21,8 +21,6 @@ import java.util.List;
 @NoArgsConstructor
 public class Order extends Transactable {
 
-    Long id;
-
     @OneToOne(orphanRemoval = true)
     @JoinColumn(name = "customer_id")
     private Customer customer;
@@ -37,35 +35,25 @@ public class Order extends Transactable {
     @Enumerated(EnumType.STRING)
     private DeliveryStatus deliveryStatus;
 
-    private BigDecimal receivedAmount;
-    private BigDecimal totalAmount;
-    private BigDecimal balance;
-
-    @Enumerated(EnumType.STRING)
-    private PaymentMethod paymentMethod;
-
-    @Enumerated(EnumType.STRING)
-    private PaymentStatus paymentStatus;
-
-    @CreatedDate
-    private LocalDateTime createdAt;
-    private LocalDateTime finishedAt;
-    private LocalDateTime canceledAt;
-    private String description;
-
-
     @PrePersist
     private void prePersist(){
         calculateTotalAmount();
         setCreatedAt(LocalDateTime.now());
     }
-    public void calculateTotalAmount(){
-        if (getTotalAmount() != null) return;
+    @PostLoad
+    private void onLoad(){
+        setBalance(this.getTotal().subtract(this.getPaidAmount()));
+    }
 
-        this.totalAmount = productOrders.stream()
+    public void calculateTotalAmount(){
+        if (getTotal() != null) return;
+
+        var total = productOrders.stream()
                 .map(p -> p.getUnitPrice()
                         .multiply(BigDecimal.valueOf(p.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        setTotal(total);
     }
 
 
@@ -74,8 +62,8 @@ public class Order extends Transactable {
                 getId(),
                 getDeliveryStatus(),
                 getPaymentStatus(),
-                getReceivedAmount(),
-                getTotalAmount(),
+                getPaidAmount(),
+                getTotal(),
                 getBalance(),
                 getPaymentMethod(),
                 getCreatedAt(),

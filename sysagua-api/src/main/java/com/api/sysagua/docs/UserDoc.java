@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 import java.util.UUID;
+
 @SecurityRequirement(name = "BearerAuth")
 @Tag(name = "User Controller", description = "Endpoints para gerenciamento de usuários")
 public interface UserDoc {
@@ -87,7 +88,7 @@ public interface UserDoc {
                     content = @Content()
             ),
             @ApiResponse(
-                    responseCode = "403",description = "Não autorizado", content = @Content()
+                    responseCode = "403", description = "Não autorizado", content = @Content()
             )
     })
     ResponseEntity<Token> authenticate(@RequestBody @Valid LoginDto loginDto);
@@ -118,7 +119,7 @@ public interface UserDoc {
                     content = @Content()
             ),
             @ApiResponse(
-                    responseCode = "403",description = "Não autorizado", content = @Content()
+                    responseCode = "403", description = "Não autorizado", content = @Content()
             )
     })
     ResponseEntity<Void> delete(
@@ -141,10 +142,10 @@ public interface UserDoc {
                     content = @Content()
             ),
             @ApiResponse(
-                    responseCode = "403",description = "Não autorizado", content = @Content()
+                    responseCode = "403", description = "Não autorizado", content = @Content()
             ),
             @ApiResponse(
-                    responseCode = "500",description = "Erro inesperado", content = @Content()
+                    responseCode = "500", description = "Erro inesperado", content = @Content()
             )
     })
     ResponseEntity<List<ViewUserDto>> list(
@@ -183,10 +184,10 @@ public interface UserDoc {
                     content = @Content()
             ),
             @ApiResponse(
-                    responseCode = "403",description = "Não autorizado", content = @Content()
+                    responseCode = "403", description = "Não autorizado", content = @Content()
             ),
             @ApiResponse(
-                    responseCode = "500",description = "Erro inesperado", content = @Content()
+                    responseCode = "500", description = "Erro inesperado", content = @Content()
             )
     })
     public ResponseEntity<Void> update(
@@ -196,7 +197,8 @@ public interface UserDoc {
             @RequestParam(required = false) String phone,
             @RequestParam(required = false) String email,
             @RequestParam(required = false) UserStatus status,
-            @RequestParam(required = false) UserAccess access
+            @RequestParam(required = false) UserAccess access,
+            String password
     );
 
 }

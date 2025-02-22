@@ -1,8 +1,6 @@
 package com.api.sysagua.model;
 
 import com.api.sysagua.dto.purchase.ViewPurchaseDto;
-import com.api.sysagua.enumeration.PaymentMethod;
-import com.api.sysagua.enumeration.PaymentStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,24 +16,10 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 public class Purchase extends Transactable {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(nullable = false, name = "id")
-    private Long id;
-    private BigDecimal paidAmount;
-    private BigDecimal totalAmount;
-    private BigDecimal balance;
+
     private Boolean active;
     private LocalDateTime entryAt;
-    private LocalDateTime createdAt;
-    private LocalDateTime finishedAt;
-    private LocalDateTime canceledAt;
-    private String description;
-    @Enumerated(EnumType.STRING)
-    private PaymentMethod paymentMethod;
     private String nfe;
-    @Enumerated(EnumType.STRING)
-    private PaymentStatus paymentStatus;
     @OneToMany(mappedBy = "purchase", cascade = CascadeType.ALL,orphanRemoval = true)
     private List<ProductPurchase> productPurchases;
     @ManyToOne
@@ -46,30 +30,37 @@ public class Purchase extends Transactable {
     private void prePersist(){
         calculateTotalAmount();
         setCreatedAt(LocalDateTime.now());
-        setBalance(totalAmount.subtract(paidAmount));
+        setBalance(getTotal().subtract(getPaidAmount()));
+    }
+
+    @PostLoad
+    private void onLoad(){
+        setBalance(getTotal().subtract(getPaidAmount()));
     }
 
     @PreUpdate
     private void preUpdate(){
         setActive(true);
         calculateTotalAmount();
-        setBalance(totalAmount.subtract(paidAmount));
+        setBalance(getTotal().subtract(getPaidAmount()));
     }
 
     @Override
     public void calculateTotalAmount() {
-        if (getTotalAmount() != null) return;
+        if (getTotal() != null) return;
 
-        this.totalAmount = productPurchases.stream()
-                .map(p -> p.getPurchasePrice().multiply(BigDecimal.valueOf(p.getQuantity())))
+        var total = productPurchases.stream()
+                .map(p -> p.getUnitPrice().multiply(BigDecimal.valueOf(p.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        setTotal(total);
     }
 
     public ViewPurchaseDto toView(){
         return new ViewPurchaseDto(
                 getId(),
                 getPaidAmount(),
-                getTotalAmount(),
+                getTotal(),
                 getBalance(),
                 getCreatedAt(),
                 getEntryAt(),
@@ -80,8 +71,8 @@ public class Purchase extends Transactable {
                 getNfe(),
                 getDescription(),
                 getActive(),
-                getProductPurchases().stream().map(ProductPurchase::toView).toList(),
-                getSupplier()
+                getSupplier(),
+                getProductPurchases().stream().map(ProductPurchase::toView).toList()
         );
     }
 }

@@ -20,6 +20,10 @@ spring:
     baseline-on-migrate: true                                # Força o Flyway a manter o controle de versões no banco
     enabled: true                                            # Habilitar o Flyway para gerenciar migrações
 
+default-user:
+  password: senha123
+  email: usuario@gmail.com
+
 security:
   config:
     key: ${JWT_SECRET_KEY:secrect-key}                         # Variável de ambiente para a chave JWT (pode ser definida no ambiente)

@@ -1,8 +1,8 @@
 package com.api.sysagua.service;
 
 import com.api.sysagua.dto.order.CreateOrderDto;
-import com.api.sysagua.dto.order.UpdateOrderDto;
 import com.api.sysagua.dto.order.ViewOrderDto;
+import com.api.sysagua.dto.transaction.CreateTransactionDto;
 import com.api.sysagua.enumeration.DeliveryStatus;
 import com.api.sysagua.enumeration.PaymentMethod;
 import com.api.sysagua.enumeration.PaymentStatus;
@@ -34,5 +34,9 @@ public interface OrderService {
             PaymentStatus paymentStatus
     );
 
-    void update(Long id, UpdateOrderDto dto);
+    void addPayment(Long id, CreateTransactionDto dto);
+
+    void delete(Long id);
+
+    void finishDelivery(Long id);
 }

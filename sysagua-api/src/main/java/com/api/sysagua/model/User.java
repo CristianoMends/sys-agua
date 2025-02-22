@@ -65,7 +65,7 @@ public class User implements UserDetails {
         private UserStatus status;
         private UserAccess access;
 
-        private final BCryptPasswordEncoder encoder = PasswordEncoderSingleton.getEncoder();
+        private final BCryptPasswordEncoder encoder = PasswordEncoderSingleton.getInstance().getEncoder();
 
         public Builder() {
         }
@@ -153,14 +153,7 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        if (this.access.equals(UserAccess.DEVELOPER)) {
-            return List.of(
-                    new SimpleGrantedAuthority("ROLE_OWNER"),
-                    new SimpleGrantedAuthority("ROLE_EMPLOYEE"),
-                    new SimpleGrantedAuthority("ROLE_MANAGER"),
-                    new SimpleGrantedAuthority("ROLE_DEVELOPER")
-            );
-        } else if (this.access.equals(UserAccess.MANAGER)) {
+        if (this.access.equals(UserAccess.MANAGER)) {
             return List.of(new SimpleGrantedAuthority("ROLE_MANAGER"));
         } else if (this.access.equals(UserAccess.EMPLOYEE)) {
             return List.of(new SimpleGrantedAuthority("ROLE_EMPLOYEE"));

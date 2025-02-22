@@ -7,7 +7,7 @@ import com.api.sysagua.security.PasswordEncoderSingleton;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 public class UserFactory {
-    private static final BCryptPasswordEncoder encoder = PasswordEncoderSingleton.getEncoder();
+    private static final BCryptPasswordEncoder encoder = PasswordEncoderSingleton.getInstance().getEncoder();
 
     public static User createUser(CreateUserDto dto) {
         User user = new User();
