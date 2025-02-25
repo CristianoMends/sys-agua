@@ -5,9 +5,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import edu.pies.sysaguaapp.dtos.pedido.SendPedidoDto;
+import edu.pies.sysaguaapp.dtos.pedido.SendPgtoPedidoDto;
 import edu.pies.sysaguaapp.enumeration.Pedidos.PedidoStatus;
 import edu.pies.sysaguaapp.models.Pedido.Pedido;
-import java.io.IOException;
+import jdk.swing.interop.SwingInterOpUtils;
+
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -59,14 +61,11 @@ public class PedidoService {
         } else {
             throw new Exception("Erro ao cadastrar: " + response.body());
         }
-
-
-
     }
 
     public static Pedido cancelarPedido(Pedido pedido, String token) throws Exception {
 
-        if (pedido.getReceivedAmount().compareTo(pedido.getTotalAmount()) > 0 ) {
+        if (pedido.getPaidAmount().compareTo(pedido.getTotalAmount()) > 0 ) {
             throw new Exception("O valor recebido ultrapassa o valor total do pedido.");
         }
 
@@ -97,6 +96,52 @@ public class PedidoService {
             return pedido;
         } else {
             throw new Exception("Erro ao cancelar: " + response.body());
+        }
+    }
+
+    public Pedido buscarPedidoId(Long id, String token) throws Exception {
+        String urlComId = BASE_URL + "?id=" + id;
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(urlComId))
+                .GET()
+                .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer " + token)
+                .build();
+
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() == 200) {
+            if (response.body().isEmpty()) {
+                return null;
+            }
+            List<Pedido> pedidos = objectMapper.readValue(response.body(), new TypeReference<List<Pedido>>() {});
+            if (!pedidos.isEmpty()) {
+                return pedidos.get(0);
+            }
+            return null;
+        } else {
+            throw new Exception("Erro ao buscar pedido: " + response.body());
+        }
+    }
+
+    public Pedido cadastrarPagamento(SendPgtoPedidoDto pagamento,Long idPedido, String token) throws Exception {
+        String compraJson = objectMapper.writeValueAsString(pagamento);
+        String urlPagamento = BASE_URL + "/payment/" + idPedido;
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(urlPagamento))
+                .POST(HttpRequest.BodyPublishers.ofString(compraJson))
+                .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer " + token)
+                .build();
+
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() == 204) {
+            return null;
+        } else {
+            throw new Exception("Erro ao cadastrar: " + response.body());
         }
     }
 

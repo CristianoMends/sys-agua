@@ -1,6 +1,6 @@
 package edu.pies.sysaguaapp.services.produto;
 
-import edu.pies.sysaguaapp.models.ProductCategory;
+import edu.pies.sysaguaapp.models.produto.ProductCategory;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 

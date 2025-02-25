@@ -11,7 +11,7 @@ module edu.pies.sysaguaapp {
     requires static lombok;
     requires com.fasterxml.jackson.datatype.jsr310;
     requires com.fasterxml.jackson.databind;
-    requires java.desktop;
+    requires jdk.unsupported.desktop;
     opens edu.pies.sysaguaapp to javafx.fxml;
     exports edu.pies.sysaguaapp;
     exports edu.pies.sysaguaapp.controllers;
@@ -27,6 +27,7 @@ module edu.pies.sysaguaapp {
     exports edu.pies.sysaguaapp.controllers.compras;
     opens edu.pies.sysaguaapp.controllers.compras to javafx.fxml;
     opens edu.pies.sysaguaapp.dtos.compra to com.fasterxml.jackson.databind;
+    opens edu.pies.sysaguaapp.models.compras;
     exports edu.pies.sysaguaapp.enumeration;
     opens edu.pies.sysaguaapp.controllers.Clientes to javafx.fxml;
     exports edu.pies.sysaguaapp.controllers.Pedidos to com.fasterxml.jackson.databind;
@@ -43,4 +44,5 @@ module edu.pies.sysaguaapp {
 
     exports edu.pies.sysaguaapp.enumeration.Usuarios to com.fasterxml.jackson.databind;
 
+    exports edu.pies.sysaguaapp.models.produto;
 }

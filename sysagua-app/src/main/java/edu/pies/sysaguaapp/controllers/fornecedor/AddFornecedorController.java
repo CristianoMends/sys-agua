@@ -2,7 +2,6 @@ package edu.pies.sysaguaapp.controllers.fornecedor;
 
 import edu.pies.sysaguaapp.models.Address;
 import edu.pies.sysaguaapp.models.Fornecedor;
-import edu.pies.sysaguaapp.models.Produto;
 import edu.pies.sysaguaapp.services.FornecedorService;
 import edu.pies.sysaguaapp.services.TokenManager;
 import javafx.fxml.FXML;
@@ -11,9 +10,6 @@ import javafx.scene.Cursor;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.layout.StackPane;
-
-import java.math.RoundingMode;
-import java.util.List;
 
 public class AddFornecedorController {
     private final FornecedorService fornecedorService;

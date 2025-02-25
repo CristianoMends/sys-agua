@@ -12,11 +12,10 @@ import java.util.List;
 
 @Getter @Setter
 public class SendPedidoDto {
-    private LocalDate dataPedido;
     private Long customerId;
     private Long deliveryPersonId;
     private List<ItemPedidoDto> productOrders;
-    private BigDecimal receivedAmount;
+    private BigDecimal paidAmount;
     private BigDecimal totalAmount;
     private PaymentMethod paymentMethod;
     private String description;
@@ -24,13 +23,5 @@ public class SendPedidoDto {
     public SendPedidoDto() {
         productOrders = new ArrayList<>();
     }
-    public SendPedidoDto(List<ItemPedidoDto> productOrders, Long customerId, Long deliveryPersonId, BigDecimal totalAmount, PaymentMethod paymentMethod, String description, LocalDate dataPedido) {
-        this.dataPedido = dataPedido;
-        this.productOrders = productOrders;
-        this.customerId = customerId;
-        this.deliveryPersonId = deliveryPersonId;
-        this.totalAmount = totalAmount;
-        this.paymentMethod = paymentMethod;
-        this.description = description;
-    }
+
 }

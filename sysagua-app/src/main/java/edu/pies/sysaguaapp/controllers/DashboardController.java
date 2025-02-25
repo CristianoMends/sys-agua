@@ -3,7 +3,7 @@ package edu.pies.sysaguaapp.controllers;
 import edu.pies.sysaguaapp.enumeration.Pedidos.PedidoStatus;
 import edu.pies.sysaguaapp.models.Pedido.ItemPedido;
 import edu.pies.sysaguaapp.models.Pedido.Pedido;
-import edu.pies.sysaguaapp.models.Produto;
+import edu.pies.sysaguaapp.models.produto.Produto;
 import edu.pies.sysaguaapp.models.compras.Compra;
 import edu.pies.sysaguaapp.services.CompraService;
 import edu.pies.sysaguaapp.services.PedidoService;

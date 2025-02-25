@@ -32,8 +32,8 @@ public class AuthController implements Initializable {
 
     public void initialize(URL location, ResourceBundle resources) {
         //testes
-        emailField.setText("dev@gmail.com");
-        senhaField.setText("dev123");
+        emailField.setText("usuario@gmail.com");
+        senhaField.setText("senha123");
     }
 
     @FXML

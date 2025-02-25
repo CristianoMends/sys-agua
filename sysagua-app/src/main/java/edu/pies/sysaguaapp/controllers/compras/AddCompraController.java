@@ -4,9 +4,8 @@ import edu.pies.sysaguaapp.controllers.produto.AddProdutoController;
 import edu.pies.sysaguaapp.dtos.compra.ItemCompraDto;
 import edu.pies.sysaguaapp.dtos.compra.SendCompraDto;
 import edu.pies.sysaguaapp.enumeration.PaymentMethod;
-import edu.pies.sysaguaapp.enumeration.PaymentStatus;
 import edu.pies.sysaguaapp.models.Fornecedor;
-import edu.pies.sysaguaapp.models.Produto;
+import edu.pies.sysaguaapp.models.produto.Produto;
 import edu.pies.sysaguaapp.models.compras.ItemCompra;
 import edu.pies.sysaguaapp.services.CompraService;
 import edu.pies.sysaguaapp.services.FornecedorService;
@@ -112,7 +111,7 @@ public class AddCompraController {
         produtoColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getProduct().getName()));
         quantidadeColumn.setCellValueFactory(cellData -> new SimpleIntegerProperty(cellData.getValue().getQuantity()).asObject());
         precoColumn.setCellValueFactory(cellData -> {
-            BigDecimal preco = cellData.getValue().getPurchasePrice();
+            BigDecimal preco = cellData.getValue().getUnitPrice();
             return new SimpleStringProperty(preco != null ? "R$ " + preco.setScale(2, RoundingMode.HALF_UP).toString().replace(".", ",") : "");
         });
 
@@ -173,7 +172,7 @@ public class AddCompraController {
         if (produtoSelecionado != null) {
             novoItemCompra.setProduct(produtoSelecionado);
             novoItemCompra.setQuantity(quantidade);
-            novoItemCompra.setPurchasePrice(preco);
+            novoItemCompra.setUnitPrice(preco);
         }
 
         return novoItemCompra;
@@ -198,7 +197,7 @@ public class AddCompraController {
                             ItemCompraDto dto = new ItemCompraDto();
                             dto.setProductId(item.getProduct().getId());
                             dto.setQuantity(item.getQuantity());
-                            dto.setPurchasePrice(item.getPurchasePrice());
+                            dto.setPurchasePrice(item.getUnitPrice());
                             return dto;
                         })
                         .collect(Collectors.toList());
@@ -279,7 +278,7 @@ public class AddCompraController {
 
     private void preencherCampos(ItemCompra itemSelecionado) {
         produtoComboBox.setValue(itemSelecionado.getProduct());
-        precoField.setText(itemSelecionado.getPurchasePrice().toString().replace(".",","));
+        precoField.setText(itemSelecionado.getUnitPrice().toString().replace(".",","));
         quantidadeField.setText(itemSelecionado.getQuantity().toString());
     }
 
@@ -386,7 +385,7 @@ public class AddCompraController {
 
     private void atualizarTotais() {
         BigDecimal total = produtosAddList.stream()
-                .map(item -> item.getPurchasePrice().multiply(BigDecimal.valueOf(item.getQuantity())))
+                .map(item -> item.getUnitPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         int itens = produtosAddList.size();

@@ -76,7 +76,7 @@ public class AddUsuarioController {
             try {
                 if (usuarioEditando != null) {
                     novoUsuario.setId(usuarioEditando.getId());
-                    usuarioService.editarUsuario(novoUsuario, token);
+//                    usuarioService.editarUsuario(novoUsuario, token);
                 } else {
                     usuarioService.criarUsuario(novoUsuario, token);
                 }

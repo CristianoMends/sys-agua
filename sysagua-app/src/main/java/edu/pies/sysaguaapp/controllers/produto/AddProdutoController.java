@@ -1,8 +1,8 @@
 package edu.pies.sysaguaapp.controllers.produto;
 
-import edu.pies.sysaguaapp.models.ProductCategory;
-import edu.pies.sysaguaapp.models.ProductLine;
-import edu.pies.sysaguaapp.models.Produto;
+import edu.pies.sysaguaapp.models.produto.ProductCategory;
+import edu.pies.sysaguaapp.models.produto.ProductLine;
+import edu.pies.sysaguaapp.models.produto.Produto;
 import edu.pies.sysaguaapp.services.produto.ProductCategoryService;
 import edu.pies.sysaguaapp.services.produto.ProductLineService;
 import edu.pies.sysaguaapp.services.produto.ProdutoService;

@@ -4,14 +4,13 @@ package edu.pies.sysaguaapp.controllers.Pedidos;
 import edu.pies.sysaguaapp.dtos.pedido.ItemPedidoDto;
 import edu.pies.sysaguaapp.dtos.pedido.SendPedidoDto;
 import edu.pies.sysaguaapp.enumeration.PaymentMethod;
-import edu.pies.sysaguaapp.enumeration.PaymentStatus;
-import edu.pies.sysaguaapp.enumeration.Pedidos.PedidoStatus;
 import edu.pies.sysaguaapp.models.Clientes;
 import edu.pies.sysaguaapp.models.Entregador;
 import edu.pies.sysaguaapp.models.Estoque;
 import edu.pies.sysaguaapp.models.Pedido.ItemPedido;
-import edu.pies.sysaguaapp.models.Produto;
+import edu.pies.sysaguaapp.models.produto.Produto;
 import edu.pies.sysaguaapp.services.*;
+import edu.pies.sysaguaapp.services.PedidoService;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -28,7 +27,6 @@ import javafx.util.StringConverter;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,9 +34,7 @@ public class AddPedidoController {
 
     private final PedidoService pedidoService;
     private final ClientesService clientesService;
-
     private final EntregadorService entregadorService;
-
     private final EstoqueService estoqueService;
     private final String token;
 
@@ -46,13 +42,7 @@ public class AddPedidoController {
     private StackPane rootPane;
 
     @FXML
-    private DatePicker dataPedido;
-
-    @FXML
-    private TextField valorRecebidoField, precoField, quantidadeField;
-
-    @FXML
-    private Label valorRecebidoErrorLabel;
+    private TextField precoField, quantidadeField;
 
     @FXML
     private ComboBox<Clientes> clientesComboBox;
@@ -65,9 +55,6 @@ public class AddPedidoController {
 
     @FXML
     private ComboBox<PaymentMethod> metodoPagamento;
-
-    @FXML
-    private ComboBox<PaymentStatus> statusPagamento;
 
     @FXML
     private ObservableList<ItemPedido> produtosAddList;
@@ -120,7 +107,7 @@ public class AddPedidoController {
         produtoColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getProduct().getName()));
         quantidadeColumn.setCellValueFactory(cellData -> new SimpleIntegerProperty(cellData.getValue().getQuantity()).asObject());
         precoColumn.setCellValueFactory(cellData -> {
-            BigDecimal preco = cellData.getValue().getPurchasePrice();
+            BigDecimal preco = cellData.getValue().getUnitPrice();
             return new SimpleStringProperty(preco != null ? "R$ " + preco.setScale(2, RoundingMode.HALF_UP).toString().replace(".", ",") : "");
         });
 
@@ -137,22 +124,6 @@ public class AddPedidoController {
             @Override
             public PaymentMethod fromString(String string) {
                 for (PaymentMethod metodo : PaymentMethod.values()) {
-                    if (metodo.getDescription().equals(string)) {
-                        return metodo;
-                    }
-                }
-                return null;
-            }
-        });
-        statusPagamento.setItems(FXCollections.observableArrayList(PaymentStatus.values()));
-        statusPagamento.setConverter(new StringConverter<PaymentStatus>() {
-            @Override
-            public String toString(PaymentStatus metodo) {
-                return metodo != null ? metodo.getDescription() : "";
-            }
-            @Override
-            public PaymentStatus fromString(String string) {
-                for (PaymentStatus metodo : PaymentStatus.values()) {
                     if (metodo.getDescription().equals(string)) {
                         return metodo;
                     }
@@ -187,15 +158,20 @@ public class AddPedidoController {
 
     private ItemPedido criarItemPedido() {
         Produto produtoSelecionado = produtoComboBox.getValue();
-        BigDecimal preco = new BigDecimal(precoField.getText().replace(",", "."));
         int quantidade = Integer.parseInt(quantidadeField.getText());
+        String precoDigitado = precoField.getText().replace(",", ".");
 
         ItemPedido novoItemPedido = new ItemPedido();
-
         if (produtoSelecionado != null) {
             novoItemPedido.setProduct(produtoSelecionado);
             novoItemPedido.setQuantity(quantidade);
-            novoItemPedido.setPurchasePrice(preco);
+
+            if (precoDigitado != null && !precoDigitado.trim().isEmpty()) {
+                BigDecimal preco = new BigDecimal(precoDigitado);
+                novoItemPedido.setUnitPrice(preco);
+            } else {
+                novoItemPedido.setUnitPrice(produtoSelecionado.getPrice());
+            }
         }
 
         return novoItemPedido;
@@ -207,28 +183,31 @@ public class AddPedidoController {
         if (validarFormPedido()){
             try {
                 SendPedidoDto novoPedido = new SendPedidoDto();
-                novoPedido.setDataPedido(dataPedido.getValue());
+
                 novoPedido.setCustomerId(clientesComboBox.getValue().getId());
                 novoPedido.setDeliveryPersonId(entregadorComboBox.getValue().getId());
+
                 List<ItemPedidoDto> itensDto = produtosAddList.stream()
                         .map(item -> {
                             ItemPedidoDto dto = new ItemPedidoDto();
                             dto.setProductId(item.getProduct().getId());
                             dto.setQuantity(item.getQuantity());
-                            dto.setPurchasePrice(item.getPurchasePrice());
+                            dto.setPurchasePrice(item.getUnitPrice());
                             return dto;
                         })
                         .collect(Collectors.toList());
                 novoPedido.setProductOrders(itensDto);
 
-                BigDecimal valorRecebido = new BigDecimal(valorRecebidoField.getText().replace(",", "."));
-                novoPedido.setReceivedAmount(valorRecebido);
+                novoPedido.setPaidAmount(BigDecimal.ZERO);
+
                 BigDecimal totalAmount = produtosAddList.stream()
-                        .map(item -> item.getPurchasePrice().multiply(BigDecimal.valueOf(item.getQuantity())))
+                        .map(item -> item.getUnitPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
                         .reduce(BigDecimal.ZERO, BigDecimal::add);
                 novoPedido.setTotalAmount(totalAmount);
+
                 novoPedido.setPaymentMethod(metodoPagamento.getValue());
                 novoPedido.setDescription("Sem descrição");
+
                 pedidoService.criarPedido(novoPedido, token);
                 clearAllForm();
                 carregarTela("/views/Pedidos/Pedido.fxml");
@@ -279,7 +258,7 @@ public class AddPedidoController {
 
     private void preencherCampos(ItemPedido itemSelecionado) {
         produtoComboBox.setValue(itemSelecionado.getProduct());
-        precoField.setText(itemSelecionado.getPurchasePrice().toString().replace(".",","));
+        precoField.setText(itemSelecionado.getUnitPrice().toString().replace(".",","));
         quantidadeField.setText(itemSelecionado.getQuantity().toString());
     }
 
@@ -428,7 +407,7 @@ public class AddPedidoController {
 
     private void atualizarTotais() {
         BigDecimal total = produtosAddList.stream()
-                .map(item -> item.getPurchasePrice().multiply(BigDecimal.valueOf(item.getQuantity())))
+                .map(item -> item.getUnitPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         int itens = produtosAddList.size();
@@ -454,15 +433,6 @@ public class AddPedidoController {
             produtoErrorLabel.setManaged(false);
         }
 
-        if (precoField.getText().trim().isEmpty()) {
-            precoErrorLabel.setText("Preço é obrigatória.");
-            precoErrorLabel.setVisible(true);
-            precoErrorLabel.setManaged(true);
-            isValid = false;
-        } else {
-            precoErrorLabel.setVisible(false);
-            precoErrorLabel.setManaged(false);
-        }
 
         if (quantidadeField.getText().trim().isEmpty()) {
             quantidadeErrorLabel.setText("Quantidade é obrigatório.");
@@ -472,18 +442,6 @@ public class AddPedidoController {
         } else {
             quantidadeErrorLabel.setVisible(false);
             quantidadeErrorLabel.setManaged(false);
-        }
-
-        BigDecimal preco = new BigDecimal(precoField.getText().replace(",", "."));
-
-        if (preco.compareTo(BigDecimal.ZERO) == 0) {
-            precoErrorLabel.setText("Campo não pode ser zero.");
-            precoErrorLabel.setVisible(true);
-            precoErrorLabel.setManaged(true);
-            isValid = false;
-        } else {
-            precoErrorLabel.setVisible(false);
-            precoErrorLabel.setManaged(false);
         }
 
         if (Integer.parseInt(quantidadeField.getText().trim()) == 0) {
@@ -549,21 +507,6 @@ public class AddPedidoController {
         } else {
             entregadorErrorLabel.setVisible(false);
             entregadorErrorLabel.setManaged(false);
-        }
-
-        if (dataPedido.getValue() == null) {
-            dataErrorLabel.setText("Data é obrigatória.");
-            dataErrorLabel.setVisible(true);
-            dataErrorLabel.setManaged(true);
-            isValid = false;
-        } else if (dataPedido.getValue().isAfter(LocalDate.now())) {
-            dataErrorLabel.setText("Data do Pedido não pode ser uma data futura.");
-            dataErrorLabel.setVisible(true);
-            dataErrorLabel.setManaged(true);
-            isValid = false;
-        } else {
-            dataErrorLabel.setVisible(false);
-            dataErrorLabel.setManaged(false);
         }
 
         return isValid;

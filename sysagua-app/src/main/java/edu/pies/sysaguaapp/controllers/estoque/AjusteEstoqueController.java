@@ -1,7 +1,7 @@
 package edu.pies.sysaguaapp.controllers.estoque;
 
 import edu.pies.sysaguaapp.models.Estoque;
-import edu.pies.sysaguaapp.models.Produto;
+import edu.pies.sysaguaapp.models.produto.Produto;
 import edu.pies.sysaguaapp.services.EstoqueService;
 import edu.pies.sysaguaapp.services.produto.ProdutoService;
 import edu.pies.sysaguaapp.services.TokenManager;

@@ -2,9 +2,7 @@ package edu.pies.sysaguaapp.services;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.pies.sysaguaapp.dtos.UpdateFornecedorDto;
 import edu.pies.sysaguaapp.models.Fornecedor;
-import edu.pies.sysaguaapp.models.Produto;
 
 import java.net.URI;
 import java.net.http.HttpClient;

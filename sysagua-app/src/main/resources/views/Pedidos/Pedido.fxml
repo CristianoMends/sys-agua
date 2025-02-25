@@ -7,7 +7,6 @@
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TreeTableView?>
-<?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
@@ -17,9 +16,9 @@
 
 <StackPane fx:id="rootPane" prefHeight="600.0" prefWidth="900.0" style="-fx-background-color: white;" stylesheets="@../../styles/addPedidos.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.pies.sysaguaapp.controllers.Pedidos.PedidoController">
     <children>
-        <VBox fx:id="listPedidoView" prefHeight="200.0" prefWidth="100.0">
+        <VBox fx:id="listPedidoView">
             <children>
-                <StackPane prefHeight="90.0">
+                <StackPane>
                     <children>
                         <Label fx:id="successMessage" alignment="CENTER" minHeight="50.0" style="-fx-text-fill: white; -fx-background-color: green; -fx-font-size: 18px; -fx-border-color: transparent; -fx-border-width: 1; -fx-border-radius: 5;" styleClass="success-Message" text="Cadastro realizado com sucesso!" visible="false" StackPane.alignment="CENTER_RIGHT">
                             <font>
@@ -32,6 +31,12 @@
                                     <font>
                                         <Font size="16.0" />
                                     </font></Label>
+                        <Region HBox.hgrow="SOMETIMES" />
+                                <Button fx:id="btnAdicionar" minWidth="80.0" mnemonicParsing="false" onAction="#handleAddPedido" styleClass="menu-button" text="Adicionar">
+                                    <padding>
+                                        <Insets left="10.0" />
+                                    </padding>
+                        </Button>
                             </children>
                         </HBox>
                     </children>
@@ -82,7 +87,7 @@
                                                         <Insets left="10.0" />
                                                     </padding>
                                                 </Button>
-                                                <Button fx:id="btnClearFilter" visible="false" managed="false" minHeight="28.0" minWidth="28.0" mnemonicParsing="false" onAction="#handleLimparFiltros" style="-fx-background-color: transparent;">
+                                                <Button fx:id="btnClearFilter" managed="false" minHeight="28.0" minWidth="28.0" mnemonicParsing="false" onAction="#handleLimparFiltros" style="-fx-background-color: transparent;" visible="false">
                                                     <graphic>
                                                         <ImageView fitHeight="28" fitWidth="28" pickOnBounds="true" preserveRatio="true">
                                                         </ImageView>
@@ -105,20 +110,12 @@
                             </children>
                         </HBox>
                         <Region HBox.hgrow="ALWAYS" />
-                        <HBox alignment="BOTTOM_CENTER">
-                            <children>
-                                <Button fx:id="btnAdicionar" mnemonicParsing="false" onAction="#handleAddPedido" styleClass="menu-button" text="Adicionar">
-                                    <padding>
-                                        <Insets left="10.0" />
-                                    </padding></Button>
-                            </children>
-                        </HBox>
                     </children>
                     <padding>
                         <Insets bottom="10.0" left="20.0" right="20.0" />
                     </padding>
                 </HBox>
-                <StackPane prefWidth="917.0" VBox.vgrow="SOMETIMES">
+                <StackPane prefWidth="900.0" VBox.vgrow="SOMETIMES">
                     <children>
                         <TreeTableView fx:id="tabelaPedido">
                             <columnResizePolicy>

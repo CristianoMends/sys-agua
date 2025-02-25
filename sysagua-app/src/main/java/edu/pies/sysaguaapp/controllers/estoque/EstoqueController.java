@@ -1,7 +1,6 @@
 package edu.pies.sysaguaapp.controllers.estoque;
 
 import edu.pies.sysaguaapp.models.Estoque;
-import edu.pies.sysaguaapp.models.Produto;
 import edu.pies.sysaguaapp.services.EstoqueService;
 import edu.pies.sysaguaapp.services.TokenManager;
 import javafx.beans.property.SimpleObjectProperty;

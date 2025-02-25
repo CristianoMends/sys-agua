@@ -228,7 +228,7 @@
                   </VBox>
                     </children>
                     <padding>
-                        <Insets right="50.0" top="30.0" />
+                        <Insets right="50.0" />
                     </padding>
                     <opaqueInsets>
                         <Insets />
