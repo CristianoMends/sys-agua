@@ -27,7 +27,7 @@
                         </Label>
                         <HBox alignment="CENTER_LEFT" prefHeight="90.0" style="-fx-padding: 10;">
                             <children>
-                                <Label text="Todas os Pedidos">
+                                <Label text="Todos os Pedidos">
                                     <font>
                                         <Font size="16.0" />
                                     </font></Label>
