@@ -98,13 +98,6 @@
                         </ImageView>
                     </graphic>
                 </Button>
-                <Button onAction="#handleRelatorio" prefWidth="180" styleClass="menu-button" text="Relatório">
-                    <graphic>
-                        <ImageView fitHeight="16" fitWidth="16" pickOnBounds="true" preserveRatio="true">
-                            <Image url="@../icons/homebar/relatorios.png" />
-                        </ImageView>
-                    </graphic>
-                </Button>
                 <Button onAction="#handleAjuda" prefWidth="180" styleClass="menu-button" text="Ajuda">
                     <graphic>
                         <ImageView fitHeight="16" fitWidth="16" pickOnBounds="true" preserveRatio="true">
