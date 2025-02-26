@@ -1,0 +1,30 @@
+#o perfil prod está configurado para usar banco no docker
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/sysagua_db}  # Variável de ambiente para o URL do banco de dados, com valor default
+    username: ${DB_USERNAME:postgres}                       # Variável de ambiente para o nome de usuário do banco, com valor default
+    password: ${DB_PASSWORD:qwe123}                         # Variável de ambiente para a senha do banco, com valor default
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect  # Dialeto do PostgreSQL
+    show-sql: false                                          # Em produção, é recomendado desabilitar a exibição de SQL
+    generate-ddl: false                                      # Não gerar DDL automaticamente em produção
+    hibernate:
+      ddl-auto: none                                         # Evita que o Hibernate altere o banco automaticamente
+      format-sql: false                                       # Desabilitar formatação de SQL
+      enable_lazy_load_no_trans: false                        # Evita erros de carregamento fora de transações
+
+  flyway:
+    locations: classpath:db/migration/postgres                       # Localização dos scripts de migração do Flyway
+    baseline-on-migrate: true                                # Força o Flyway a manter o controle de versões no banco
+    enabled: true                                            # Habilitar o Flyway para gerenciar migrações
+
+default-user:
+  password: senha123
+  email: usuario@gmail.com
+
+security:
+  config:
+    key: ${JWT_SECRET_KEY:secrect-key}                         # Variável de ambiente para a chave JWT (pode ser definida no ambiente)
+    expiration: ${JWT_EXPIRATION:12}                     # Definir o tempo de expiração do JWT (hora)

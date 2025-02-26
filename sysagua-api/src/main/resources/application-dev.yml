@@ -1,0 +1,56 @@
+#o perfil prod está configurado para usar banco h2, as migrations devem ser na sintaxe de h2
+
+spring:
+  datasource:
+    url: jdbc:h2:mem:sysagua_db # Banco de dados em memória
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+    initialize: true  # Inicia o banco de dados automaticamente
+  sql:
+    init:
+      mode: always  # Garante que os arquivos SQL sejam executados em todos os perfis
+
+  jpa:
+    show-sql: true  # Exibe as consultas SQL no console
+    generate-ddl: false
+    database-platform: org.hibernate.dialect.H2Dialect  # Dialeto do H2
+    properties:
+      hibernate.show_sql: true
+      hibernate:
+        ddl-auto: none
+        format_sql: false  # Formata as consultas SQL para facilitar a leitura
+      jakarta:
+        persistence:
+          schema-generation:
+            scripts:
+              action: none  # Não gera scripts automaticamente
+    hibernate:
+      ddl-auto: create  # Cria o esquema do banco de dados a cada execução
+
+  flyway:
+    locations: classpath:db/migration/h2  # Caminho para scripts de migração com Flyway
+    enabled: true
+    baseline-on-migrate: true  # Permite migrações em bancos de dados existentes
+
+  h2:
+    console:
+      enabled: true  # Habilita o console web do H2
+      path: /h2  # Define o caminho para acessar o console via navegador
+
+security:
+  config:
+    key: qwe123  # Chave para segurança (pode ser modificada conforme necessidade)
+    expiration: 3  # Expiração dos tokens em horas
+
+default-user:
+  password: senha123
+  email: usuario@gmail.com
+
+logging:
+  level:
+    org:
+      springframework: DEBUG
+      flywaydb: DEBUG
+
+

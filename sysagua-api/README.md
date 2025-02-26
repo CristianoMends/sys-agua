@@ -62,6 +62,7 @@ O projeto Sys Água é composto por duas partes principais: uma API REST desenvo
 - **Java 21 [LTS]**
 - **JavaFX**
 - **FXML**
+- **BootstrapFX**
 - **Maven**
 - **Jackson ObjectMapper**
 
