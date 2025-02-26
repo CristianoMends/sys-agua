@@ -24,7 +24,7 @@ services:
       context: ./sysagua-api  # Define o diretório do código-fonte da API para o build do Docker
     container_name: sysagua-api  # Nome do container da API
     environment:
-      SPRING_PROFILES_ACTIVE: test      # Perfil ativo do Spring
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}      # Perfil ativo do Spring
       DB_URL: jdbc:postgresql://db:5432/sysagua_db  # URL de conexão com o banco de dados
       DB_USERNAME: postgres               # Nome de usuário do banco de dados
       DB_PASSWORD: ${DB_PASSWORD}                 # Senha padrão para autenticação
